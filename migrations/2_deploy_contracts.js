@@ -1,9 +1,9 @@
-var registry = artifacts.require("./contracts/UportRegistry.sol");
-var idManager = artifacts.require("./contracts/MetaIdentityManager.sol");
+var aim = artifacts.require("./contracts/AlastriaIdentityManager.sol");
+var bim = artifacts.require("./contracts/BasicIdentityManager.sol");
 var proxy = artifacts.require("./contracts/Proxy.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(registry);
-  deployer.deploy(idManager);
+  deployer.deploy(aim);
+  deployer.deploy(bim);
   deployer.deploy(proxy);
 };
