@@ -1,0 +1,42 @@
+@startuml
+== Create Identity ==
+User_app -> AIM: call createIdentity()
+activate User_app
+AIM -> proxy: call proxy()
+AIM -> Blockchain: call LogIdentityCreated()
+User_app -> Blockchain: call get_LogIdentityCreated()
+Blockchain --> User_app: return LogIdentityCreated
+User_app -> User_app: message "Ok"
+== Request EU student card ==
+User_app -> Web_uni: get_EuStudentCard()
+Web_uni --> User_app: redirect to https://hydra...?client_id
+User_app -> Hydra: call https://hydra...?client_id
+Hydra --> User_app: redirect to https://hydra.consent...?consent=consID
+activate Consent_app
+User_app -> Consent_app: call https://hydra.consent...?consent=consID
+Consent_app -> Consent_app: call newSessionId()
+activate SessionManager
+Consent_app -> SessionManager: call catchSessionId(sessionId)
+Consent_app --> User_app: return sessionId
+User_app -> AIM: call fordward(sessionId)
+AIM -> proxy: call forward(SessionID)
+proxy -> SessionManager: call catchSessionId(SessionId)
+SessionManager -> Blockchain: event SessionCatched()
+deactivate SessionManager
+Consent_app -> Blockchain: get event SessionCatched()
+Consent_app -> Hydra: call API to confirm Consent_app
+Consent_app -> User_app: redirect to https://hydra...?client_id
+deactivate Consent_app
+User_app -> Hydra: call https://hydra...?...?consent=consID&client_id
+Hydra -> Hydra: validates the consent, generate jwt/authorize code
+Hydra --> Web_uni: return jwt/codes
+activate uni.resource.eustudentcard
+Web_uni -> uni.resource.eustudentcard: auth call getEuCard()
+uni.resource.eustudentcard -> uni.resource.eustudentcard: call create_att(euStudentCard)
+uni.resource.eustudentcard -> Registry: newAttestation(euStudentCard)
+Registry -> Blockchain: event LogNewAttestation(euStudentCard)
+User_app -> Blockchain: get event LogNewAttestation
+[<- User_app: EU Student Card Created for the user
+deactivate uni.resource.eustudentcard
+deactivate User_app
+@enduml
