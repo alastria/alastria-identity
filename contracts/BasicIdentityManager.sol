@@ -6,6 +6,7 @@ contract BasicIdentityManager {
     uint adminTimeLock;
     uint userTimeLock;
     uint adminRate;
+    address registry;
 
     event LogIdentityCreated(
         address indexed identity,
@@ -36,11 +37,12 @@ contract BasicIdentityManager {
     /// @param _adminTimeLock Time before new owner can add/remove owners
     /// @param _adminRate Time period used for rate limiting a given key for admin functionality
     /// @param _relayAddress Address of meta transaction relay contract remove in first implementation
-    function BasicIdentityManager(uint _userTimeLock, uint _adminTimeLock, uint _adminRate) {
+    function BasicIdentityManager(uint _userTimeLock, uint _adminTimeLock, uint _adminRate, address _registry) {
         require(_adminTimeLock >= _userTimeLock);
         adminTimeLock = _adminTimeLock;
         userTimeLock = _userTimeLock;
         adminRate = _adminRate;
+        registry = _registry;
     }
 
     /// @dev Creates a new proxy contract for an owner and recovery

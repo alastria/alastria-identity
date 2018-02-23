@@ -82,6 +82,7 @@ contract AlastriaIdentityManager is BasicIdentityManager{
     /// @dev Allows to recover attestations without burning gas
     /// @param _id identification number for an attestation
     function getAtestationById(uint _id) constant internal returns(Attest){
+      forwardTo(msg.sender, identity, registry, value, data)
       return Attest[_id];
     }
 
