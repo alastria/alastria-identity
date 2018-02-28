@@ -14,6 +14,10 @@ contract BasicIdentityManager {
         address owner
         );
 
+    event newRegistryAdded(
+        address newRegistry
+      );
+
     mapping(address => mapping(address => uint)) owners;
 
     ///TxRelay linked to realay || checkMessageData(msg.sender)
@@ -62,7 +66,14 @@ contract BasicIdentityManager {
         identity.forward(destination, value, data);
     }
 
-        //Checks that address a is the first input in msg.data.
+    // @dev Change the address of the target registry used
+    // @param _newRegistry New Registry address
+    function changeRegistryPoint(address _newRegistry){
+      registry = _newRegistry;
+      newRegistryAdded(_newRegistry):
+    }
+
+    //Checks that address a is the first input in msg.data.
     //Has very minimal gas overhead.
     function checkMessageData(address a) internal constant returns (bool t) {
         if (msg.data.length < 36) return false;
