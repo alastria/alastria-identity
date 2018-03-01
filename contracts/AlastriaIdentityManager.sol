@@ -34,6 +34,11 @@ contract AlastriaIdentityManager is BasicIdentityManager{
     event LogOwnerRemoved(proxy identity, address owner, address sender);
     event LogOwnerAdded(proxy identity, address newOwner, address sender);
 
+    // @dev Inherit Basic constructor declaration
+    function AlastriaIdentityManager(uint _userTimeLock, uint _adminTimeLock, uint _adminRate, address _registry)
+     BasicIdentityManager(_userTimeLock, _adminTimeLock, _adminRate, _registry) {
+    }
+
     /// @dev Allows a recoveryKey to add a new owner with userTimeLock waiting time
     function addOwnerFromRecovery(address sender, proxy identity, address newOwner, bytes _data) public
         onlyRecovery(identity, sender, _data)  //eIDAS
