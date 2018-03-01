@@ -20,3 +20,19 @@ Inherit from Basic Identity Manager
 Allows user to interface the main functions of the registry
 
 Allows user to manage different wallets o
+
+## AlastriaRegistry
+Has all the information about the IDs
+
+Has the proccess to create, validate and revoke attestations for the users
+
+The attestations points to off-chain resources (URI)
+
+##proxy
+Is the AlastriaID itself
+
+Is the interface with the world for an AlastriaID
+
+Only receive transactions and resend them to the target
+
+##How to use
