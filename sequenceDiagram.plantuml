@@ -36,7 +36,9 @@ Hydra --> Web_uni: return jwt/codes
 activate uni.resource.eustudentcard
 Web_uni -> uni.resource.eustudentcard: auth call getEuCard()
 uni.resource.eustudentcard -> uni.resource.eustudentcard: call create_att(euStudentCard)
-uni.resource.eustudentcard -> SC_Registry: newAttestation(euStudentCard)
+uni.resource.eustudentcard -> User_app: newAttestation(euStudentCard)
+User_app -> Alastria_node: PUT newAttestation(euStudentCard) accepted
+Alastria_node -> SC_Registry: newAttestation(euStudentCard) accepted
 SC_Registry -> Blockchain: event LogNewAttestation(euStudentCard)
 User_app -> Alastria_node: call API GET AIM.LogNewAttestation()
 Alastria_node -> Blockchain: get event LogNewAttestation
