@@ -10,38 +10,42 @@ contract AlastriaIdentityManager is BasicIdentityManager{
       bytes32 attUri;
     }
 
-    mapping(address => mapping(address => uint)) eidasLevel;
+      mapping(address => mapping(address => uint)) limiter;
 
       modifier onlyOlderOwner(address identity, address sender) {
         require(isOlderOwner(identity, sender));
         _;
     }
 
-    modifier onlyRecovery(Proxy identity, address sender, bytes32 _data) {
+    modifier onlyRecovery(proxy identity, address sender, bytes _data) {
         uint eidasLevel;
-        eidasLevel = forwardTo(msg.sender, identity, registry, 0, _data);
+        uint _valueFix;
+        eidasLevel = 3; //Requesting eidasLevel needed
         require( eidasLevel == 3);
         _;
     }
 
-    modifier rateLimited(Proxy identity, address sender) {
+    modifier rateLimited(proxy identity, address sender) {
         require(limiter[identity][sender] < (now - adminRate));
         limiter[identity][sender] = now;
         _;
     }
 
+    event LogOwnerRemoved(proxy identity, address owner, address sender);
+    event LogOwnerAdded(proxy identity, address newOwner, address sender);
+
     /// @dev Allows a recoveryKey to add a new owner with userTimeLock waiting time
-    function addOwnerFromRecovery(address sender, Proxy identity, address newOwner) public
-        onlyRecovery(identity, sender)  //eIDAS
+    function addOwnerFromRecovery(address sender, proxy identity, address newOwner, bytes _data) public
+        onlyRecovery(identity, sender, _data)  //eIDAS
         rateLimited(identity, sender)
     {
-        require(!isOwner(identity, newOwner));
+        require(!isOlderOwner(identity, newOwner));
         owners[identity][newOwner] = now;
         LogOwnerAdded(identity, newOwner, sender);
     }
 
     /// @dev Allows an olderOwner to add a new owner instantly
-    function addOwner(address sender, Proxy identity, address newOwner) public
+    function addOwner(address sender, proxy identity, address newOwner) public
         onlyOlderOwner(identity, sender)
         rateLimited(identity, sender)
     {
@@ -51,7 +55,7 @@ contract AlastriaIdentityManager is BasicIdentityManager{
     }
 
     /// @dev Allows an owner to remove another owner instantly
-    function removeOwner(address sender, Proxy identity, address owner) public
+    function removeOwner(address sender, proxy identity, address owner) public
         onlyOlderOwner(identity, sender)
         rateLimited(identity, sender)
     {

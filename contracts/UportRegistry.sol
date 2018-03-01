@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.8;
 
 //group_bme
 contract UportRegistry{
@@ -7,7 +7,7 @@ contract UportRegistry{
   address public previousPublishedVersion;
 
   enum EidasLevel { Reputational, Low, Substantial, High }
- 
+
   struct RegistryEntry {
     bytes32 value; //hash or url of attestation. This might change if we use IPFS since it sometimes uses more than 32 bytes
     EidasLevel eidas; //level of eidas
@@ -56,7 +56,7 @@ contract UportRegistry{
     address indexed issuer,
     address indexed subject,
     uint removedAt);
-    
+
   event RevokedEntry(
     bytes32 indexed registrationIdentifier,
     address indexed issuer,
@@ -88,20 +88,20 @@ contract UportRegistry{
   function setMyself(bytes32 registrationIdentifier, bytes32 value) public {
       set(registrationIdentifier, msg.sender, value, EidasLevel.Reputational);
   }
-  
+
   //revoked a previously saved entry in registry
   function revokeEntry(bytes32 registrationIdentifier, address subject, address issuer) public entryExists(registrationIdentifier, subject, issuer ){
         registry[registrationIdentifier][issuer][msg.sender].revoked = false;
-        RevokedEntry(registrationIdentifier, issuer, msg.sender, now);    
+        RevokedEntry(registrationIdentifier, issuer, msg.sender, now);
    }
-   
-   
+
+
   //reject a previously saved entry in registry
   function rejectEntry(bytes32 registrationIdentifier, address issuer) public entryExists(registrationIdentifier, issuer, msg.sender){
     registry[registrationIdentifier][issuer][msg.sender].accepted = false;
     RejectedEntry(registrationIdentifier, issuer, msg.sender, now);
   }
-  
+
   //accept a previously saved entry in registry
   function acceptEntry(bytes32 registrationIdentifier, address issuer) public entryExists(registrationIdentifier, issuer, msg.sender){
     registry[registrationIdentifier][issuer][msg.sender].accepted = true;
@@ -124,7 +124,7 @@ contract UportRegistry{
     UserAtributeList storage myAttributes = userAttributes[msg.sender];
     return (myAttributes.registrationIdentifier, myAttributes.issuer);
   }
- 
+
   //
     /*
 	//remove entry ---- If implemented, the related attributes, userAttributes, must be taken into consideration
