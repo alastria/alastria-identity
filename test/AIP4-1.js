@@ -8,7 +8,7 @@ contract('AIM', function(accounts){
   console.log("#57AIP4: 1. As a user, I want to make possible to create my identity in order to interact with the Alastria network.\n");
   web3.eth.defaultAccount = accounts[0];
   console.log("Default account " + accounts[0]);
-  it("An AlastriaIdentityManager with it's proxy should be deployed",()=>{
+  it("An AlastriaIdentityManager with it's proxy should be deployed",() => {
     return AIM.deployed()
     .then((AIM_instance) => {
       AIM_instance.createIdentity(accounts[1]);

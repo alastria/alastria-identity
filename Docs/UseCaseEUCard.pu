@@ -1,21 +1,11 @@
 @startuml
-== Create Identity ==
-activate User_app
-User_app -> Alastria_node: call API PUT AIM.createIdentity()
-Alastria_node -> SC_AIM: call createIdentity()
-SC_AIM -> SC_Proxy: call proxy()
-SC_AIM -> Blockchain: call LogIdentityCreated()
-User_app -> Alastria_node: call API GET AIM.LogIdentityCreated()
-Alastria_node -> Blockchain: call get_LogIdentityCreated()
-Blockchain --> Alastria_node: return LogIdentityCreated
-Alastria_node --> User_app: return ID_created_status = "succes"
 == Request EU student card ==
 User_app -> Web_uni: get_EuStudentCard()
 Web_uni --> User_app: redirect to https://hydra...?client_id
 User_app -> Hydra: call https://hydra...?client_id
 Hydra --> User_app: redirect to https://hydra.consent...?consent=consID
 activate Consent_app
-Hydra -> Consent_app : call https://hydra.consent...?consent=consID
+Hydra -> Consent_app : call https://hydra.consent...?consent=consID,
 Consent_app -> Consent_app: call newSessionId()
 activate SC_SessionManager
 Consent_app -> SC_SessionManager: call catchSessionId(sessionId)
