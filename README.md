@@ -37,5 +37,7 @@ Only receive transactions and resend them to the target
 
 ## How to use
 For creating an identity, the sequence diagram is the one that follows
+
 ![alt text](https://github.com/alastria/alastria-identity/blob/develop/Docs/NewIdentity.png)
+
 In which the User app is the mobile phone app from the user, that is the one that has the logic for management the attestation to be stored and sended when required. Also, the app asks for user aceptance.
