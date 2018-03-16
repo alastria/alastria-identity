@@ -20,3 +20,24 @@ Inherit from Basic Identity Manager
 Allows user to interface the main functions of the registry
 
 Allows user to manage different wallets o
+
+## AlastriaRegistry
+Has all the information about the IDs
+
+Has the proccess to create, validate and revoke attestations for the users
+
+The attestations points to off-chain resources (URI)
+
+## proxy
+Is the AlastriaID itself
+
+Is the interface with the world for an AlastriaID
+
+Only receive transactions and resend them to the target
+
+## How to use
+For creating an identity, the sequence diagram is the one that follows
+
+![alt text](https://github.com/alastria/alastria-identity/blob/develop/Docs/NewIdentity.png)
+
+In which the User app is the mobile phone app from the user, that is the one that has the logic for management the attestation to be stored and sended when required. Also, the app asks for user aceptance.

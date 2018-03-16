@@ -62,3 +62,6 @@ NOTAS.txt
 
 #app
 app/
+
+#Truffle binary 
+build/

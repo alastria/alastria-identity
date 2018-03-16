@@ -1,0 +1,39 @@
+@startuml
+== Request EU student card ==
+User_app -> Web_uni: get_EuStudentCard()
+Web_uni --> User_app: redirect to https://hydra...?client_id
+User_app -> Hydra: call https://hydra...?client_id
+Hydra --> User_app: redirect to https://hydra.consent...?consent=consID
+activate Consent_app
+Hydra -> Consent_app : call https://hydra.consent...?consent=consID,
+Consent_app -> Consent_app: call newSessionId()
+activate SC_SessionManager
+Consent_app -> SC_SessionManager: call catchSessionId(sessionId)
+Consent_app --> User_app: return sessionId
+User_app -> Alastria_node: call API PUT AIM.fordward(sessionId)
+Alastria_node -> SC_AIM: call fordward(sessionId)
+SC_AIM -> SC_Proxy: call forward(SessionID)
+SC_Proxy -> SC_SessionManager: call catchSessionId(SessionId)
+SC_SessionManager -> Blockchain: event SessionCatched()
+deactivate SC_SessionManager
+Consent_app -> Blockchain: get event SessionCatched()
+Consent_app -> Hydra: call API to confirm Consent_app
+Consent_app -> User_app: redirect to https://hydra...?client_id
+deactivate Consent_app
+User_app -> Hydra: call https://hydra...?...?consent=consID&client_id
+Hydra -> Hydra: validates the consent, generate jwt/authorize code
+Hydra --> Web_uni: return jwt/codes
+activate uni.resource.eustudentcard
+Web_uni -> uni.resource.eustudentcard: auth call getEuCard()
+uni.resource.eustudentcard -> uni.resource.eustudentcard: call create_att(euStudentCard)
+uni.resource.eustudentcard -> User_app: newAttestation(euStudentCard)
+User_app -> Alastria_node: PUT newAttestation(euStudentCard) accepted
+Alastria_node -> SC_Registry: newAttestation(euStudentCard) accepted
+SC_Registry -> Blockchain: event LogNewAttestation(euStudentCard)
+User_app -> Alastria_node: call API GET AIM.LogNewAttestation()
+Alastria_node -> Blockchain: get event LogNewAttestation
+Blockchain --> Alastria_node: EU Student Card Created for the user
+Alastria_node --> User_app: return ID_created_status = "succes"
+deactivate uni.resource.eustudentcard
+deactivate User_app
+@enduml
