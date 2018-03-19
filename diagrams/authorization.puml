@@ -61,7 +61,7 @@ alt token == null
         group Lectura del QR por la aplicación móvil
             User_Web->User: Lectura con el móvil del código QR
             activate User
-            group verificación de la información recuperada
+            group Verificación de la información recuperada
                 User->Gateway: Solicito la recuperación de la clave pública de la aplicación.
                 activate Gateway
                 Gateway->MetaIdentityManager: Aceptación de la llamada.
@@ -120,18 +120,20 @@ alt token == null
         end
     end
     group Utilizando una notificación push
-        note right Consent: Se genera una URI en el consent.
-        Consent-->PushMovileManager: Envío de la URI en el consent
+        note right Consent: Se genera una URL en el consent para recuperar la información desde el móvil.
+        Consent-->PushMovileManager: Envío de la URL en el consent para obtener la información desde el móvil.
         deactivate Consent
         activate PushMovileManager
         PushMovileManager->User: Envío de la notificación con la URL al móvil
         deactivate PushMovileManager
         activate User
         User->Consent: Con la URL de la notificación, accedo al consent 
+        deactivate User
         activate Consent
         Consent->User: Información de la session key y URL Mapping, junto con la información necesaria para la aceptación de la acción por el usuario.
         deactivate Consent
-        group verificación de la información recuperada
+        activate User
+        group Verificación de la información recuperada
             User->Gateway: Solicito la recuperación de la clave pública de la aplicación.
             activate Gateway
             Gateway->MetaIdentityManager: Aceptación de la llamada.
@@ -159,8 +161,33 @@ alt token == null
             note right User: Se pregunta al usuario si quiere acceder a....
             alt respuesta is OK
                 User-->Consent: Aceptación del inicio de sesión
-
                 activate Consent
+
+                group Verificación de la información recuperada del usuario
+                    Consent->Gateway: Solicito la recuperación de la clave pública del usuario.
+                    activate Gateway
+                    Gateway->MetaIdentityManager: Aceptación de la llamada.
+                    deactivate Gateway
+                    activate MetaIdentityManager
+                    MetaIdentityManager->Proxy: Reenvío al proxy.
+                    deactivate MetaIdentityManager
+                    activate Proxy
+                    Proxy->Registry: Recupero la clave pública del usuario
+                    deactivate Proxy
+                    activate Registry
+                    Registry->Proxy: Clave pública del alastria_id asociada a la aplicación 
+                    deactivate Registry
+                    activate Proxy
+                    Proxy->MetaIdentityManager: Clave pública del alastria_id asociada a la aplicación
+                    deactivate Proxy
+                    activate MetaIdentityManager
+                    MetaIdentityManager->Gateway: Clave pública del alastria_id asociada a la aplicación
+                    deactivate MetaIdentityManager
+                    activate Gateway
+                    Gateway->Consent: Clave pública de alastria_id asociada al usuario
+                    deactivate Gateway
+                end
+
                 Consent-->Hydra: Confirma la solicitud
                 deactivate Consent
                 activate Hydra
