@@ -1,0 +1,111 @@
+@startuml
+actor User <<Móvil>>
+actor User_Web <<Browser/App>>
+boundary Associate_Web
+boundary  PushMovileManager
+boundary Gateway
+boundary MetaIdentityManager
+boundary Proxy
+boundary Registry
+
+boundary Repository
+autonumber
+title
+    Proceso de creación de identidad
+end title
+activate User
+User->User: Instalación de la aplicación Alastria en el móvil
+
+User_Web->Associate_Web: Solicitud del token de sesión
+Associate_Web->User_Web: Entrega del token de sesión
+
+User_Web-->Associate_Web: Quiero darme de alta en alastria id
+Associate_Web --> Associate_Web: Preparación de objeto JSON con el alta en alastria
+Associate_Web --> PushMovileManager: Envío de la url de recuperación del JSON con el token de sesión
+PushMovileManager --> User: Push de la url de recuperación del JSON
+User --> Gateway : Dame clave pública del alastria id del associate
+Gateway --> User: Entrega de clave pública
+User --> User: Verificación de la firma del objeto JSON
+User --> Gateway: Creación del alastria_id del usuario
+Gateway --> User: Recuperación del alasitra_id del usuario
+User --> User: Creación de claves
+User --> Gateway: Publicación en el Registry de la clave pública
+Gateway --> User: OK
+
+
+note right User: Alastgria_ID creado
+
+note right User: La URL de recuperación de los atestados, se ha recibido en el JSON del push inicial
+User --> Associate_Web: Solicitud de los atestados aportados por el socio
+Associate_Web --> Associate_Web: Construcción de los atestados del usuario (JSON Firmado)
+Associate_Web --> PushMovileManager: Envío de la URL de recuperación de los atestados 
+PushMovileManager --> User: Notificación Push con URL de recuperación de los atestados
+alt no tengo la clave pública del alastria_id
+  User --> Gateway : Dame clave pública del alastria id del associate
+  Gateway --> User: Entrega de clave pública
+end
+User --> User: Verificación de la firma del objeto JSON
+User --> User: Aceptación y firma de los atestados
+
+User --> Repository: Almacenamiento del atestado
+Repository --> User: Uri de recuperación
+
+User --> Gateway: Registro de los atributo en registry
+Gateway --> Usser: Registro OK
+
+
+deactivate User
+group Creación desde app
+activate User_Web
+User -> Gateway: Se llama a createIdentity()
+activate Gateway
+Gateway -> MetaIdentityManager: Se llama a createIdentity()
+activate MetaIdentityManager
+MetaIdentityManager -> MetaIdentityManager: Se crea proxy()
+MetaIdentityManager -> Proxy: Se llama proxy()
+MetaIdentityManager -> Blockchain: Se crea el evento LogIdentityCreated()
+deactivate MetaIdentityManager
+group Polling en gateway - bucle
+Gateway -> Blockchain: call get_LogIdentityCreated()
+Blockchain --> Gateway: return LogIdentityCreated
+end
+Gateway --> User: return ID_created_status = "succes"
+deactivate Gateway
+end
+note right User_Web: Se tiene una identidad vacia. Requirimiento de testimonios iniciales
+group Inclusión de testimonios
+Associate_Web -> User: Testimonios firmados
+User -> Gateway: Crear nuevo atestado (hash JWT y URI)
+Gateway -> MetaIdentityManager: Crear nuevo atestado (hash JWT y URI)
+MetaIdentityManager -> Proxy: Crear nuevo atestado (hash JWT y URI)
+Proxy -> Registry: Crear nuevo atestado (hash JWT y URI)
+Registry -> Blockchain: Nuevo evento LogNewAttestion(hash JWT y URI)
+group Polling en gateway - bucle
+Gateway -> Blockchain: call get_LogNewAttestation()
+Blockchain --> Gateway: return LogNewAttestation
+end
+User -> Repository: Guardar atestado cifrado
+Gateway -> User:
+end
+
+
+
+
+
+group Creación desde el navegador
+note right User_Web: Se requiere Metamask o un
+activate User_Web
+User_Web -> Gateway: Se llama a createIdentity()
+activate Gateway
+Gateway -> MetaIdentityManager: Se llama a createIdentity() con el token de sesión
+activate MetaIdentityManager
+MetaIdentityManager -> MetaIdentityManager: Se crea proxy() con los parámetros de inicialización.
+deactivate MetaIdentityManager
+group Polling en gateway - bucle
+Gateway -> Gateway: Esperando al get_LogIdentityCreated()
+end
+Gateway --> User_Web: return ID_created_status = "need to link mobile device"
+deactivate Gateway
+end
+
+@enduml
