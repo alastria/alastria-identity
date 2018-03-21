@@ -73,14 +73,8 @@ alt token == null
                 Proxy->Registry: Recupero la clave pública del usuario
                 deactivate Proxy
                 activate Registry
-                Registry->Proxy: Clave pública del alastria_id asociada a la aplicación 
+                Registry->Gateway: Clave pública del alastria_id asociada a la aplicación 
                 deactivate Registry
-                activate Proxy
-                Proxy->MetaIdentityManager: Clave pública del alastria_id asociada a la aplicación
-                deactivate Proxy
-                activate MetaIdentityManager
-                MetaIdentityManager->Gateway: Clave pública del alastria_id asociada a la aplicación
-                deactivate MetaIdentityManager
                 activate Gateway
                 Gateway->User: Clave pública de alastria_id asociada a la aplicación
                 deactivate Gateway
