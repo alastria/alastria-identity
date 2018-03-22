@@ -11,7 +11,7 @@ boundary Registry
 boundary Repository
 autonumber
 title
-    Proceso de creación de identidad
+    Proceso de creación de identidad (WIP)
 end title
 activate User
 User->User: Instalación de la aplicación Alastria en el móvil
