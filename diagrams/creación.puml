@@ -114,13 +114,23 @@ group Inclusión de testimonios
   User --> User: Verificación de la firma del objeto JSON
   User --> User: Aceptación y firma de los atestados
   User --> Repository: Almacenamiento del atestado
+  activate Repository
   Repository --> User: Uri de recuperación
+  deactivate Repository
   User --> Gateway: Registro de los atributo en registry
-  Gateway -> MetaIdentityManager: Crear nuevo atributo (hash JWT y/o URI)
-  MetaIdentityManager -> Proxy: Crear nuevo atributo (hash JWT y/o URI)
-  Proxy -> Gateway: Crear nuevo atributo (hash JWT y/o URI)
-  Registry -> Gateway: Nuevo evento LogNewAttribute(hash JWT y/o URI)
+  activate Gateway
+  Gateway -> MetaIdentityManager: Aceptación de la llamada
+  activate MetaIdentityManager
+  MetaIdentityManager -> Proxy: Reenvío al proxy.
+  deactivate MetaIdentityManager
+  activate Proxy
+  Proxy --> Registry: Registro de los atributos en registry (Hash y/o URI por atributo)
+  deactivate Proxy
+  activate Registry
+  Registry --> Gateway: Registro de los atributos en registry (Hash y/o URI por atributo)
+    deactivate Registry
   Gateway --> User: Registro OK
+  deactivate Gateway
 end
 deactivate User
 
