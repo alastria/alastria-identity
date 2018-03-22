@@ -44,14 +44,8 @@ group Verificación de la información recuperada
     Proxy->Registry: Recupero la clave pública del usuario
     deactivate Proxy
     activate Registry
-    Registry->Proxy: Clave pública del alastria_id asociada a la aplicación 
+    Registry->Gateway: Clave pública del alastria_id asociada a la aplicación 
     deactivate Registry
-    activate Proxy
-    Proxy->MetaIdentityManager: Clave pública del alastria_id asociada a la aplicación
-    deactivate Proxy
-    activate MetaIdentityManager
-    MetaIdentityManager->Gateway: Clave pública del alastria_id asociada a la aplicación
-    deactivate MetaIdentityManager
     activate Gateway
     Gateway->User: Clave pública de alastria_id asociada a la aplicación
     deactivate Gateway
@@ -68,16 +62,10 @@ group Obtención de los testimonios vigentes
     Proxy->Registry: Recuperación de la lista de testimonios evitando los caducados
     deactivate Proxy
     activate Registry
-    Registry->Proxy: Lista de testimonios vigentes
+    Registry->Gateway: Clave pública del alastria_id asociada a la aplicación 
     deactivate Registry
-    activate Proxy
-    Proxy->MetaIdentityManager: Lista de testimonios vigentes
-    deactivate Proxy
-    activate MetaIdentityManager
-    MetaIdentityManager->Gateway: Lista de testimonios vigentes
-    deactivate MetaIdentityManager
     activate Gateway
-    Gateway->User: Lista de testimonios vigentes
+    Gateway->User: Clave pública de alastria_id asociada a la aplicación
     deactivate Gateway
 end
 User --> Repository: Solicitud al repositorio de los testimonios disponibles.
@@ -102,16 +90,10 @@ group Verificación de la información recuperada
     Proxy->Registry: Recupero la clave pública del usuario
     deactivate Proxy
     activate Registry
-    Registry->Proxy: Clave pública del alastria_id
+    Registry->Gateway: Clave pública del alastria_id asociada a la aplicación 
     deactivate Registry
-    activate Proxy
-    Proxy->MetaIdentityManager: Clave pública del alastria_id
-    deactivate Proxy
-    activate MetaIdentityManager
-    MetaIdentityManager->Gateway: Clave pública del alastria_id
-    deactivate MetaIdentityManager
     activate Gateway
-    Gateway->User_Web: Clave pública de alastria_id
+    Gateway->User: Clave pública de alastria_id asociada a la aplicación
     deactivate Gateway
 end
 note right User_Web: La aplicación verifica la firma del objeto JWT con la clave.
