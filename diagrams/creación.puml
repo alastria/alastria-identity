@@ -24,16 +24,33 @@ User_Web-->Associate_Web: Quiero darme de alta en alastria id
 Associate_Web --> Associate_Web: Preparación de objeto JSON con el alta en alastria
 Associate_Web --> PushMovileManager: Envío de la url de recuperación del JSON con el token de sesión
 PushMovileManager --> User: Push de la url de recuperación del JSON
-User --> Gateway : Dame clave pública del alastria id del associate
-Gateway --> Registry: Recuperación de clave pública de alastria_id del Associate
-note right Gateway: Recuperación de clave sin necesidad de alastria_id
-Registry --> Gateway: Envio de clave publica de alastria_id del Associate
-Gateway --> User: Entrega de clave pública
+
+group Recuperación de la clave pública para verificar la información recuperada
+    User->Gateway: Solicito la recuperación de la clave pública de la aplicación.
+    activate Gateway
+    Gateway->MetaIdentityManager: Aceptación de la llamada.
+    deactivate Gateway
+    activate MetaIdentityManager
+    MetaIdentityManager->Proxy: Reenvío al proxy.
+    deactivate MetaIdentityManager
+    activate Proxy
+    Proxy->Registry: Recupero la clave pública del usuario
+    deactivate Proxy
+    activate Registry
+    Registry->Gateway: Clave pública del alastria_id asociada a la aplicación 
+    deactivate Registry
+    activate Gateway
+    Gateway->User: Clave pública de alastria_id asociada a la aplicación
+    deactivate Gateway
+end
+
 User --> User: Verificación de la firma del objeto JSON
 User --> Gateway: Creación del alastria_id del usuario
+note right Gateway: ¿Qué contrato se llama y qué consecuencias tiene?
 Gateway --> User: Recuperación del alasitra_id del usuario
 User --> User: Creación de claves
 User --> Gateway: Publicación en el Registry de la clave pública
+note right Gateway: ¿Qué contrato se llama y qué consecuencias tiene?
 Gateway --> User: OK
 end
 
@@ -47,8 +64,24 @@ Associate_Web --> Associate_Web: Construcción de los atestados del usuario (JSO
 Associate_Web --> PushMovileManager: Envío de la URL de recuperación de los atestados
 PushMovileManager --> User: Notificación Push con URL de recuperación de los atestados
 alt no tengo la clave pública del alastria_id
-  User --> Gateway : Dame clave pública del alastria id del associate
-  Gateway --> User: Entrega de clave pública
+  group Recuperación de la clave pública para verificar la información recuperada
+    User->Gateway: Solicito la recuperación de la clave pública de la aplicación.
+    activate Gateway
+    Gateway->MetaIdentityManager: Aceptación de la llamada.
+    deactivate Gateway
+    activate MetaIdentityManager
+    MetaIdentityManager->Proxy: Reenvío al proxy.
+    deactivate MetaIdentityManager
+    activate Proxy
+    Proxy->Registry: Recupero la clave pública del usuario
+    deactivate Proxy
+    activate Registry
+    Registry->Gateway: Clave pública del alastria_id asociada a la aplicación 
+    deactivate Registry
+    activate Gateway
+    Gateway->User: Clave pública de alastria_id asociada a la aplicación
+    deactivate Gateway
+  end
 end
 User --> User: Verificación de la firma del objeto JSON
 User --> User: Aceptación y firma de los atestados
@@ -60,8 +93,8 @@ User --> Gateway: Registro de los atributo en registry
 Gateway -> MetaIdentityManager: Crear nuevo atributo (hash JWT y/o URI)
 MetaIdentityManager -> Proxy: Crear nuevo atributo (hash JWT y/o URI)
 Proxy -> Gateway: Crear nuevo atributo (hash JWT y/o URI)
-Registry -> Blockchain: Nuevo evento LogNewAttribute(hash JWT y/o URI)
-Gateway --> Usser: Registro OK
+Registry -> Gateway: Nuevo evento LogNewAttribute(hash JWT y/o URI)
+Gateway --> User: Registro OK
 end
 
 deactivate User
