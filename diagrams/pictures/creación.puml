@@ -1,0 +1,143 @@
+@startuml
+actor User <<Móvil>>
+actor User_Web <<Browser/App>>
+boundary Associate_Web
+boundary  PushMovileManager
+boundary Gateway
+boundary MetaIdentityManager
+boundary Proxy
+boundary Registry
+boundary Repository
+
+autonumber
+title
+    Proceso de creación de identidad (WIP)
+end title
+activate User
+
+User->User: Instalación de la aplicación Alastria en el móvil
+
+group Creación de identidad
+
+  User -> Associate_Web: Solicitud del token de sesión
+  activate Associate_Web
+  Associate_Web -> User: Entrega del token de sesión
+  User --> Associate_Web: Quiero darme de alta en alastria id
+  alt inicio de proceso via web/app de socio
+  User_Web->Associate_Web: Solicitud del token de sesión
+  Associate_Web->User_Web: Entrega del token de sesión
+  User_Web-->Associate_Web: Quiero darme de alta en alastria id
+  end
+  activate Associate_Web
+  Associate_Web --> Associate_Web: Preparación de objeto JSON con el alta en alastria
+  Associate_Web --> PushMovileManager: Envío de la url de recuperación del JSON con el token de sesión
+  deactivate Associate_Web
+  activate PushMovileManager
+  PushMovileManager --> User: Push de la url de recuperación del JSON
+  deactivate PushMovileManager
+
+  group Recuperación de la clave pública para verificar la información recuperada
+      User->Gateway: Solicito la recuperación de la clave pública de la aplicación.
+      activate Gateway
+      Gateway->MetaIdentityManager: Aceptación de la llamada.
+      deactivate Gateway
+      activate MetaIdentityManager
+      MetaIdentityManager->Proxy: Reenvío al proxy.
+      deactivate MetaIdentityManager
+      activate Proxy
+      Proxy->Registry: Recupero la clave pública del usuario
+      deactivate Proxy
+      activate Registry
+      Registry->Gateway: Clave pública del alastria_id asociada a la aplicación
+      deactivate Registry
+      activate Gateway
+      Gateway->User: Clave pública de alastria_id asociada a la aplicación
+      deactivate Gateway
+  end
+
+  User --> User: Verificación de la firma del objeto JSON
+  User --> Gateway: Creación del alastria_id del usuario
+  activate Gateway
+  Gateway --> MetaIdentityManager: Se crea un nuevo Proxy()
+  activate MetaIdentityManager
+  MetaIdentityManager --> Gateway: Identidad creada OK y alastria_id retornado
+  deactivate MetaIdentityManager
+  Gateway --> User: Recuperación del alasitra_id del usuario
+  deactivate Gateway
+  User --> User: Creación de claves
+  User --> Gateway: Publicación en el Registry de la clave pública
+  activate Gateway
+  Gateway --> MetaIdentityManager: Aceptación de la llamada
+  deactivate Gateway
+  activate MetaIdentityManager
+  MetaIdentityManager --> Proxy: Reenvío al proxy
+  deactivate MetaIdentityManager
+  activate Proxy
+  Proxy --> Registry: Registro la clave pública
+  deactivate Proxy
+  activate Registry
+  Registry --> Gateway: Devuelve OK de clave registrada
+  deactivate Registry
+  activate Gateway
+  Gateway --> User: OK
+  deactivate Gateway
+
+end
+
+note right User: Alastgria_ID creado
+note right User: Se tiene una identidad vacia. Requirimiento de testimonios iniciales
+note right User: La URL de recuperación de los atestados, se ha recibido en el JSON del push inicial
+
+group Inclusión de testimonios
+  User --> Associate_Web: Solicitud de los atestados aportados por el socio
+  activate Associate_Web
+  Associate_Web --> Associate_Web: Construcción de los atestados del usuario (JSON Firmado)
+  Associate_Web --> PushMovileManager: Envío de la URL de recuperación de los atestados
+  deactivate Associate_Web
+  activate PushMovileManager
+  PushMovileManager --> User: Notificación Push con URL de recuperación de los atestados
+  deactivate PushMovileManager
+  alt no tengo la clave pública del alastria_id
+    group Recuperación de la clave pública para verificar la información recuperada
+      User->Gateway: Solicito la recuperación de la clave pública de la aplicación.
+      activate Gateway
+      Gateway->MetaIdentityManager: Aceptación de la llamada.
+      deactivate Gateway
+      activate MetaIdentityManager
+      MetaIdentityManager->Proxy: Reenvío al proxy.
+      deactivate MetaIdentityManager
+      activate Proxy
+      Proxy->Registry: Recupero la clave pública del usuario
+      deactivate Proxy
+      activate Registry
+      Registry->Gateway: Clave pública del alastria_id asociada a la aplicación
+      deactivate Registry
+      activate Gateway
+      Gateway->User: Clave pública de alastria_id asociada a la aplicación
+      deactivate Gateway
+    end
+  end
+  User --> User: Verificación de la firma del objeto JSON
+  User --> User: Aceptación y firma de los atestados
+  User --> Repository: Almacenamiento del atestado
+  activate Repository
+  Repository --> User: Uri de recuperación
+  deactivate Repository
+  User --> Gateway: Registro de los atributo en registry
+  activate Gateway
+  Gateway -> MetaIdentityManager: Aceptación de la llamada
+  activate MetaIdentityManager
+  MetaIdentityManager -> Proxy: Reenvío al proxy.
+  deactivate MetaIdentityManager
+  activate Proxy
+  Proxy --> Registry: Registro de los atributos en registry (Hash y/o URI por atributo)
+  deactivate Proxy
+  activate Registry
+  Registry --> Gateway: Registro de los atributos en registry (Hash y/o URI por atributo)
+    deactivate Registry
+  Gateway --> User: Registro OK
+  deactivate Gateway
+end
+deactivate User
+
+@enduml
