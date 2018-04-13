@@ -1,5 +1,5 @@
-pragma solidity 0.4.15;
-import "./Proxy.sol";
+pragma solidity ^0.4.8;
+import "./proxy.sol";
 
 
 contract MetaIdentityManager {
@@ -70,7 +70,7 @@ contract MetaIdentityManager {
         _;
     }
 
-    modifier rateLimited(Proxy identity, address sender) {
+    modifier rateLimited(proxy identity, address sender) {
         require(limiter[identity][sender] < (now - adminRate));
         limiter[identity][sender] = now;
         _;
@@ -99,7 +99,7 @@ contract MetaIdentityManager {
     /// @param recoveryKey Key of recovery network or address from seed to recovery proxy
     /// Gas cost of ~300,000
     function createIdentity(address owner, address recoveryKey) public validAddress(recoveryKey) {
-        Proxy identity = new Proxy();
+        proxy identity = new proxy();
         owners[identity][owner] = now - adminTimeLock; // This is to ensure original owner has full power from day one
         recoveryKeys[identity] = recoveryKey;
         LogIdentityCreated(identity, msg.sender, owner,  recoveryKey);
@@ -111,7 +111,7 @@ contract MetaIdentityManager {
     /// @param destination Address of contract to be called after proxy is created
     /// @param data of function to be called at the destination contract
     function createIdentityWithCall(address owner, address recoveryKey, address destination, bytes data) public validAddress(recoveryKey) {
-        Proxy identity = new Proxy();
+        proxy identity = new proxy();
         owners[identity][owner] = now - adminTimeLock; // This is to ensure original owner has full power from day one
         recoveryKeys[identity] = recoveryKey;
         LogIdentityCreated(identity, msg.sender, owner,  recoveryKey);
@@ -130,7 +130,7 @@ contract MetaIdentityManager {
     }
 
     /// @dev Allows a user to forward a call through their proxy.
-    function forwardTo(address sender, Proxy identity, address destination, uint value, bytes data) public
+    function forwardTo(address sender, proxy identity, address destination, uint value, bytes data) public
         onlyAuthorized
         onlyOwner(identity, sender)
     {
@@ -138,7 +138,7 @@ contract MetaIdentityManager {
     }
 
     /// @dev Allows an olderOwner to add a new owner instantly
-    function addOwner(address sender, Proxy identity, address newOwner) public
+    function addOwner(address sender, proxy identity, address newOwner) public
         onlyAuthorized
         onlyOlderOwner(identity, sender)
         rateLimited(identity, sender)
@@ -149,7 +149,7 @@ contract MetaIdentityManager {
     }
 
     /// @dev Allows a recoveryKey to add a new owner with userTimeLock waiting time
-    function addOwnerFromRecovery(address sender, Proxy identity, address newOwner) public
+    function addOwnerFromRecovery(address sender, proxy identity, address newOwner) public
         onlyAuthorized
         onlyRecovery(identity, sender)
         rateLimited(identity, sender)
@@ -160,7 +160,7 @@ contract MetaIdentityManager {
     }
 
     /// @dev Allows an owner to remove another owner instantly
-    function removeOwner(address sender, Proxy identity, address owner) public
+    function removeOwner(address sender, proxy identity, address owner) public
         onlyAuthorized
         onlyOlderOwner(identity, sender)
         rateLimited(identity, sender)
@@ -172,7 +172,7 @@ contract MetaIdentityManager {
     }
 
     /// @dev Allows an owner to change the recoveryKey instantly
-    function changeRecovery(address sender, Proxy identity, address recoveryKey) public
+    function changeRecovery(address sender, proxy identity, address recoveryKey) public
         onlyAuthorized
         onlyOlderOwner(identity, sender)
         rateLimited(identity, sender)
@@ -183,7 +183,7 @@ contract MetaIdentityManager {
     }
 
     /// @dev Allows an owner to begin process of transfering proxy to new IdentityManager
-    function initiateMigration(address sender, Proxy identity, address newIdManager) public
+    function initiateMigration(address sender, proxy identity, address newIdManager) public
         onlyAuthorized
         onlyOlderOwner(identity, sender)
     {
@@ -193,7 +193,7 @@ contract MetaIdentityManager {
     }
 
     /// @dev Allows an owner to cancel the process of transfering proxy to new IdentityManager
-    function cancelMigration(address sender, Proxy identity) public
+    function cancelMigration(address sender, proxy identity) public
         onlyAuthorized
         onlyOwner(identity, sender)
     {
@@ -206,7 +206,7 @@ contract MetaIdentityManager {
     /// @dev Allows an owner to finalize and completly transfer proxy to new IdentityManager
     /// Note: before transfering to a new address, make sure this address is "ready to recieve" the proxy.
     /// Not doing so risks the proxy becoming stuck.
-    function finalizeMigration(address sender, Proxy identity) onlyAuthorized onlyOlderOwner(identity, sender) {
+    function finalizeMigration(address sender, proxy identity) onlyAuthorized onlyOlderOwner(identity, sender) {
         require(migrationInitiated[identity] != 0 && migrationInitiated[identity] + adminTimeLock < now);
         address newIdManager = migrationNewAddress[identity];
         delete migrationInitiated[identity];

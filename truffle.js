@@ -9,7 +9,7 @@ module.exports = {
       host: "35.176.19.89",
       port: 22000,
       network_id: "*",
-      gas: 0xfffff,
+      gas: 0xffffff,
       gasPrice: 0x0,
       from: "0xd65616c46a2e55957aff33e238b31bc568358e20"
     },
@@ -17,7 +17,7 @@ module.exports = {
       host: "35.176.19.89",
       port: 22000,
       network_id: "*",
-      gas: 0xfffff,
+      gas: 0xffffff,
       gasPrice: 0x0,
       from: "0xd65616c46a2e55957aff33e238b31bc568358e20"
       }

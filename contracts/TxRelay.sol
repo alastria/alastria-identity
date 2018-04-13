@@ -1,4 +1,4 @@
-pragma solidity 0.4.15;
+pragma solidity ^0.4.8;
 
 
 // This contract is meant as a "singleton" forwarding contract.

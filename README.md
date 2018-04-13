@@ -1,6 +1,16 @@
 # UPORT BASED ALASTRIA IDENTITY V.0.0.0
 Uport platform adapted to Alastria network
 
+## UportRaw contracts
+The directions of the contracts (as Uport provide them) in the alastria test-net are:
+```
+  IdentityManager: 0xb08c53b75030eb406f4c856a524f57a35410f474
+  MetaIdentityManager: 0x28d38d5cfe3c721506665fe2c1ca165ea3c81ea6
+  proxy: 0xfc5940d3180fd294aad65d2fcc6b8c7664828cf8
+  UportRegistry: 0x4dedc4b2e4122158d0df02c3cfdd5f07326497c0
+  TxRelay: 0x815af292ba858a3256fc0d03e40b75b07fcdf317
+```
+
 ## Basic Identity Manager
 Forked from uPort
 
