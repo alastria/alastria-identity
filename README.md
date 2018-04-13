@@ -2,7 +2,7 @@
 Uport platform adapted to Alastria network
 
 ## UportRaw contracts
-The directions of the contracts (as Uport provide them) in the alastria test-net are:
+The adresses of the contracts (as Uport provide them) in the alastria test-net are:
 ```
   IdentityManager: 0xb08c53b75030eb406f4c856a524f57a35410f474
   MetaIdentityManager: 0x28d38d5cfe3c721506665fe2c1ca165ea3c81ea6
