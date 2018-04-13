@@ -1,5 +1,5 @@
 pragma solidity 0.4.15;
-import "./Proxy.sol";
+import "./proxy.sol";
 
 
 contract IdentityManager {
