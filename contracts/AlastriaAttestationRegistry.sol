@@ -3,7 +3,6 @@ pragma solidity ^0.4.20;
 contract AlastriaAttestationRegistry{
   //Variables
 
-  // ¿Should we add Level of Assurance? 
   struct attestation {
     bool exists;
     bytes32 status;
