@@ -73,19 +73,11 @@ contract AlastriaAttestationRegistry{
 
   // Simple implementation
   function revocationChallenge(address subject, bytes32 dataHash, bytes32 rKey) public view returns (bool) {
-    bool value;
-    bytes32 rc = registry[subject][dataHash].revocationChallenge;
-    bytes32 rcec = keccak256 (dataHash, rKey);
-    // value = keccak256 (dataHash, rKey) == registry[subject][dataHash].revocationChallenge;
-    value = rcec == rc ;
-	RevocationChallenge (subject, dataHash, rKey, rc, rcec);
-    return value;
+    return keccak256 (dataHash, rKey) == registry[subject][dataHash].revocationChallenge;
   }
   
   // Utility function 
   function revocationHash(bytes32 dataHash, bytes32 rKey) public pure returns (bytes32) {
-	bytes32 value;
-	value = keccak256 (dataHash, rKey);
-	return value;
+	return keccak256 (dataHash, rKey);
   }
 }
