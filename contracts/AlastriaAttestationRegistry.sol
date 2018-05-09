@@ -17,14 +17,6 @@ contract AlastriaAttestationRegistry{
   mapping (address => mapping(bytes32 => attestation)) private registry;
 
   //Events
-   event RevocationChallenge(
-    address indexed subject,
-    bytes32 indexed dataHash,
-	bytes32 revocationKey,
- 	bytes32 revocationChallenge,
- 	bytes32 calculatedRevocationChallenge
-	);
-
 
   //Modifiers
   modifier validAddress(address addr) { //protects against some weird attacks
