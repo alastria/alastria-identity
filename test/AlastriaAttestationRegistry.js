@@ -2,29 +2,6 @@
 var AlastriaAttestationRegistry = artifacts.require('./AlastriaAttestationRegistry.sol')
 // var Web3Utils = artifacts.require('web3-utils') not available, use solidity function instead.
 
-// No se puede usar web3.toAscii porque añade un \0
-// al final del string y falla el assert.equal
-function hex2string(hexx) {
-    var hex = hexx.toString();//force conversion
-    var str = '';
-	var code = 0;
-	// Nos saltamos el 0x inicial y eliminamos los caracteres 00
-    for (var i = 2; i < hex.length; i += 2) {
-		code = parseInt(hex.substr(i, 2), 16)
-		if (code != 0)  
-			str += String.fromCharCode(code);
-	}
-    return str;
-}
-
-function string2hex(str) {
-  var arr = [];
-  for (var i = 1, l = str.length; i < l; i ++) {
-    var hex = Number(str.charCodeAt(i)).toString(16);
-    arr.push(hex);
-  }
-  return arr.join('');
-}
 
 contract('AlastriaAttestationRegistry', function (accounts) {
   let Attestation
@@ -39,23 +16,25 @@ contract('AlastriaAttestationRegistry', function (accounts) {
   var attribute3 = "Attribute2"  
   var attribute4 = "Attribute4"  
   
-  var inputHex1 = web3.fromUtf8(attribute1);
-
-  var dataHash1 = "0x3131"  // Should be web3.utils.soliditySha3(attribute1)
+  var dataHash1 = "dataHash1"  // Should be web3.utils.soliditySha3(attribute1)
   var dataHash2 = "dataHash2"  
   var dataHash3 = "dataHash3"  
   var dataHash4 = "dataHash4" 
+
+  var signature1 = "signature1" // Should be the signature of Attribute1
+  var signature2 = "signature2"
+  var signature3 = "signature3"
+  var signature4 = "signature4"
   
-  var revocationKey1 = "0x3231" // Could be anything
-  var revocationKey2 = "RevKey2"
-  var revocationKey3 = "RevKey3"
-  var revocationKey4 = "RevKey4"
+  var revHash1 = "revHash1" // Should be web3.utils.soliditySha3(dataHash1 + signature1)
+  var revHash2 = "revHash2"
+  var revHash3 = "revHash3"
+  var revHash4 = "revHash4"
+  var revHash
   
-  var revocationChallenge1 // Should be web3.utils.soliditySha3(dataHash1 + revocationKey1)
-  var revocationChallenge2 
-  var revocationChallenge3 
-  var revocationChallenge4 
-  var revCha
+  var subjectStatus
+  var issuerStatus
+  var attestationStatus
   
   //we can't reuse enum in solidity contract so status definition is duplicated here
   let Status = {
@@ -70,7 +49,7 @@ contract('AlastriaAttestationRegistry', function (accounts) {
     done()
   })
 
-  it('Creates Attestation correctly', done => {
+  it('Creates AlastriaAttestationRegistry correctly', done => {
     let fakePrevVersion = accounts[3]
     AlastriaAttestationRegistry.new(fakePrevVersion, {from: accounts[0], gas: 3141592}).then(attestation => {
       Attestation = attestation
@@ -80,376 +59,660 @@ contract('AlastriaAttestationRegistry', function (accounts) {
       return Attestation.previousPublishedVersion()
     }).then(previousVersion => {
       assert.equal(previousVersion, fakePrevVersion)
-      return Attestation.revocationHash.call(dataHash1, revocationKey1)
-    }).then(revCha => {
-      revocationChallenge1 = revCha
-      console.log("revCha1:"+revocationChallenge1)
-      return Attestation.revocationHash.call(dataHash2, revocationKey2)
-    }).then(revCha => {
-      revocationChallenge2 = revCha
-      console.log("revCha2:"+revocationChallenge2)
-      return Attestation.revocationHash.call(dataHash3, revocationKey3)
-    }).then(revCha => {
-      revocationChallenge3 = revCha
-      console.log("revCha3:"+revocationChallenge3)
-      return Attestation.revocationHash.call(dataHash4, revocationKey4)
-    }).then(revCha => {
-      revocationChallenge4 = revCha
-      console.log("revCha4:"+revocationChallenge4)
+/*
+      return Attestation.solidityHash.call(dataHash1, revHash1)
+    }).then(revHash => {
+      revHash1 = revHash
+      console.log("revHash1:"+revHash1)
+      return Attestation.solidityHash.call(dataHash2, revHash2)
+    }).then(revHash => {
+      revHash2 = revHash
+      console.log("revHash2:"+revHash2)
+      return Attestation.solidityHash.call(dataHash3, revHash3)
+    }).then(revHash => {
+      revHash3 = revHash
+      console.log("revHash3:"+revHash3)
+      return Attestation.solidityHash.call(dataHash4, revHash4)
+    }).then(revHash => {
+      revHash4 = revHash
+      console.log("revHash4:"+revHash4)
+*/
       done()
     }).catch(done)
   })
 
   
-//Test Set 1: Subject1, Issuer1, dataHash1, revocationChallenge1, revocationKey1. One by one transitions
-  it('Initial Set for subject1 ', done => {
-    console.log ("Test Set 1: Subject1, Issuer1, dataHash1, revocationChallenge1, revocationKey1. One by one transitions")
-    console.log("dataHash1 :"+dataHash1);
-    console.log("revKey1 :"+revocationKey1);
-    console.log("revCha1 :"+revocationChallenge1);
+//Test Set 1: Subject1, Issuer1, dataHash1, revHash1. One by one transitions
+  it('Initial Set for subject1, Issuer1', done => {
+    console.log("");
+    console.log("Test Set 1: Subject1, Issuer1, dataHash1, revHash1. One by one transitions")
+    console.log("dataHash1 : "+dataHash1);
+    console.log("revHash1  : "+revHash1);
+    console.log("");
 	
-    Attestation.set(dataHash1, revocationChallenge1, "Direccion1", {from: subject1}).then(() => {
-      return Attestation.get.call(subject1, dataHash1)
+    Attestation.set(dataHash1, "Direccion1", {from: subject1}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject1, dataHash1)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.Valid, 'should be valid')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer1, revHash1)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be valid')
+	  assert.strictEqual(issuerStatus[0], false, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Valid, 'should be valid')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.Valid, 'should be valid')
+
       done()	  
     }).catch(done)
-  })
+	
+})
 
   it('Change to AskIssuer by subject, no change', done => {
-    Attestation.revoke(subject1, dataHash1, Status.AskIssuer, 0, {from: subject1}).then(() => {
-      return Attestation.get.call(subject1, dataHash1)
+    Attestation.revokeAttestation(revHash1, Status.AskIssuer, {from: subject1}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject1, dataHash1)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.Valid, 'should be Valid, no change')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer1, revHash1)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be valid')
+	  assert.strictEqual(issuerStatus[0], false, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Valid, 'should be valid')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.Valid, 'should be valid')
       done()	  
     }).catch(done)
   })
 
   it('Change to AskIssuer by issuer1', done => {
-    Attestation.revoke(subject1, dataHash1, Status.AskIssuer, revocationKey1, {from: issuer1}).then(() => {
-      return Attestation.get.call(subject1, dataHash1)
+    Attestation.revokeAttestation(revHash1, Status.AskIssuer, {from: issuer1}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject1, dataHash1)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.AskIssuer, 'should be AskIssuer')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer1, revHash1)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be valid')
+	  assert.strictEqual(issuerStatus[0], true, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.AskIssuer, 'should be AskIssuer')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.AskIssuer, 'should be AskIssuer')
       done()	  
     }).catch(done)
   })
 
   it('Change to Revoked by issuer1', done => {
-    Attestation.revoke(subject1, dataHash1, Status.Revoked, revocationKey1, {from: issuer1}).then(() => {
-      return Attestation.get.call(subject1, dataHash1)
+    Attestation.revokeAttestation(revHash1, Status.Revoked, {from: issuer1}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject1, dataHash1)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.Revoked, 'should be Revoked')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer1, revHash1)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be valid')
+	  assert.strictEqual(issuerStatus[0], true, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Revoked, 'should be Revoked')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.Revoked, 'should be Revoked')
       done()	  
     }).catch(done)
   })
 
   it('Change to DeletedByUser by issuer1, no change', done => {
-    Attestation.revoke(subject1, dataHash1, Status.DeletedByUser, revocationKey1, {from: issuer1}).then(() => {
-      return Attestation.get.call(subject1, dataHash1)
+    Attestation.deleteAttestation(dataHash1, {from: issuer1}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject1, dataHash1)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.Revoked, 'should be Revoked')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer1, revHash1)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be valid')
+	  assert.strictEqual(issuerStatus[0], true, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Revoked, 'should be Revoked')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.Revoked, 'should be Revoked')
       done()	  
     }).catch(done)
   })
 
   it('Change to DeletedByUser by subject', done => {
-    Attestation.revoke(subject1, dataHash1, Status.DeletedByUser, 0, {from: subject1}).then(() => {
-      return Attestation.get.call(subject1, dataHash1)
+    Attestation.deleteAttestation(dataHash1, {from: subject1}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject1, dataHash1)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
-      done()	  
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer1, revHash1)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
+	  assert.strictEqual(issuerStatus[0], true, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Revoked, 'should be Revoked')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
+     done()	  
     }).catch(done)
   })
 
 
-//Connjunto 2: Subject1, Issuer2, dataHash2, revocationChallenge2, revocationKey2. One by one transitions
-  it('Initial Set for subject1 ', done => {
-    console.log ("Test Set 2: Subject1, Issuer2, dataHash2, revocationChallenge2, revocationKey2. One by one transitions")
-    console.log("dataHash2 :"+dataHash2);
-    console.log("revKey2 :"+revocationKey2);
-    console.log("revCha2 :"+revocationChallenge2);
+//Connjunto 2: Subject1, Issuer2, dataHash2, revHash2. One by one transitions
+  it('Initial Set for subject1, Issuer2', done => {
+    console.log("");
+    console.log("Test Set 2: Subject1, Issuer2, dataHash2, revHash2. One by one transitions")
+    console.log("dataHash2 : "+dataHash2);
+    console.log("revHash2  : "+revHash2);
+    console.log("");
 	
-    Attestation.set(dataHash2, revocationChallenge2, "Direccion2", {from: subject1}).then(() => {
-      return Attestation.get.call(subject1, dataHash2)
+    Attestation.set(dataHash2, "Direccion2", {from: subject1}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject1, dataHash2)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.Valid, 'should be valid')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash2)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(issuerStatus[0], false, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.Valid, 'should be Valid')
       done()	  
     }).catch(done)
   })
 
   it('Change to AskIssuer by subject1, no change', done => {
-    Attestation.revoke(subject1, dataHash2, Status.AskIssuer, 0, {from: subject1}).then(() => {
-      return Attestation.get.call(subject1, dataHash2)
+    Attestation.revokeAttestation(revHash2, Status.AskIssuer, {from: subject1}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject1, dataHash2)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.Valid, 'should be Valid, no change')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash2)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(issuerStatus[0], false, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.Valid, 'should be Valid')
       done()	  
     }).catch(done)
   })
 
   it('Change to AskIssuer by issuer2', done => {
-    Attestation.revoke(subject1, dataHash2, Status.AskIssuer, revocationKey2, {from: issuer2}).then(() => {
-      return Attestation.get.call(subject1, dataHash2)
+    Attestation.revokeAttestation(revHash2, Status.AskIssuer, {from: issuer2}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject1, dataHash2)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.AskIssuer, 'should be AskIssuer')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash2)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(issuerStatus[0], true, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.AskIssuer, 'should be AskIssuer')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.AskIssuer, 'should be AskIssuer')
       done()	  
     }).catch(done)
   })
 
-  it('Change to Revoked by subject1', done => {
-    Attestation.revoke(subject1, dataHash2, Status.Revoked, 0, {from: subject1}).then(() => {
-      return Attestation.get.call(subject1, dataHash2)
+  it('Change to Revoked by subject1, no change', done => {
+    Attestation.revokeAttestation(revHash2, Status.Revoked, {from: subject1}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject1, dataHash2)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.Revoked, 'should be Revoked')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash2)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(issuerStatus[0], true, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.AskIssuer, 'should be AskIssuer')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.AskIssuer, 'should be AskIssuer')
+      done()	  
+    }).catch(done)
+  })
+
+  it('Change to Revoked by issuer1, no change', done => {
+    Attestation.revokeAttestation(revHash2, Status.Revoked, {from: issuer1}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject1, dataHash2)
+    }).then(function(r) {
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash2)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(issuerStatus[0], true, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.AskIssuer, 'should be AskIssuer')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.AskIssuer, 'should be AskIssuer')
+      done()	  
+    }).catch(done)
+  })
+
+  it('Change to Revoked by issuer2', done => {
+    Attestation.revokeAttestation(revHash2, Status.Revoked, {from: issuer2}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject1, dataHash2)
+    }).then(function(r) {
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash2)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(issuerStatus[0], true, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Revoked, 'should be Revoked')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.Revoked, 'should be Revoked')
       done()	  
     }).catch(done)
   })
 
   it('Change to DeletedByUser by issuer2, no change', done => {
-    Attestation.revoke(subject1, dataHash2, Status.DeletedByUser, revocationKey2, {from: issuer2}).then(() => {
-      return Attestation.get.call(subject1, dataHash2)
+    Attestation.deleteAttestation (dataHash2, {from: issuer2}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject1, dataHash2)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.Revoked, 'should be Revoked')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash2)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(issuerStatus[0], true, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Revoked, 'should be Revoked')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.Revoked, 'should be Revoked')
       done()	  
     }).catch(done)
   })
 
   it('Change to DeletedByUser by subject1', done => {
-    Attestation.revoke(subject1, dataHash2, Status.DeletedByUser, 0, {from: subject1}).then(() => {
-      return Attestation.get.call(subject1, dataHash2)
+    Attestation.deleteAttestation (dataHash2, {from: subject1}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject1, dataHash2)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash2)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
+	  assert.strictEqual(issuerStatus[0], true, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Revoked, 'should be Revoked')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
       done()	  
     }).catch(done)
   })
 
-  
-//Test Set 3: Subject2, Issuer2, dataHash3, revocationChallenge3, revocationKey3. Direct jump to Revoked and backtransitions
+
+//Test Set 3: Subject2, Issuer2, dataHash3, revHash3. Direct jump to Revoked and backtransitions
   it('Initial Set for subject2 ', done => {
-    console.log ("Test Set 3: Subject2, Issuer2, dataHash3, revocationChallenge3, revocationKey3. Direct jump to Revoked and backtransitions")
-    console.log("dataHash3 :"+dataHash3);
-    console.log("revKey3 :"+revocationKey3);
-    console.log("revCha3 :"+revocationChallenge3);
+    console.log("");
+    console.log("Test Set 3: Subject2, Issuer2, dataHash3, revHash3. Direct jump to Revoked and backtransitions")
+    console.log("dataHash3 : "+dataHash3);
+    console.log("revHash3  : "+revHash3);
+    console.log("");
 	
-    Attestation.set(dataHash3, revocationChallenge3, "Direccion3", {from: subject2}).then(() => {
-      return Attestation.get.call(subject2, dataHash3)
+    Attestation.set(dataHash3, "Direccion3", {from: subject2}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject2, dataHash3)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.Valid, 'should be valid')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash3)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(issuerStatus[0], false, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.Valid, 'should be Valid')
       done()	  
     }).catch(done)
   })
 
   it('Change to AskIssuer by subject2, no change', done => {
-    Attestation.revoke(subject2, dataHash3, Status.AskIssuer, 0, {from: subject2}).then(() => {
-      return Attestation.get.call(subject2, dataHash3)
+    Attestation.revokeAttestation(revHash3, Status.AskIssuer, {from: subject2}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject2, dataHash3)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.Valid, 'should be Valid, no change')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash3)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(issuerStatus[0], false, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.Valid, 'should be Valid')
       done()	  
     }).catch(done)
   })
 
-  it('Direct Change to Revoked by subject2', done => {
-    Attestation.revoke(subject2, dataHash3, Status.Revoked, 0, {from: subject2}).then(() => {
-      return Attestation.get.call(subject2, dataHash3)
+  it('Direct Change to Revoked by subject2, no change', done => {
+    Attestation.revokeAttestation(revHash3, Status.Revoked, {from: subject2}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject2, dataHash3)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.Revoked, 'should be Revoked')
-      done()	  
-    }).catch(done)
-  })
-
-  it('Back Change to Valid by subject2, no change', done => {
-    Attestation.revoke(subject2, dataHash3, Status.Valid, 0, {from: subject2}).then(() => {
-      return Attestation.get.call(subject2, dataHash3)
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash3)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.Revoked, 'should be Revoked')
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(issuerStatus[0], false, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.Valid, 'should be Valid')
       done()	  
     }).catch(done)
   })
 
   it('Change to DeletedByUser by issuer2, no change', done => {
-    Attestation.revoke(subject2, dataHash3, Status.DeletedByUser, revocationKey3, {from: issuer2}).then(() => {
-      return Attestation.get.call(subject2, dataHash3)
+    Attestation.deleteAttestation (dataHash3, {from: issuer2}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject2, dataHash3)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.Revoked, 'should be Revoked')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash3)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(issuerStatus[0], false, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.Valid, 'should be Valid')
       done()	  
     }).catch(done)
   })
 
-  it('Change to DeletedByUser by subject 2', done => {
-    Attestation.revoke(subject2, dataHash3, Status.DeletedByUser, 0, {from: subject2}).then(() => {
-      return Attestation.get.call(subject2, dataHash3)
+  it('Direct Change to Revoked by issuer2', done => {
+    Attestation.revokeAttestation(revHash3, Status.Revoked, {from: issuer2}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject2, dataHash3)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash3)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(issuerStatus[0], true, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Revoked, 'should be Revoked')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.Revoked, 'should be Revoked')
       done()	  
     }).catch(done)
   })
 
-   it('Back Change to Valid by subject2, no change', done => {
-    Attestation.revoke(subject2, dataHash3, Status.Valid, 0, {from: subject2}).then(() => {
-      return Attestation.get.call(subject2, dataHash3)
+  it('Back Change to Valid by Issuer2, no change', done => {
+    Attestation.revokeAttestation(revHash3, Status.Valid, {from: issuer2}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject2, dataHash3)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
-      done()	  
-    }).catch(done)
-  })
-
-   it('Back Change to AskIssuer by subject2, no change', done => {
-    Attestation.revoke(subject2, dataHash3, Status.AskIssuer, 0, {from: subject2}).then(() => {
-      return Attestation.get.call(subject2, dataHash3)
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash3)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
-      done()	  
-    }).catch(done)
-  })
-
-   it('Back Change to Revoked by subject2, no change', done => {
-    Attestation.revoke(subject2, dataHash3, Status.Revoked, 0, {from: subject2}).then(() => {
-      return Attestation.get.call(subject2, dataHash3)
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
-      done()	  
-    }).catch(done)
-  })
-
-   it('Back Change to Valid by Issuer2, no change', done => {
-    Attestation.revoke(subject2, dataHash3, Status.Valid, revocationKey3, {from: issuer2}).then(() => {
-      return Attestation.get.call(subject2, dataHash3)
-    }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(issuerStatus[0], true, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Revoked, 'should be Revoked')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.Revoked, 'should be Revoked')
       done()	  
     }).catch(done)
   })
   
    it('Back Change to AskIssuer by Issuer2, no change', done => {
-    Attestation.revoke(subject2, dataHash3, Status.AskIssuer, revocationKey3, {from: issuer2}).then(() => {
-      return Attestation.get.call(subject2, dataHash3)
+    Attestation.revokeAttestation(revHash3, Status.AskIssuer, {from: issuer2}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject2, dataHash3)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash3)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(issuerStatus[0], true, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Revoked, 'should be Revoked')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.Revoked, 'should be Revoked')
+      done()	  
+      }).catch(done)
+  })
+  
+  it('Change to DeletedByUser by subject 2', done => {
+    Attestation.deleteAttestation(dataHash3, {from: subject2}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject2, dataHash3)
+    }).then(function(r) {
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash3)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
+	  assert.strictEqual(issuerStatus[0], true, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Revoked, 'should be Revoked')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
+      done()	  
+    }).catch(done)
+  })
+
+  it('Back Change to Valid by subject2, no change', done => {
+    Attestation.deleteAttestation(dataHash3, {from: subject2}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject2, dataHash3)
+    }).then(function(r) {
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash3)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
+	  assert.strictEqual(issuerStatus[0], true, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Revoked, 'should be Revoked')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
       done()	  
     }).catch(done)
   })
   
-   it('Back Change to Revoked by Issuer2, no change', done => {
-    Attestation.revoke(subject2, dataHash3, Status.Revoked, revocationKey3, {from: issuer2}).then(() => {
-      return Attestation.get.call(subject2, dataHash3)
-    }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
-      done()	  
-    }).catch(done)
-  })
   
-//Test Set 4: Subject2, Issuer2, dataHash4, revocationChallenge4, revocationKey4. Direct jump to DeletedByUser
-  it('Initial Set for subject2 ', done => {
-    console.log ("Test Set 4: Subject2, Issuer2, dataHash4, revocationChallenge4, revocationKey4. Direct jump to DeletedByUser")
-    console.log("dataHash4 :"+dataHash4);
-    console.log("revKey4 :"+revocationKey4);
-    console.log("revCha4 :"+revocationChallenge4);
+//Test Set 4: Subject2, Issuer2, dataHash4, revHash4. Direct jump to DeletedByUser
+  it('Initial Set for subject2 dataHash4 ', done => {
+    console.log("");
+    console.log("Test Set 4: Subject2, Issuer2, dataHash4, revHash4. Direct jump to DeletedByUser")
+    console.log("dataHash4 : " +dataHash4);
+    console.log("revHash4  : " +revHash4);
+    console.log("");
 	
-    Attestation.set(dataHash4, revocationChallenge4, "Direccion4", {from: subject2}).then(() => {
-      return Attestation.get.call(subject2, dataHash4)
+    Attestation.set(dataHash4, "Direccion4", {from: subject2}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject2, dataHash4)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.Valid, 'should be Valid')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash4)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(issuerStatus[0], false, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.Valid, 'should be Valid')
       done()	  
     }).catch(done)
   })
 
   it('Direct Change to DeletedByUser by issuer2, no change', done => {
-    Attestation.revoke(subject2, dataHash4, Status.DeletedByUser, revocationKey4, {from: issuer2}).then(() => {
-      return Attestation.get.call(subject2, dataHash4)
+    Attestation.deleteAttestation(dataHash4, {from: issuer2}).then(() => {
+      return Attestation.subjectAttestationStatus.call(subject2, dataHash4)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.Valid, 'should be Valid')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash4)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(issuerStatus[0], false, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.Valid, 'should be Valid')
       done()	  
     }).catch(done)
   })
   
   it('Direct Change to DeletedByUser by subject2', done => {
-    Attestation.revoke(subject2, dataHash4, Status.DeletedByUser, 0, {from: subject2}).then(() => {
-      return Attestation.get.call(subject2, dataHash4)
+    Attestation.deleteAttestation(dataHash4, {from: subject2}).then(() => {
+       return Attestation.subjectAttestationStatus.call(subject2, dataHash4)
     }).then(function(r) {
-      console.log("exists   :", r[0])
-      console.log("status   :", r[1])
-	  assert.strictEqual(r[0], true, 'should exists')
-	  assert.strictEqual(r[1].toNumber(), Status.DeletedByUser, 'should be Revoked')
+	  subjectStatus = r
+      return Attestation.issuerRevocationStatus.call(issuer2, revHash4)
+    }).then(function(r) {
+	  issuerStatus = r
+      return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+    }).then(function(r) {
+	  attestationStatus = r
+      console.log("subject    : ", subjectStatus)
+      console.log("issuer     : ", issuerStatus)
+      console.log("attestation: ", attestationStatus)
+	  assert.strictEqual(subjectStatus[0], true, 'should exist')
+	  assert.strictEqual(subjectStatus[1].toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
+	  assert.strictEqual(issuerStatus[0], false, 'should exist')
+	  assert.strictEqual(issuerStatus[1].toNumber(), Status.Valid, 'should be Valid')
+	  assert.strictEqual(attestationStatus.toNumber(), Status.DeletedByUser, 'should be DeletedByUser')
       done()	  
     }).catch(done)
   })
-
+  
 })
 
