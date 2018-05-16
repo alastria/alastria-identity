@@ -1,8 +1,16 @@
 pragma solidity ^0.4.19;
 
-// Attestation are registered under Hash(Attestation) Revocations under Hash (Attestations + AttestationSignature)
 contract AlastriaAttestationRegistry{
-  //Variables
+
+  // Attestation are registered under Hash(Attestation) in a (subject, hash) mapping
+  // Revocations are registered under Hash (Attestations + AttestationSignature) in a (issuer, hash) mapping
+  // A List of User attestation Hashes is gathered in a (subject) mapping
+  // To Do: Return attestation URI. Should only be available to user. Mainly as a backup or main index when there are more than one device.
+     // Could be done from attestation mapping in another get function only for subject
+     // or in subjectAttestationList (changing URI from one mapping to the other)
+
+
+   //Variables
   
   int public version; 
   address public previousPublishedVersion;
@@ -17,7 +25,8 @@ contract AlastriaAttestationRegistry{
   }
   // Mapping subject, hash (JSON attestation)
   mapping (address => mapping(bytes32 => Attestation)) private attestationRegistry;
-
+  mapping (address => bytes32[]) private attestationList;
+  
   struct Revocation {
     bool exists;
     Status status;
@@ -43,6 +52,7 @@ contract AlastriaAttestationRegistry{
   function set(bytes32 dataHash, string URI) public {
     require(!attestationRegistry[msg.sender][dataHash].exists);
     attestationRegistry[msg.sender][dataHash] = Attestation(true, Status.Valid, URI);
+    attestationList[msg.sender].push(dataHash);
   }
 
   function deleteAttestation (bytes32 dataHash) public {
@@ -58,6 +68,10 @@ contract AlastriaAttestationRegistry{
   function subjectAttestationStatus (address subject, bytes32 dataHash) constant public returns (bool exists, Status status) {
     Attestation storage value = attestationRegistry[subject][dataHash];
     return (value.exists, value.status);
+  }
+
+  function subjectAttestationList () public view returns (uint, bytes32[]) {
+    return (attestationList[msg.sender].length, attestationList[msg.sender]);
   }
 
   function revokeAttestation(bytes32 revHash, Status status) public {
