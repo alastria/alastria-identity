@@ -2,7 +2,6 @@ pragma solidity ^0.4.19;
 
 contract AlastriaAttestationRegistry{
 
-  // Hola
   // Attestation are registered under Hash(Attestation) in a (subject, hash) mapping
   // Revocations are registered under Hash (Attestations + AttestationSignature) in a (issuer, hash) mapping
   // A List of User attestation Hashes is gathered in a (subject) mapping
