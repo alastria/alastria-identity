@@ -1,11 +1,11 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.23;
 
 contract AlastriaAttestationRegistry{
 
   // Attestation are registered under Hash(Attestation) in a (subject, hash) mapping
   // Revocations are registered under Hash (Attestations + AttestationSignature) in a (issuer, hash) mapping
-  // A List of User attestation Hashes is gathered in a (subject) mapping
-  // To Do: Return attestation URI. Should only be available to user. Mainly as a backup or main index when there are more than one device.
+  // A List of Subject attestation Hashes is gathered in a (subject) mapping
+  // To Do: Return attestation URI. Should only be available to Subject. Mainly as a backup or main index when there are more than one device.
      // Could be done from attestation mapping in another get function only for subject
      // or in subjectAttestationList (changing URI from one mapping to the other)
 
@@ -15,9 +15,9 @@ contract AlastriaAttestationRegistry{
   int public version; 
   address public previousPublishedVersion;
 
-  // Attestation: Initially Valid: Only DeletedByUser
+  // Attestation: Initially Valid: Only DeletedBySubject
   // Revocations: Initially Valid: Only AskIssuer or Revoked, no backwards transitions.
-  enum Status {Valid, AskIssuer, Revoked, DeletedByUser}
+  enum Status {Valid, AskIssuer, Revoked, DeletedBySubject}
   struct Attestation {
     bool exists;
     Status status;
@@ -44,7 +44,7 @@ contract AlastriaAttestationRegistry{
   }
 
   //Functions
-  function AlastriaAttestationRegistry (address _previousPublishedVersion) public {
+  constructor (address _previousPublishedVersion) public {
     version = 3;
     previousPublishedVersion = _previousPublishedVersion;
   }
@@ -59,7 +59,7 @@ contract AlastriaAttestationRegistry{
     Attestation storage value = attestationRegistry[msg.sender][dataHash];
     // only existent
     if (value.exists) {
-        value.status = Status.DeletedByUser;
+        value.status = Status.DeletedBySubject;
     }
   }
 
@@ -94,9 +94,9 @@ contract AlastriaAttestationRegistry{
 
   // Utility functions
   // Defining three status functions avoid linking the subject to the issuer or the corresponding hashes
-  function attestationStatus (Status userStatus, Status issuerStatus) pure public returns (Status) {
-     if (userStatus >= issuerStatus) {
-        return userStatus;
+  function attestationStatus (Status subjectStatus, Status issuerStatus) pure public returns (Status) {
+     if (subjectStatus >= issuerStatus) {
+        return subjectStatus;
      } else {
         return issuerStatus;
      }
@@ -106,7 +106,4 @@ contract AlastriaAttestationRegistry{
 	return keccak256 (data);
   }
 
-  function solidityHash(bytes32 data1, bytes32 data2) public pure returns (bytes32) {
-	return keccak256 (data1, data2);
-  }
 }
