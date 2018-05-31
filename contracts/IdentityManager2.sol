@@ -60,14 +60,6 @@ function changeOwner(proxy identity, address newOwner) public onlyIdentityProvid
     emit LogOwnerChanged(identity, newOwner, msg.sender);
 }
 
-/// @dev Allows a recoveryKey to add a new owner with userTimeLock waiting time
-/// @param identity
-/// @param newOwner
-function changeOwnerFromRecovery(proxy identity, address newOwner) public onlyIdentityProvider {
-    require(!isOwner(identity, newOwner));
-    emit LogOwnerAdded(identity, newOwner, msg.sender);
-}
-
 /// @dev Allows an idenity provider to set a new identity identityProvider
 /// @param identityProvider The alastria ID of the new identity provider
 /// TODO: Add checks for the identity provider
