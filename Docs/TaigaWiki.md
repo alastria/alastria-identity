@@ -235,3 +235,6 @@ Cada clave se troceara en n partes (al menos 3) de forma que se pueda reconstrui
 
 En este punto se podría comprobar que el registro de la clave publica en el registry coincide y se recomienda fuertemente recuperar los testimonios y alegaciones del repositorio y sustituir las claves recuperadas por una nueva pareja.
 
+# Documentacion asociada
+Formatos de intercambio
+Diagramas de tiempo
