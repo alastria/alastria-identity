@@ -26,10 +26,15 @@ modifier onlyIdentityProvider () {
 }
 
 //Events
+event LogIdentityCreated(
+    address indexed identity,
+    address indexed creator,
+    address owner);
+
 event LogOwnerChanged(
   address indexed identity,
   address indexed newOner,
-  saddress by);
+  address by);
 
 //Functions
 constructor(address destination, bytes data, uint _version) {
@@ -49,6 +54,7 @@ function createIdentityWithCall(address owner, address destination, bytes data) 
     identityKeys[identity] = owner;
     identity.forward(destination, 0, data);
     indentity.transfer(owner);
+    emit LogIdentityCreated(identity, msg.sender, owner);
 }
 
 /// @dev Change the owner of an identity, can only be called by an identityProvider
