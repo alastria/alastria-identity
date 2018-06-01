@@ -5,8 +5,10 @@
   * Asunciones
   * Creación de Alastria Id
   * Autenticación
-  * Creación de testimonios
+  * Testimonios
+    Emisión, registro, revocación y borrado
   * Entrega de alegaciones
+    Entrega, registro, aceptacióny borrado
   * Publicación de información pública de usuario
   * Transacciones
   * Revocación de testimonios
