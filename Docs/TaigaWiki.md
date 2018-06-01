@@ -50,6 +50,7 @@ A continuación se describen paso a paso cada una de las acciones.
     ```
 	2. Objeto AT enviado al usuario desde el serviceProvider (Paso 2)
 	3. Clave pública del usuario (PubKeyCuentaUsuario)
+
 Se firma el objeto completo de creación de identidad (Alastria Identity Creation)
 
 4. El GateWay verifica:
