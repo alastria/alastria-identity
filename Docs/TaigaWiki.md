@@ -16,7 +16,7 @@
 
 ## Asunciones
 
-Los nodos de Alastria son permisionados y por tanto no es posible iniciar ninguna interacción con la blockchain desde el exterior. Es necesaria una pieza de arquitectura que actué como Gateway (GW) que será gestionada en combinación con los nodos y por los mismos actores. Los usuarios finales necesitan el apoyo de los socios que operan un nodo y GW para todas las acciones.
+Los nodos de Alastria son permisionados y por tanto no es posible iniciar ninguna interacción con la blockchain desde el exterior. Es necesaria una pieza de arquitectura que actué como Gateway (GW) que será gestionada en combinación con los nodos y por los mismos actores. Los usuarios finales necesitan el apoyo de los socios que operan un nodo y GW para todas las acciones. El GW permite detectar y gestionar posibles ataques de denegación de servicio y permite especificar las funciones disponibles.
 
 A continuación se describen paso a paso cada una de las acciones.
 
@@ -98,7 +98,7 @@ El objeto AlastriaSesion va firmado con la PrivKeyUser
 Las claves publicas PubKeyUser y privadas PrivKeyUser se crearán en la aplicación Alastria en el móvil y la privada no saldra nunca del móvil siendo almacenada en un enclave seguro. Las claves de los asociados serán creadas y custodiadas por ellos.
 
 ### Registro
-1. El usuario manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaPublicKeyRegistry.set para que se registre la clave pública con los siguientes datos:
+El usuario manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaPublicKeyRegistry.set para que se registre la clave pública con los siguientes datos:
 	1. publicKey: Hash (pubKeyUser)
 La transacción se envía firmada por la PrivKeyUser
 El registro de una clave implica la inmediata revocación de la clave anterioir si existe.
@@ -121,12 +121,12 @@ La transacción se envía firmada por la PrivKeyUser
 	1. Consulta de datos validados del usuario en el sistema tradicional.
 	2. Generación de un testimonio firmado en formato JSON firmado por el SP para cada uno de los datos validados: signedAttestment
 	3. Envío de cada testimonio al móvil del usuario.
-	4. Almacenamiento de los testimonios deseados en el repositorio accesible exclusivamente por el usuario. Para cada Testimonio generará una URI.
+	4. Almacenamiento de los testimonios deseados en el repositorio accesible exclusivamente por el usuario, se cifrará con la clave pública del usuario (PubKeyUser). Para cada Testimonio generará una URI.
 
 El formato del testimonio es un JSON firmado por la PrivKeySP
 
 ### Registro
-1. El usuario manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaAttestationRegistry.set para que se registre el testimonio con los siguientes datos:
+El usuario manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaAttestationRegistry.set para que se registre el testimonio con los siguientes datos:
 	1. dataHash: Hash (SignedAttestment)
 	2. URI: Localizador abstracto del testimonio en su repositorio.
 La transacción se envía firmada por la PrivKeyUser
@@ -167,9 +167,12 @@ La petición tiene formato JSON firmado por PrivKeySP.
 	2. Aprobación: envío de un Claim con los testimonios elegidos
 	El formato es un JSON firmado por PrivKeyUser
 
+6. Se almacena la Alegación en el repositorio de forma que sólo el usuario pueda acceder, cifrándola con la PubKeyUser. Para cada Testimonio generará una URI.
+
 ### Registro
 El usuario registra el Claim enviado a traves del GW y el identitymanager/proxy al AlastriaClaimRegistry.set para que se registre el claim con los siguientes datos:
 	1. subjectHash: Hash (SignedClaim)
+	2. URI: Localizador abstracto del testimonio en su repositorio.
 La transacción se envía firmada por la PrivKeyUser
 
 ### Aceptacion
@@ -182,19 +185,16 @@ El usuario manda una transaccion a traves del GW y el identitymanager/proxy al A
 	1. dataHash: Hash (SignedClaim)
 La transacción se envía firmada por la PrivKeyUser
 
-Publicación de Metadatos en el Registry
+## El gateway
+El Gateway presentará una interfaz REST y recibirá los parámetros en formato JSON firmado por el emisor de la transacción. Realizará simpre las siguientes validacines genéricas, adicionales a las indicadas en cada una de las operaciones anteriores.
+1. Existencia de la cuenta del emisor (excepto en la creación de AlastriaID)
+2. La firma del emisor.
+3. Que el destinatario de la transacción es el identityManager
 
-    a. JWT. El GW comprueba la firma del emisor.
-    b. Transacción firmada.
-        De: Usr (KPub cliente). El GW comprueba que la cuenta existe.
-        Para: IdentityManager. El GW comprueba la dirección.
-        Función: Forward. El GW comprueba la función llamada Destination = Registry.Set.
-            Parámetros: Identificador ¿opaco o cifrado? del Testimonio, ¿Issuer?, URI.
-
-## Transacciones (to be rewied)
-Cuando una aplicación de uns SP desea que un usuario invoque un contrato la aplicación generará un JWT firmado, con los siguientes datos:
-1. Transacción completa a firmar por el usuario
-	1. Dirección del contrato.
+### Transacciones genéricas 
+Cuando una aplicación de un SP desea que un usuario invoque un contrato la aplicación generará un JWT firmado, con los siguientes datos:
+1. Transacción completa a firmar por el usuario, preparada para ser enviada a traves del IdentityManager/Proxy
+	1. Dirección del contrato destino
 	2. Función a invocar en el contrato.
 	3. Valores de los parámetros.
 2. Descripción amigable de lo que se está solicitando.
@@ -209,34 +209,29 @@ Tras la invocación de la transacción, el Gateway envía el hash de la transacc
 # Recuperación de identidad y claves privadas
 
 ## Restablecimiento de las claves de control
-En caso de pérdida de la clave privada del usuario el identity manager es capaza de restablecer la relación entre una nueva pareja de claves y el contrto proxy que constituye el AlastriaId.
 
-Se contempla que dicha restitución se realice mediante el concurso de 3 o más asociados que hayan sido previamente seleccionados por el usuario y que pertenezcan a la lista blanca de creación de identidades.
+### Cuando se dispone de la clave actual
+Esta opción es útil para sustituir la PrivKeyUser de forma periódica o cuando se suponga que la clave privada ha podido ser comprometida,  pero se conserva. El IdentityManager puede cambiar la asociación entre la antigua clave privada y la nueva y registra la nueva clave publica en el registry. Si se considera que la antigua clave privada ha estado comprometida, se podria solicitar la marca de borrado en la clave publica correspondiente.
 
-## Recuperación de claves
-Se contempla un mecanismo de salvaguardia y recuperación de la clave personal, publica y privada, del usuario.
+## Caso de pérdida
+En caso de pérdida de la clave privada del usuario el identity manager es capaz de restablecer la relación entre una nueva pareja de claves y el contrato proxy que constituye el AlastriaId.
 
-Cada clave se troceara en n partes (al menos 3) de forma que se pueda reconstruir la clave original con cualesquiera n-1 partes. La partes se cifrarán con una password del usuario y se repartirán entre n socios para su salvaguardia. Los socios podrán ser elegidos por el usuario pero se le propondrán 3 socios de los que estén en la lista blanca de creación de identidades o hayan prestado al menos n testimonios de nivel 2-3, en caso de no existir al menos tres socios que cumplan la condición se dará un aviso al usuario.
+Se contempla que dicha restitución se realice mediante el concurso de 3 o más asociados que hayan sido previamente seleccionados por el usuario y que pertenezcan a la lista blanca de creación de identidades. Se está analizando si la participacióin de la FNMT en Alastria puede abrir otras opciones complementarias.
 
-La recuperación de la clave la iniciará el usuario mediante un (nuevo) dispositivo con la aplicación Alastria instalada en la que se habrá creado el par de claves de dispositivo.
+Se mantiene la identidad pero se habrá perdido los testimonios y alegaciones del repositorio salvo que se disponga de un backup.
+
+## Recuperación de claves privada y pública
+Se contempla así mismo un mecanismo de salvaguardia y recuperación de la clave personal, publica y privada, del usuario.
+
+Cada clave se troceara en n partes (al menos 3) de forma que se pueda reconstruir la clave original con cualesquiera n-1 partes mediante la técnic de shamir secret key. La partes se cifrarán con una password del usuario y se repartirán entre n socios para su salvaguardia. Los socios podrán ser elegidos por el usuario pero se le propondrán 3 socios de los que estén en la lista blanca de creación de identidades o hayan prestado al menos n testimonios de nivel 2-3, en caso de no existir al menos tres socios que cumplan la condición se dará un aviso al usuario.
 
 ### Proceso
+1. La recuperación de la clave la iniciará el usuario mediante un (nuevo) dispositivo con la aplicación Alastria instalada.
+2.Identificación ante los sistema tradicionales (off chain) del socio y selección de opción de recuperación de claves Alastria.
+	1. Se genera un Alastria Token.
+	2. Se entrega el Alastria Id correspondiente al usuario identificado y la parte de las claves que almacena el SP.
 
-    Identificación ante los sistema tradicionales (off chain) del socio y selección de opción de recuperación de claves Alastria.
-    a. Se genera un token de sesión que permita enlazar esta identificación con el paso siguiente.
-    b. Se entrega el Alastria Id correspondiente al usuario identificado.
-    c. Se solicita al usuario la llave pública de dispositivo.
+3. Se repetirá el proceso hasta obtener n-1 claves, con las n-1 partes la Aplicación Móvil Alastria pedirá el password al usuario para recomponer y descifrar el par de claves, instalandolas en el enclave.
 
-    Inicio de la recuperación de clave, enviando al GW los siguientes datos:
-    a. Token de sesión.
-    b. Llave de dispositivo firmada por la clave de dispositivo (en este momento el usuario no tiene la clave personal).
+En este punto se podría comprobar que el registro de la clave publica en el registry coincide y se recomienda fuertemente recuperar los testimonios y alegaciones del repositorio y sustituir las claves recuperadas por una nueva pareja.
 
-    El GW verifica que no haya otro Alastria ID para ese dispositivo (la comprobación se hace sobre la llave de dispositivo) ¿y no haya otro dispositivo asociado a ese Alastria Id?.
-
-    El GW solicita al sistema tradicional la parte de la clave personal Alastria correspondiente al AlastriaId y token de sesión.
-
-    Se repetirá el proceso hasta obtener n-1 claves.
-
-    Con las n-1 partes de recompondrá y descifrará el par de claves.
-
-En este punto se podría comprobar que el registro de la clave publica en el registry coincide.
