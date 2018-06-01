@@ -2,17 +2,18 @@
 
 ## En este documento se describen las acciones relacionadas con Alastria Id.
 
-  * Asunciones
-  * Creación de Alastria Id
-  * Autenticación
-  * Testimonios
-    - Emisión, registro, revocación y borrado
-  * Alegaciones
-    - Entrega, registro, aceptacióny borrado
-  * Claves Publicas
-    - Registro, revocación y borrado
-  * Transacciones
-  * Recuperación de claves privadas
+* Asunciones
+* Creación de Alastria Id
+* Autenticación
+* Acciones relativas a Claves Publicas
+	- Creaciión, registro, revocación y borrado
+* Acciones relativas a Testimonios
+	- Emisión, registro, revocación y borrado
+* Acciones relativas a Alegaciones
+	- Entrega, registro, aceptacióny borrado
+* Gateway
+	- Transacciones genéricas
+* Recuperación de claves privadas
 
 ## Asunciones
 
