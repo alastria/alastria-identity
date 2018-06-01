@@ -6,7 +6,7 @@
 * Creación de Alastria Id
 * Autenticación
 * Acciones relativas a Claves Publicas
-	- Creaciión, registro, revocación y borrado
+	- Creación, registro, revocación y borrado
 * Acciones relativas a Testimonios
 	- Emisión, registro, revocación y borrado
 * Acciones relativas a Alegaciones
@@ -17,14 +17,13 @@
 
 ## Asunciones
 
-Los nodos de Alastria son permisionados y por tanto no es posible iniciar ninguna interacción con la blockchain desde el exterior. Es necesaria una pieza de arquitectura que actué como Gateway (GW) que será gestionada en combinación con los nodos y por los mismos actores. Los usuarios finales necesitan el apoyo de los socios que operan un nodo y GW para todas las acciones. El GW permite detectar y gestionar posibles ataques de denegación de servicio y permite especificar las funciones disponibles.
+Los nodos de Alastria son permisionados y por tanto no es posible iniciar ninguna interacción con la blockchain desde el exterior. Es necesaria una pieza de arquitectura que actue como Gateway (GW) que será gestionada en combinación con los nodos y por los mismos actores. Los usuarios finales necesitan el apoyo de los socios que operan un nodo y GW para todas las acciones. El GW permite detectar y gestionar posibles ataques de denegación de servicio y permite especificar las funciones disponibles.
 
 A continuación se describen paso a paso cada una de las acciones.
 
 ## Creación de Alastria Id
 
-1. Creación en el dispositivo del usuario del par de claves personales (pública/privada) y, en su caso, el par de claves de dispositivo en un dispositivo con la aplicación Alastria instalada.
-
+1. Creación en el dispositivo del usuario del par de claves personales (pública/privada).
 2. Identificación ante los sistema tradicionales (off chain) del socio y selección de opción de creación de identidad Alastria.
 	1. El SP  genera un objeto JSON con formato AT (Alastria Token) que permita enlazar esta identificación con el paso siguiente.
 	2. El SP solicita al usuario la llave pública de usuario (Generada en el punto 1).
