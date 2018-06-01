@@ -46,7 +46,7 @@ A continuación se describen paso a paso cada una de las acciones.
       Data: PayloadBytes //createIdentityWithCall(0xCuentaUsuario,AlastriaIDServiceProvider,0xRegistry,PayloadBytesCallRegistry)
     }.FirmaCuentaUsuario
     //Payload llamada a registry
-      Data: registry.SetPubKey(PubKeyCuentaUsuario)
+      Data: registry.SetPubKey(HashPubKeyCuentaUsuario)
     ```
 	2. Objeto AT enviado al usuario desde el serviceProvider (Paso 2)
 	3. Clave pública del usuario (PubKeyCuentaUsuario)
@@ -68,41 +68,43 @@ Se firma el objeto completo de creación de identidad (Alastria Identity Creatio
 ## Autenticación con Alastria Id
 
 1. Acceso a WebApp y selección de Alastria Id como identificación, iniciando la creación de la sesión.
-2. Se envía un Push de requerimiento de Identificación al móvil, seguido de un JWT firmado (K App) con:
-        Session Key
-        Alastria Id de la aplicación
-        Dirección callback del GW
+	1. Se genera un objeto JSON con formato AT (Alastria Token) que permita enlazar esta identificación con el paso siguiente.
+	2. Se solicita al usuario la llave pública y AlastriaID de usuario 
 
-3. Solicitud de la clave publica de la aplicación (Aplicación Alastria -> GW -> BlockChain)
+2. Comprobación de la identidad de la aplicación del SP por la Aplicación Alastria.
+	1. Solicitud de la clave publica de la aplicación (Aplicación Alastria -> GW -> getPubKey(AlastriaIDServiceProvider)
+	2. Verificación de la firma del AT
 
-    Comprobación de la identidad de la aplicación por la Aplicación Alastria.
+3. El usuario manda un JSON firmado de aceptación de sesion a *URLCallBack* conteniendo:
+	1. Objeto AT enviado al usuario desde el serviceProvider
+	2. AlastriaId del Usuario
+	3. Clave pública del usuario (PubKeyCuentaUsuario)
+El objeto de aceptación de sesion va firmado con la ClavePRivadaUsuario
 
-    La Aplicacion Alastria manda la aceptación de la sesión, firmada por KPersonal, al gestor de sesiones
-        Sessión Key
+4. El ServiceProvider recupera el HashPubKeyCuentaUsuario del Registry getPubKey(AlastriaIDUsuario)
 
-    Se recupera la KPub del usuario del Registry
+5. Comprobación de la clave publica y firma del usuario y por tanto de su Identidad.
 
-    Comprobación de la firma del usuario y por tanto de su Identidad.
+6. Si es la primera vez que se accede con AlastriaId puede ser necesario ligarlo con la cuenta en el sistema del proveedor de servicios:
+	1. Utilizando usuario/password u otro sistema de autenticación
+	2. Pidiendo atributos básicos (Nombre/apellidos, DNI) del nivel (LoA) que se considere (p.e.: 2 ó 3)
 
-    Si es la primera vez que se accede con AlastriaId puede ser necesario ligarlo con la cuenta en el sistema del proveedor de servicios:
-        Utilizando usuario/password u otro sistema de autenticación
-        Pidiendo atributos básicos (Nombre/apellidos, DNI) del nivel (LoA) que se considere (p.e.: 2 ó 3)
+7. Envío del token de sesión a la aplicación Web.
 
-    Envío del token de sesión JWT a la aplicación Web.
+## Testimonios
 
-Creación de testimonios
+### Emisión (offchain)
+1. Identificación del usuario ante sistema tradicional del socio mediante AlastriaId (Creación o autenticación) 
+2. Creación de testimonios firmados por el SP para cada atributo 
+	1. Consulta de datos validados del usuario en el sistema tradicional.
+	2. Generación de un testimonio firmado en formato JSON firmado por el SP para cada uno de los datos validados.
+	3. Envío de cada testimonio al móvil del usuario.
+	4. Almacenamiento de los testimonios deseados en el repositorio accesible exclusivamente por el usuario.
 
-    Identificación del usuario ante sistema tradicional del socio con uno de los siguientes mecanismos:
-        Token de sesión de Creación de Alastria ID
-        Token de sesión de Autenticació con Alastria_id
-        Credenciales del sistema tradicional del socio
+### Registro
 
-    Creación de testimonios firmados para cada atributo en formato JWT y envío al móvil del usuario.
-        Consulta de datos validados del usuario en el sistema tradicional.
-        Generación de testimonio firmado en formato JWT para cada uno de los datos validados.
-        Envío de cada testimonio al móvil del usuario y almacenamiento en el repositorio accesible exclusivamente por el usuario.
 
-Entrega de alegaciones
+## Alegaciones
 
     Creación de la solicitud del consumidor de identidad (prestador de servicios) de:
         La lista de atributos requeridos con el nivel EIDAS de cada uno.
