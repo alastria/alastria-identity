@@ -27,7 +27,7 @@ A continuación se describen paso a paso cada una de las acciones.
 2. Identificación ante los sistema tradicionales (off chain) del socio y selección de opción de creación de identidad Alastria.
 	1. Se genera un objeto JSON con formato AT (Alastria Token) que permita enlazar esta identificación con el paso siguiente.
 	2. Se solicita al usuario la llave pública de usuario (Generada en el punto 1).
-	Modelo de datos objeto JSON:
+	3. Modelo de datos objeto JSON:
   ```
   {
     URLGateWay  : http:www.gateway_socio.com
@@ -59,11 +59,17 @@ Se firma el objeto completo de creación de identidad (Alastria Identity Creatio
   4. Si ya existe otro Alastria ID para ese usuario (*0xCuentaUsuario*) no se crea otra identidad y se devuelve la existente
   
 
-El GateWay
+5. El GateWay genera una transacción de creación de Alastria ID:
 
-    El GW devuelve el alastria_id al sistema tradicional del socio así como a la aplicación móvil junto con otros parámetros necesarios de la red (direcciones de contratos, lista de gw, ...).
+De: Gateway.
+Para: MetaIdentityManager.
+Función: CreateIdentity (DeviceKey,...)
 
-Autenticación con Alastria Id
+6. El GW devuelve el alastria_id al sistema tradicional del socio así como a la aplicación móvil junto con otros parámetros necesarios de la red (direcciones de contratos, lista de gw, ...).
+
+7. Se liga el nuevo Alastria ID on el identificador corporativo
+
+## Autenticación con Alastria Id
 
     Acceso a WebApp y selección de Alastria Id como identificación, iniciando la creación de la sesión.
 
