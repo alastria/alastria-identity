@@ -92,7 +92,28 @@ El objeto AlastriaSesion va firmado con la PrivKeyUser
 
 7. Envío del token de sesión a la aplicación Web.
 
-## Testimonios
+## Acciones relativas a Claves Públicas
+
+### Creación
+Las claves publicas PubKeyUser y privadas PrivKeyUser se crearán en la aplicación Alastria en el móvil y la privada no saldra nunca del móvil siendo almacenada en un enclave seguro. Las claves de los asociados serán creadas y custodiadas por ellos.
+
+### Registro
+1. El usuario manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaPublicKeyRegistry.set para que se registre la clave pública con los siguientes datos:
+	1. publicKey: Hash (pubKeyUser)
+La transacción se envía firmada por la PrivKeyUser
+El registro de una clave implica la inmediata revocación de la clave anterioir si existe.
+
+### Revocación
+El usuario manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaPublicKeyRegistry.revokePublicKey para que se registre la revocación de la clave (el fin de su vigencia), con los siguientes datos:
+	1. publicKey: Hash (pubKeyUser)
+La transacción se envía firmada por la PrivKeyAttester
+
+### Borrado
+El usuario manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaPublicKeyRegistry.deletePublicKey para que se registre el borrado de la clave, se indica el fin de su vigencia y que los datos firmados con dicha clave deben dejar de usarse, con los siguientes datos:
+	1. publicKey: Hash (pubKeyUser)
+La transacción se envía firmada por la PrivKeyUser
+
+## Acciones relativas a Testimonios
 
 ### Emisión (offchain)
 1. Identificación del usuario ante sistema tradicional del socio mediante AlastriaId (Creación o autenticación) 
@@ -105,57 +126,64 @@ El objeto AlastriaSesion va firmado con la PrivKeyUser
 El formato del testimonio es un JSON firmado por la PrivKeySP
 
 ### Registro
-1. El usuario manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaAttestationRegistry.set para que se registre el atributo con los siguientes datos:
+1. El usuario manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaAttestationRegistry.set para que se registre el testimonio con los siguientes datos:
 	1. dataHash: Hash (SignedAttestment)
 	2. URI: Localizador abstracto del testimonio en su repositorio.
 La transacción se envía firmada por la PrivKeyUser
 
 ### Revocación
-1. El Testimoniador manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaAttestationRegistry.revokeAttestation para que se registre la revocación del atributo con los siguientes datos:
-	1. revHash: Hash (signedAttestment+AttestmentSignature) 
+El Testimoniador manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaAttestationRegistry.revokeAttestation para que se registre la revocación del testimonio con los siguientes datos:
+	1. revHash: Hash (signedAttestment + AttestmentSignature) 
 	2. Status: askIssuer or Revoked 
-La transacción se envía firmada por la PrivKeySP
+La transacción se envía firmada por la PrivKeyAttester
 
 ### Borrado
-1. El usuario manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaAttestationRegistry.deleteAttestation para que se registre el borrado del atributo con los siguientes datos:
-	1. dataHash: Hash (Testimonio)
+El usuario manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaAttestationRegistry.deleteAttestation para que se registre el borrado del testimonio con los siguientes datos:
+	1. dataHash: Hash (signedAttestment)
 La transacción se envía firmada por la PrivKeyUser
 
-## Alegaciones
+## Acciones relativas a Alegaciones
 
-    Creación de la solicitud del consumidor de identidad (prestador de servicios) de:
-        La lista de atributos requeridos con el nivel EIDAS de cada uno.
-        El callback donde deben ser enviados los datos.
-        Firma del requerimiento (a través de un JWT).
+### Presentación o entrega
+1. El usuario y la aplicación del SP están mutuamente identificados mediante auntenticación Alastria
+2. El SP crea una solicitud de datos (solicitud de Claim), conteniendo:
+	1. La lista de atributos requeridos (identificados mediante el esquema de nombrado y el nombrel del atributo), con el nivel EIDAS requerido de cada uno.
+	2. El callback donde deben ser enviados los datos.
+La petición tiene formato JSON firmado por PrivKeySP.
 
-    Envío de la solicitud de datos al usuario mediante:
-        URL inter aplicación.
-        Push notification al móvil.
-        Código QR para escanear con la aplicación Alastria del móvil.
+3. El SP envía  la solicitud de datos al usuario mediante:
+	1. URL inter aplicación.
+	2. Push notification al móvil.
+	3. Código QR para escanear con la aplicación Alastria del móvil.
 
-    La aplicación valida el requerimiento y realiza las siguientes acciones:
-        La aplicación selecciona los testimonios más adecuados.
-        Se los presenta al usuario para su validación.
-        Permite que el usuario cambie la elección pre-definida.
-        Permite la aprobación/rechazo de la solicitud.
+4. La Aplicación Móvil Alastria valida el requerimiento (comprobación de firma) y realiza las siguientes acciones:
+	1. La aplicación selecciona los testimonios más adecuados.
+	2. Se los presenta al usuario para su validación.
+	3. Permite que el usuario cambie la elección pre-definida.
+	4. Permite la aprobación/rechazo de la solicitud.
 
-    Remisión del callback con la respuesta:
-        rechazo.
-        aprobación: con los testimonios elegidos por el usuario (incluyendo sus firmas originales) más el requerimiento original, en un JWT firmado (por la clave personal del usuario).
+5. Remisión del callback con la respuesta:
+	1. Rechazo.
+	2. Aprobación: envío de un Claim con los testimonios elegidos
+	El formato es un JSON firmado por PrivKeyUser
 
-Publicación de información pública de usuario
+### Registro
+El usuario registra el Claim enviado a traves del GW y el identitymanager/proxy al AlastriaClaimRegistry.set para que se registre el claim con los siguientes datos:
+	1. subjectHash: Hash (SignedClaim)
+La transacción se envía firmada por la PrivKeyUser
 
-NOTA: En una primera versión sólo se registra la clave personal pública del usuario.
-Clave personal pública del usuario en un repositorio
+### Aceptacion
+El ServiceProvider manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaClaimRegistry.confirm para que se registre la recepción del Claim con los siguientes datos:
+	1. SPHash: Hash (SignedClaim + claimSignature) 
+La transacción se envía firmada por la PrivKeySP
+	
+### Borrado
+El usuario manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaClaimRegistry.deleteClaim para que se registre el borrado del Claim con los siguientes datos:
+	1. dataHash: Hash (SignedClaim)
+La transacción se envía firmada por la PrivKeyUser
 
-    Se guarda la clave personal pública del usuario en un objeto JSON en IPFS (u otro repositorio).
-    EL usuario registra por medio de su alastria_id (gateway -> metaidentitycontract -> proxy contract) en el registry el hash IPFS de su clave pública personal.
-
-NOTA: El posible registro de los metadatos de los registros está en estudio, en una primera aproximación se realizaría de la siguiente manera.
 Publicación de Metadatos en el Registry
 
-    Se utilizará la URI correspondiente al JWT de cada testimonio (ver apartado de Creación de Alastria Id).
-    Registrar los atributos, enviando al GW los siguientes datos:
     a. JWT. El GW comprueba la firma del emisor.
     b. Transacción firmada.
         De: Usr (KPub cliente). El GW comprueba que la cuenta existe.
@@ -163,43 +191,36 @@ Publicación de Metadatos en el Registry
         Función: Forward. El GW comprueba la función llamada Destination = Registry.Set.
             Parámetros: Identificador ¿opaco o cifrado? del Testimonio, ¿Issuer?, URI.
 
-Transacción
+## Transacciones (to be rewied)
+Cuando una aplicación de uns SP desea que un usuario invoque un contrato la aplicación generará un JWT firmado, con los siguientes datos:
+1. Transacción completa a firmar por el usuario
+	1. Dirección del contrato.
+	2. Función a invocar en el contrato.
+	3. Valores de los parámetros.
+2. Descripción amigable de lo que se está solicitando.
+3. Callback de respuesta.
 
-    Cuando una aplicación Alastria desea que un usuario invoque un contrato:
+La aplicación presenta la descripción amigable y los datos de la transacción para su aceptación o rechazo. En caso de aprobación, se firma la transacción y se remiten los datos al Gateway y el metaidentitymanager/proxy.
 
-        La aplicación generará un JWT firmado, con los datos de la transacción a firmar por el usuario.
-            Descripción amigable de lo que se está solicitando.
-            Dirección del contrato.
-            Función a invocar en el contrato.
-            Valores de los parámetros.
-            Callback de respuesta.
+Se incorporarán controles sobre las transacción (por ejemplo, que no se trate de ninguno de los contratos relacionados con identidad), etc.
 
-        La aplicación presenta la descripción amigable y los datos de la transacción para su aceptación o rechazo.
+Tras la invocación de la transacción, el Gateway envía el hash de la transacción a la Aplicación Móvil Alastria. El móvil envía a la url de callback el hash de la transacción.
 
-        En caso de aprobación, se firma la transacción y se remiten los datos al Gateway para su envío a la blockchain ¿encaminándolo a través del metaidentitymanager?. En este punto podría incorporarse controles sobre las transacción (por ejemplo, que no se trate de ninguno de los contratos relacionados con identidad).
+# Recuperación de identidad y claves privadas
 
-        El Gateway envía el hash de la transacción al móvil.
+## Restablecimiento de las claves de control
+En caso de pérdida de la clave privada del usuario el identity manager es capaza de restablecer la relación entre una nueva pareja de claves y el contrto proxy que constituye el AlastriaId.
 
-        El móvil envía a la url de callback el hash de la transacción.
+Se contempla que dicha restitución se realice mediante el concurso de 3 o más asociados que hayan sido previamente seleccionados por el usuario y que pertenezcan a la lista blanca de creación de identidades.
 
-Revocacion de testimonios
+## Recuperación de claves
+Se contempla un mecanismo de salvaguardia y recuperación de la clave personal, publica y privada, del usuario.
 
-NOTA: Aunque cualquiera pueda registrar una revocación de un testimonio en el registro, los casos de uso más frecuentes son las revocaciones por el propio usuario, por el emisor del testimonio o por fuerza legal.
+Cada clave se troceara en n partes (al menos 3) de forma que se pueda reconstruir la clave original con cualesquiera n-1 partes. La partes se cifrarán con una password del usuario y se repartirán entre n socios para su salvaguardia. Los socios podrán ser elegidos por el usuario pero se le propondrán 3 socios de los que estén en la lista blanca de creación de identidades o hayan prestado al menos n testimonios de nivel 2-3, en caso de no existir al menos tres socios que cumplan la condición se dará un aviso al usuario.
 
-Para revocar un testimonio, se requiere remitir una transacción al blockchain de Alastria con los siguientes parámetros:
+La recuperación de la clave la iniciará el usuario mediante un (nuevo) dispositivo con la aplicación Alastria instalada en la que se habrá creado el par de claves de dispositivo.
 
-    De: Llave del revocador (emisor/usuario).
-    Para: Registry.
-    Función: revoke (SHA-3 del testimonio)
-
-Recuperación de claves privadas
-
-Se contempla un mecanismo de salvaguardia y recuperación de la clave personal, publica y privada, del usuario. En su caso el mismo mecanismo se podría aplicar a la clave de dispositivo. En futuras versiones se podría utilizar un conjunto de claves derivadas (no en el MVP).
-
-Cada clave se troceara en n partes (al menos 3) de forma que se pueda reconstruir la clave original con cualesquiera n-1 partes. La partes se cifrarán con una password del usuario y se repartirán entre n socios para su salvaguardia. Los socios podrán ser elegidos por el usuario pero se le propondrán 3 socios de los que hayan prestado al menos un testimonio de nivel ¿3?, en caso de no existir al menos tres socios que cumplan la condición se dará un aviso al usuario.
-
-La recuperación de la clave la iniciará el usuario mediante un dispositivo con la aplicación Alastria instalada en la que se habrá creado el par de claves de dispositivo.
-Proceso
+### Proceso
 
     Identificación ante los sistema tradicionales (off chain) del socio y selección de opción de recuperación de claves Alastria.
     a. Se genera un token de sesión que permita enlazar esta identificación con el paso siguiente.
