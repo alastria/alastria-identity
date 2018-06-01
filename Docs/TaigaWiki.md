@@ -67,14 +67,13 @@ Se firma el objeto completo de creación de identidad (Alastria Identity Creatio
 
 ## Autenticación con Alastria Id
 
-    Acceso a WebApp y selección de Alastria Id como identificación, iniciando la creación de la sesión.
-
-    Se envía un Push de requerimiento de Identificación al móvil, seguido de un JWT firmado (K App) con:
+1. Acceso a WebApp y selección de Alastria Id como identificación, iniciando la creación de la sesión.
+2. Se envía un Push de requerimiento de Identificación al móvil, seguido de un JWT firmado (K App) con:
         Session Key
         Alastria Id de la aplicación
         Dirección callback del GW
 
-    Solicitud de la clave publica de la aplicación (Aplicación Alastria -> GW -> BlockChain)
+3. Solicitud de la clave publica de la aplicación (Aplicación Alastria -> GW -> BlockChain)
 
     Comprobación de la identidad de la aplicación por la Aplicación Alastria.
 
