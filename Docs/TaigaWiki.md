@@ -27,7 +27,7 @@ A continuación se describen paso a paso cada una de las acciones.
 2. Identificación ante los sistema tradicionales (off chain) del socio y selección de opción de creación de identidad Alastria.
 	1. Se genera un objeto JSON con formato AT (Alastria Token) que permita enlazar esta identificación con el paso siguiente.
 	2. Se solicita al usuario la llave pública de usuario (Generada en el punto 1).
-	3. Modelo de datos objeto JSON:
+	Modelo de datos objeto JSON:
   ```
   {
     URLGateWay  : http:www.gateway_socio.com
