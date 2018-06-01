@@ -19,7 +19,8 @@
 Los nodos de Alastria son permisionados y por tanto no es posible iniciar ninguna interacción con la blockchain desde el exterior. Es necesaria una pieza de arquitectura que actué como Gateway (GW) que será gestionada en combinación con los nodos y por los mismos actores. Los usuarios finales necesitan el apoyo de los socios que operan un nodo y GW para todas las acciones.
 
 A continuación se describen paso a paso cada una de las acciones.
-Creación de Alastria Id
+
+## Creación de Alastria Id
 
 1. Creación en el dispositivo del usuario del par de claves personales (pública/privada) y, en su caso, el par de claves de dispositivo en un dispositivo con la aplicación Alastria instalada.
 
@@ -53,9 +54,9 @@ Creación de Alastria Id
 Se firma el objeto completo de creación de identidad (Alastria Identity Creation)
 
 4. El GateWay verifica:
-  1. Comprobar la firma de todos los elementos firmados
+  1. Comprueba la firma de todos los elementos firmados
   2. Existe sesión en la capa OAuth
-  3. Que la petición viene autorizada por un service provider capaz de crear identidades
+  3. Que la petición viene autorizada por un service provider capaz de crear identidades (para el MPV será una lista blanca)
   4. Si ya existe otro Alastria ID para ese usuario (*0xCuentaUsuario*) no se crea otra identidad y se devuelve la existente
   
 
