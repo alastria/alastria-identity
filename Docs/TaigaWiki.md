@@ -82,6 +82,7 @@ El objeto Alastria Identity Creation se envía firmado con la PrivKeyUser
 	1. Objeto AT enviado al usuario desde el serviceProvider
 	2. AlastriaId del Usuario
 	3. Clave pública del usuario (PubKeyUser)
+
 El objeto AlastriaSesion va firmado con la PrivKeyUser
 
 4. El ServiceProvider recupera el Hash de PubKeyUser del Registry getPubKey(AlastriaIDUser)
