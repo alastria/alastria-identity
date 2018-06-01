@@ -25,8 +25,8 @@ A continuación se describen paso a paso cada una de las acciones.
 1. Creación en el dispositivo del usuario del par de claves personales (pública/privada) y, en su caso, el par de claves de dispositivo en un dispositivo con la aplicación Alastria instalada.
 
 2. Identificación ante los sistema tradicionales (off chain) del socio y selección de opción de creación de identidad Alastria.
-	1. Se genera un objeto JSON con formato AT (Alastria Token) que permita enlazar esta identificación con el paso siguiente.
-	2. Se solicita al usuario la llave pública de usuario (Generada en el punto 1).
+	1. El SP  genera un objeto JSON con formato AT (Alastria Token) que permita enlazar esta identificación con el paso siguiente.
+	2. El SP solicita al usuario la llave pública de usuario (Generada en el punto 1).
 	3. Modelo de datos objeto JSON:
   ```
   {
@@ -35,8 +35,9 @@ A continuación se describen paso a paso cada una de las acciones.
     AlastriaIDServiceProvider : 0xServiceProvider
   }.firma_service_provider
   ```
+El SP manda una notificación Push al móvil del usuario o presenta un QR que es escaneado por el móvil
 
-3. Creación de Alastria ID por el usuario, enviando al GateWay los siguientes datos:
+3. Creación de Alastria ID por el usuario, enviando al GateWay un Alastria Identity Creation (AIC) con los siguientes datos:
 	1. Objeto de transacción Ethereum para creación de Identidad
     ```
     {
@@ -51,7 +52,7 @@ A continuación se describen paso a paso cada una de las acciones.
 	2. Objeto AT enviado al usuario desde el serviceProvider (Paso 2)
 	3. Clave pública del usuario (PubKeyCuentaUsuario)
 
-Se firma el objeto completo de creación de identidad (Alastria Identity Creation)
+El objeto Alastria Identity Creation se envía firmado con la PrivKeyUser
 
 4. El GateWay verifica:
 	1. Comprueba la firma de todos los elementos firmados
@@ -63,25 +64,25 @@ Se firma el objeto completo de creación de identidad (Alastria Identity Creatio
 
 6. El GW devuelve el alastria_id creado al sistema tradicional del socio así como a la aplicación móvil junto con otros parámetros necesarios de la red (direcciones de contratos, lista de gw, ...).
 
-7. El socio liga el nuevo Alastria ID on el identificador corporativo,para poder usarlo directamente en autenticaciones siguientes.
+7. El socio liga el nuevo Alastria ID con el identificador corporativo,para poder usarlo directamente en autenticaciones siguientes.
 
 ## Autenticación con Alastria Id
 
 1. Acceso a WebApp y selección de Alastria Id como identificación, iniciando la creación de la sesión.
 	1. Se genera un objeto JSON con formato AT (Alastria Token) que permita enlazar esta identificación con el paso siguiente.
-	2. Se solicita al usuario la llave pública y AlastriaID de usuario 
+	2. Se solicita al usuario la PubKeyUser y AlastriaID de usuario 
 
 2. Comprobación de la identidad de la aplicación del SP por la Aplicación Alastria.
 	1. Solicitud de la clave publica de la aplicación (Aplicación Alastria -> GW -> getPubKey(AlastriaIDServiceProvider)
 	2. Verificación de la firma del AT
 
-3. El usuario manda un JSON firmado de aceptación de sesion a *URLCallBack* conteniendo:
+3. El usuario manda un AlastriaSesion (JSON firmado) de aceptación de sesion a *URLCallBack* conteniendo:
 	1. Objeto AT enviado al usuario desde el serviceProvider
 	2. AlastriaId del Usuario
-	3. Clave pública del usuario (PubKeyCuentaUsuario)
-El objeto de aceptación de sesion va firmado con la ClavePRivadaUsuario
+	3. Clave pública del usuario (PubKeyUser)
+El objeto AlastriaSesion va firmado con la PrivKeyUser
 
-4. El ServiceProvider recupera el HashPubKeyCuentaUsuario del Registry getPubKey(AlastriaIDUsuario)
+4. El ServiceProvider recupera el Hash de PubKeyUser del Registry getPubKey(AlastriaIDUser)
 
 5. Comprobación de la clave publica y firma del usuario y por tanto de su Identidad.
 
@@ -97,12 +98,28 @@ El objeto de aceptación de sesion va firmado con la ClavePRivadaUsuario
 1. Identificación del usuario ante sistema tradicional del socio mediante AlastriaId (Creación o autenticación) 
 2. Creación de testimonios firmados por el SP para cada atributo 
 	1. Consulta de datos validados del usuario en el sistema tradicional.
-	2. Generación de un testimonio firmado en formato JSON firmado por el SP para cada uno de los datos validados.
+	2. Generación de un testimonio firmado en formato JSON firmado por el SP para cada uno de los datos validados: signedAttestment
 	3. Envío de cada testimonio al móvil del usuario.
-	4. Almacenamiento de los testimonios deseados en el repositorio accesible exclusivamente por el usuario.
+	4. Almacenamiento de los testimonios deseados en el repositorio accesible exclusivamente por el usuario. Para cada Testimonio generará una URI.
+
+El formato del testimonio es un JSON firmado por la PrivKeySP
 
 ### Registro
+1. El usuario manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaAttestationRegistry.set para que se registre el atributo con los siguientes datos:
+	1. dataHash: Hash (SignedAttestment)
+	2. URI: Localizador abstracto del testimonio en su repositorio.
+La transacción se envía firmada por la PrivKeyUser
 
+### Revocación
+1. El Testimoniador manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaAttestationRegistry.revokeAttestation para que se registre la revocación del atributo con los siguientes datos:
+	1. revHash: Hash (signedAttestment+AttestmentSignature) 
+	2. Status: askIssuer or Revoked 
+La transacción se envía firmada por la PrivKeySP
+
+### Borrado
+1. El usuario manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaAttestationRegistry.deleteAttestation para que se registre el borrado del atributo con los siguientes datos:
+	1. dataHash: Hash (Testimonio)
+La transacción se envía firmada por la PrivKeyUser
 
 ## Alegaciones
 
