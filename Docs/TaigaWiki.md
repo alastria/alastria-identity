@@ -7,11 +7,11 @@
   * Autenticación
   * Testimonios
     - Emisión, registro, revocación y borrado
-  * Entrega de alegaciones
-    Entrega, registro, aceptacióny borrado
-  * Publicación de información pública de usuario
+  * Alegaciones
+    - Entrega, registro, aceptacióny borrado
+  * Claves Publicas
+    - Registro, revocación y borrado
   * Transacciones
-  * Revocación de testimonios
   * Recuperación de claves privadas
 
 ## Asunciones
