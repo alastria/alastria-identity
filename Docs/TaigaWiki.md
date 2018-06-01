@@ -105,17 +105,20 @@ El usuario manda una transaccion a traves del GW y el identitymanager/proxy al A
 
 1. publicKey: Hash (pubKeyUser)
 
-La transacción se envía firmada por la PrivKeyUser
-El registro de una clave implica la inmediata revocación de la clave anterioir si existe.
+La transacción se envía firmada por la PrivKeyUser. El registro de una clave implica la inmediata revocación de la clave anterior si existe.
 
 ### Revocación
 El usuario manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaPublicKeyRegistry.revokePublicKey para que se registre la revocación de la clave (el fin de su vigencia), con los siguientes datos:
+
 	1. publicKey: Hash (pubKeyUser)
+
 La transacción se envía firmada por la PrivKeyAttester
 
 ### Borrado
 El usuario manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaPublicKeyRegistry.deletePublicKey para que se registre el borrado de la clave, se indica el fin de su vigencia y que los datos firmados con dicha clave deben dejar de usarse, con los siguientes datos:
-	1. publicKey: Hash (pubKeyUser)
+
+1. publicKey: Hash (pubKeyUser)
+
 La transacción se envía firmada por la PrivKeyUser
 
 ## Acciones relativas a Testimonios
