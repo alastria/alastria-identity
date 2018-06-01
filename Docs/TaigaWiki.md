@@ -98,11 +98,13 @@ El objeto AlastriaSesion va firmado con la PrivKeyUser
 ## Acciones relativas a Claves Públicas
 
 ### Creación
-Las claves publicas PubKeyUser y privadas PrivKeyUser se crearán en la aplicación Alastria en el móvil y la privada no saldra nunca del móvil siendo almacenada en un enclave seguro. Las claves de los asociados serán creadas y custodiadas por ellos.
+Las claves publicas PubKeyUser y privadas PrivKeyUser se crearán en la aplicación Alastria en el móvil y la privada no saldrá nunca del móvil siendo almacenada en un enclave seguro. Las claves de los asociados serán creadas y custodiadas por ellos.
 
 ### Registro
 El usuario manda una transaccion a traves del GW y el identitymanager/proxy al AlastriaPublicKeyRegistry.set para que se registre la clave pública con los siguientes datos:
-	1. publicKey: Hash (pubKeyUser)
+
+1. publicKey: Hash (pubKeyUser)
+
 La transacción se envía firmada por la PrivKeyUser
 El registro de una clave implica la inmediata revocación de la clave anterioir si existe.
 
