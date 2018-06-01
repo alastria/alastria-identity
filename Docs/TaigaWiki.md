@@ -37,7 +37,7 @@ A continuación se describen paso a paso cada una de las acciones.
   ```
 
 3. Creación de Alastria ID por el usuario, enviando al GateWay los siguientes datos:
-    1. Objeto de transacción Ethereum para creación de Identidad
+	1. Objeto de transacción Ethereum para creación de Identidad
     ```
     {
       From: 0xCuentaUsuario,
@@ -48,8 +48,8 @@ A continuación se describen paso a paso cada una de las acciones.
     //Payload llamada a registry
       Data: registry.SetPubKey(PubKeyCuentaUsuario)
     ```
-    2. Objeto AT enviado al usuario desde el serviceProvider (Paso 2)
-    3. Clave pública del usuario (PubKeyCuentaUsuario)
+	2. Objeto AT enviado al usuario desde el serviceProvider (Paso 2)
+	3. Clave pública del usuario (PubKeyCuentaUsuario)
 Se firma el objeto completo de creación de identidad (Alastria Identity Creation)
 
 4. El GateWay verifica:
