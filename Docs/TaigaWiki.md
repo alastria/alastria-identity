@@ -54,21 +54,16 @@ A continuación se describen paso a paso cada una de las acciones.
 Se firma el objeto completo de creación de identidad (Alastria Identity Creation)
 
 4. El GateWay verifica:
-  1. Comprueba la firma de todos los elementos firmados
-  2. Existe sesión en la capa OAuth
-  3. Que la petición viene autorizada por un service provider capaz de crear identidades (para el MPV será una lista blanca)
-  4. Si ya existe otro Alastria ID para ese usuario (*0xCuentaUsuario*) no se crea otra identidad y se devuelve la existente
+	1. Comprueba la firma de todos los elementos firmados
+	2. Existe sesión en la capa OAuth
+	3. Que la petición viene autorizada por un service provider capaz de crear identidades (para el MPV será una lista blanca)
+	4. Si ya existe otro Alastria ID para ese usuario (*0xCuentaUsuario*) no se crea otra identidad y se devuelve la existente
   
+5. El GateWay manda la transaccion del punto 3 a IdentityManager
 
-5. El GateWay genera una transacción de creación de Alastria ID:
+6. El GW devuelve el alastria_id creado al sistema tradicional del socio así como a la aplicación móvil junto con otros parámetros necesarios de la red (direcciones de contratos, lista de gw, ...).
 
-De: Gateway.
-Para: MetaIdentityManager.
-Función: CreateIdentity (DeviceKey,...)
-
-6. El GW devuelve el alastria_id al sistema tradicional del socio así como a la aplicación móvil junto con otros parámetros necesarios de la red (direcciones de contratos, lista de gw, ...).
-
-7. Se liga el nuevo Alastria ID on el identificador corporativo
+7. El socio liga el nuevo Alastria ID on el identificador corporativo,para poder usarlo directamente en autenticaciones siguientes.
 
 ## Autenticación con Alastria Id
 
