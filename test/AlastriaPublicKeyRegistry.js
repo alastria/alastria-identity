@@ -13,11 +13,11 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
   let subject3 = accounts[2]
   let subject4 = accounts[3]
 
-  var publicKey1 = "PublicKey1"  // Should be web3.eth.abi.encodeParameter("bytes32","WhatEver"))  
-  var publicKey2 = "PublicKey2"  
-  var publicKey3 = "PublicKey2"  
-  var publicKey4 = "PublicKey4"  
-  
+  var publicKey1 = "PublicKey1"  // Should be web3.eth.abi.encodeParameter("bytes32","WhatEver"))
+  var publicKey2 = "PublicKey2"
+  var publicKey3 = "PublicKey2"
+  var publicKey4 = "PublicKey4"
+
 
   // Return Variables from Solidity Smart Contract
   var currentPublicKey
@@ -25,13 +25,13 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
   var blockInfo
   var previousBlockInfo
 
-  
+
   //we can't reuse enum in solidity contract so status definition is duplicated here
   let Status = {
       "Valid": 0,
       "DeletedBySubject": 1
   }
-  
+
   function LogStatus(description) {
     console.log("Test           : ", description);
     console.log("Now            : ", blockInfo.timestamp);
@@ -39,7 +39,7 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
     console.log("publicKeyStatus: "+ publicKeyStatus)
     console.log("publicKeyStatus: ", publicKeyStatus[0], ", " , publicKeyStatus[1], ",", publicKeyStatus[2], ",", publicKeyStatus[3])
   }
-  
+
   before(done => {
     done()
   })
@@ -58,7 +58,7 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
     }).catch(done)
   })
 
-  
+
 //Test Set 1: subject1, publicKey1, publicKey2
   it('Initial Set for subject1, publicKey1', done => {
     console.log("");
@@ -66,7 +66,7 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
     console.log("Subject1  : ", subject1);
     console.log("publicKey1: ", publicKey1)
     console.log("publicKey2: ", publicKey2)/**/
-    console.log("");    
+    console.log("");
     PublicKey.set(publicKey1, {from: subject1}).then(() => {
       blockInfo = web3.eth.getBlock("latest")
       return PublicKey.currentPublicKey.call(subject1)
@@ -83,9 +83,9 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
       assert.strictEqual(publicKeyStatus[2].toNumber(), blockInfo.timestamp, 'should be now')
       assert.strictEqual(publicKeyStatus[3].toNumber(), 0, 'should be 0 notime')
 
-      done()      
+      done()
     }).catch(done)
-    
+
   })
 
   it('Second equal Set for subject1, PublicKey1, will fail & revert', done => {
@@ -113,8 +113,8 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
         assert.strictEqual(publicKeyStatus[3].toNumber(), 0, 'should be 0 notime')
 
         done()
-        })  
-    }).catch(done)   
+        })
+    }).catch(done)
   })
 
   it('Set for subject1, publicKey2', done => {
@@ -144,8 +144,8 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
       assert.strictEqual(publicKeyStatus[2].toNumber(), blockInfo.timestamp, 'should be now')
       assert.strictEqual(publicKeyStatus[3].toNumber(), 0, 'should be 0 notime')
 
-      done()      
-    }).catch(done)    
+      done()
+    }).catch(done)
   })
 
   it('Delete subject1, publicKey1', done => {
@@ -175,8 +175,8 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
       assert.strictEqual(publicKeyStatus[2].toNumber(), previousBlockInfo.timestamp, 'should be unchanged')
       assert.strictEqual(publicKeyStatus[3].toNumber(), 0, 'should be 0 notime')
 
-      done()      
-    }).catch(done)    
+      done()
+    }).catch(done)
   })
 
 
@@ -187,7 +187,7 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
     console.log("subject2  : ", subject2);
     console.log("publicKey3: ", publicKey3)
     console.log("publicKey4: ", publicKey4)/**/
-    console.log("");    
+    console.log("");
     PublicKey.set(publicKey3, {from: subject2}).then(() => {
       blockInfo = web3.eth.getBlock("latest")
       return PublicKey.currentPublicKey.call(subject2)
@@ -204,9 +204,9 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
       assert.strictEqual(publicKeyStatus[2].toNumber(), blockInfo.timestamp, 'should be now')
       assert.strictEqual(publicKeyStatus[3].toNumber(), 0, 'should be 0 notime')
 
-      done()      
+      done()
     }).catch(done)
-    
+
   })
 
   it('Revoke subject2, publicKey3', done => {
@@ -226,10 +226,10 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
       assert.strictEqual(publicKeyStatus[2].toNumber(), previousBlockInfo.timestamp, 'should be unchanged')
       assert.strictEqual(publicKeyStatus[3].toNumber(), blockInfo.timestamp, 'should be now')
 
-      done()      
-    }).catch(done)    
+      done()
+    }).catch(done)
   })
-  
+
   it('Set for subject2, publicKey4', done => {
     PublicKey.set(publicKey4, {from: subject2}).then(() => {
       blockInfo = web3.eth.getBlock("latest")
@@ -256,8 +256,8 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
       assert.strictEqual(publicKeyStatus[2].toNumber(), blockInfo.timestamp, 'should be now')
       assert.strictEqual(publicKeyStatus[3].toNumber(), 0, 'should be 0 notime')
 
-      done()      
-    }).catch(done)    
+      done()
+    }).catch(done)
   })
 
   it('Delete subject2, publicKey3', done => {
@@ -273,10 +273,10 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
       assert.strictEqual(publicKeyStatus[1].toNumber(), Status.DeletedBySubject, 'should be Deleted')
       assert.strictEqual(publicKeyStatus[3].toNumber(), blockInfo.timestamp, 'should be now')
 
-      done()      
-    }).catch(done)    
+      done()
+    }).catch(done)
   })
-  
+
   it('Revoke subject2, deleted publicKey3, no change', done => {
     PublicKey.revokePublicKey(publicKey3, {from: subject2}).then(() => {
       blockInfo = web3.eth.getBlock("latest")
@@ -292,11 +292,10 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
       assert.strictEqual(publicKeyStatus[3].toNumber(), previousBlockInfo.timestamp, 'should be previous')
 // To check      assert.strictEqual(publicKeyStatus[1].toNumber(), Status.DeletedBySubject, 'should be valid')
 
-      done()      
-    }).catch(done)    
+      done()
+    }).catch(done)
   })
-  
 
-  
+
+
 })
-

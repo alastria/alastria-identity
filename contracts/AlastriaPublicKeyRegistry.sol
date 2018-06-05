@@ -3,11 +3,11 @@ pragma solidity ^0.4.24;
 contract AlastriaPublicKeyRegistry{
 
   // This contracts registers and makes publicly avalaible the AlastriaID Public Keys hash and status, current and past.
-  
+
   //To Do: Should we add RevokedBySubject Status?
 
   //Variables
-  int public version; 
+  int public version;
   address public previousPublishedVersion;
 
   // Initially Valid: could only be changed to DeletedBySubject for the time being.
@@ -18,7 +18,7 @@ contract AlastriaPublicKeyRegistry{
     uint startDate;
     uint endDate;
   }
-  // Mapping (subject, publickey) 
+  // Mapping (subject, publickey)
   mapping (address => mapping(bytes32 => PublicKey)) private publicKeyRegistry;
   // mapping subject => publickey
   mapping (address => bytes32[]) public publicKeyList;
@@ -46,7 +46,7 @@ contract AlastriaPublicKeyRegistry{
     publicKeyRegistry[msg.sender][publicKey] = PublicKey(true, Status.Valid, changeDate, 0);
     publicKeyList[msg.sender].push(publicKey);
   }
-
+q
   function revokePublicKey (bytes32 publicKey) public {
     PublicKey storage value = publicKeyRegistry[msg.sender][publicKey];
     // only existent no backtransition
@@ -71,7 +71,7 @@ contract AlastriaPublicKeyRegistry{
         return 0;
     }
   }
-  
+
   function publicKeyStatus (address subject, bytes32 publicKey) constant public returns (bool exists, Status status, uint startDate, uint endDate) {
     PublicKey storage value = publicKeyRegistry[subject][publicKey];
     return (value.exists, value.status, value.startDate, value.endDate);
