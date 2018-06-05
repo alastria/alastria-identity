@@ -11,8 +11,8 @@ contract AlastriaAttestationRegistry{
 
 
    //Variables
-  
-  int public version; 
+
+  int public version;
   address public previousPublishedVersion;
 
   // Attestation: Initially Valid: Only DeletedBySubject
@@ -26,7 +26,7 @@ contract AlastriaAttestationRegistry{
   // Mapping subject, hash (JSON attestation)
   mapping (address => mapping(bytes32 => Attestation)) private attestationRegistry;
   mapping (address => bytes32[]) private attestationList;
-  
+
   struct Revocation {
     bool exists;
     Status status;
@@ -35,7 +35,9 @@ contract AlastriaAttestationRegistry{
   mapping (address => mapping(bytes32 => Revocation)) private revocationRegistry;
 
 
-  //Events
+  //Events. Just for changes, not for initial set
+  event AttestationDeleted (bytes32 dataHash);
+  event AttestationRevoked (bytes32 revHash, Status status);
 
   //Modifiers
   modifier validAddress(address addr) { //protects against some weird attacks
@@ -58,8 +60,9 @@ contract AlastriaAttestationRegistry{
   function deleteAttestation (bytes32 dataHash) public {
     Attestation storage value = attestationRegistry[msg.sender][dataHash];
     // only existent
-    if (value.exists) {
+    if (value.exists && value.status != Status.DeletedBySubject) {
         value.status = Status.DeletedBySubject;
+        emit AttestationDeleted (dataHash);
     }
   }
 
@@ -81,6 +84,7 @@ contract AlastriaAttestationRegistry{
         if (status == Status.AskIssuer || status == Status.Revoked) {
             value.exists = true;
             value.status = status;
+            emit AttestationRevoked (revHash, status);
         }
     }
   }
@@ -100,7 +104,7 @@ contract AlastriaAttestationRegistry{
      } else {
         return issuerStatus;
      }
-  } 
+  }
 
   function solidityHash(bytes data) public pure returns (bytes32) {
 	return keccak256 (data);
