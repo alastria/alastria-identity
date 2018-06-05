@@ -1,15 +1,16 @@
 # Roles
 An attestation is issued by an issuer about a subject and sent offchain by the issuer to the subjet. Each attestation is registered in the BlockChain using hashes.
-Information about an attesttion in the BC only includes the status and the URI where the attestaton is really stored off chain.
-Issuer and subject, included in a given attestation, should be able to update the status of an attestation:
+Information about an attestation in the BC only includes the status and the URI where the attestation is really stored off chain.
+Issuer and subject, included in a given attestation, should be able to update the status of an attestation.
+
 Posible values for the State are: Valid, AskIssuer, Revoked and DeletedBySubject
 
-An attestation could be sent offchain by the subject to a Service Provider as part of a Claim. Service providers having received an attestation shoud be able to access the attestation status but should not be able to change its status.
+An attestation could be sent offchain by the Subject to a Service Provider as part of a Claim. Service providers having received an attestation should be able to access the attestation status but should not be able to change its status.
 
 # Privacy
-To ensure privacy, the relationship between subject and issuer can not be exposed to third parties. Upddates made by subject and those made by issuer should be kept isolated. Updates made by the subject and by the issuer to the status require information available in the attestation. So only by those having a copy of the attestation can update the status. Furthermore only those having a copy of the attestation are able to know where the status of a given attestation is stored.
+To ensure privacy, the relationship between subject and issuer can not be exposed to third parties. Upddates made by subject and those made by issuer should be kept isolated. Updates made by the subject and by the issuer to the status require information available in the attestation. So, only those having a copy of the attestation can update the status. Furthermore only those having a copy of the attestation are able to know where the status of a given attestation is stored.
 
-Alastria Id uses a pair of hashes to allow subject and issuer to update the attestatin status independently. Those hashes can be used by a Service Provider having reveived the attestation as part of a claim to read the status of an attestatoin and act accordingly. 
+Alastria Id uses a pair of hashes to allow subject and issuer to update the attestation status independently. Those two hashes can be used by a Service Provider having reveived the attestation as part of a claim to read the status of an attestatoin and act accordingly. 
  
 ## Subject Attestation Hash
 Subject will use *hash (attestation)*, aka dataHash, to refer to and update the attestation. Attestation is the full attestation including all the fields and the original signature from issuer.
