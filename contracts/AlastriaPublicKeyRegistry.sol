@@ -24,8 +24,10 @@ contract AlastriaPublicKeyRegistry{
   mapping (address => bytes32[]) public publicKeyList;
 
 
-  //Events
-
+  //Events, just for revocation and deletion
+  event PublicKeyDeleted (bytes32 publicKey);
+  event PublicKeyRevoked (bytes32 publicKey);
+  
   //Modifiers
   modifier validAddress(address addr) { //protects against some weird attacks
       require(addr != address(0));
@@ -46,12 +48,13 @@ contract AlastriaPublicKeyRegistry{
     publicKeyRegistry[msg.sender][publicKey] = PublicKey(true, Status.Valid, changeDate, 0);
     publicKeyList[msg.sender].push(publicKey);
   }
-q
+
   function revokePublicKey (bytes32 publicKey) public {
     PublicKey storage value = publicKeyRegistry[msg.sender][publicKey];
     // only existent no backtransition
     if (value.exists || value.status != Status.DeletedBySubject) {
         value.endDate = now;
+        emit PublicKeyRevoked(publicKey);
     }
   }
 
@@ -61,6 +64,7 @@ q
     if (value.exists) {
         value.status = Status.DeletedBySubject;
         value.endDate = now;
+        emit PublicKeyDeleted(publicKey);
     }
   }
 
