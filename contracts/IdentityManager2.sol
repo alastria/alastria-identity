@@ -6,8 +6,9 @@ contract IdentityManager2 {
 //Variables
 mapping(address => address) identityKeys;
 mapping(address => bool) identityProvider;
-uint public version;
+uint256 public version;
 address public previousPublishedVersion;
+proxy public identityManagerId;
 
 //Modifiers
 modifier onlyOwner(address identity) {
@@ -37,12 +38,20 @@ event LogOwnerChanged(
   address by);
 
 //Functions
-constructor(address destination, bytes data, uint _version) {
+constructor(uint256 _version, address _previousVersion) {
+  //TODO require(_version > getPreviousVersion(_previousVersion));
   proxy identity = new proxy();
   identityKeys[identity] = msg.sender;
   identity.forward(destination, 0, data);
   indentity.transfer(msg.sender);
   identityProvider[identity] = true;
+  version = _version;
+  previousPublishedVersion = _previousVersion;
+  if (_version == 0) {
+    proxy identityManagerId = new proxy();
+  } else {
+    identityManagerId.transfer(address(this));
+  }
 }
 
 /// @dev Creates a new proxy contract for an owner and recovery and allows an initial forward call which would be to set the registry in our case
