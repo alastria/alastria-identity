@@ -52,7 +52,7 @@ contract AlastriaPublicKeyRegistry{
   function revokePublicKey (bytes32 publicKey) public {
     PublicKey storage value = publicKeyRegistry[msg.sender][publicKey];
     // only existent no backtransition
-    if (value.exists || value.status != Status.DeletedBySubject) {
+    if (value.exists && value.status != Status.DeletedBySubject) {
         value.endDate = now;
         emit PublicKeyRevoked(publicKey);
     }
@@ -68,7 +68,7 @@ contract AlastriaPublicKeyRegistry{
     }
   }
 
-  function currentPublicKey (address subject) constant public returns (bytes32) {
+  function currentPublicKey (address subject) view public returns (bytes32) {
     if (publicKeyList[subject].length > 0) {
         return publicKeyList[subject][publicKeyList[subject].length-1];
     } else {
@@ -76,7 +76,7 @@ contract AlastriaPublicKeyRegistry{
     }
   }
 
-  function publicKeyStatus (address subject, bytes32 publicKey) constant public returns (bool exists, Status status, uint startDate, uint endDate) {
+  function publicKeyStatus (address subject, bytes32 publicKey) view public returns (bool exists, Status status, uint startDate, uint endDate) {
     PublicKey storage value = publicKeyRegistry[subject][publicKey];
     return (value.exists, value.status, value.startDate, value.endDate);
   }
