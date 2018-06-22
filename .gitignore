@@ -69,6 +69,9 @@ build/
 #PlantUML exports
 out/
 
-#solium ignore
+#Solium
 .soliumignore
 .soliumrc.json
+
+#Test
+test/
