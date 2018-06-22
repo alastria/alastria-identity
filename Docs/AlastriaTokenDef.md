@@ -1,4 +1,0 @@
-# Alstria token
-```
-
-```

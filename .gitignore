@@ -63,8 +63,12 @@ NOTAS.txt
 #app
 app/
 
-#Truffle binary 
+#Truffle binary
 build/
 
 #PlantUML exports
 out/
+
+#solium ignore
+.soliumignore
+.soliumrc.json
