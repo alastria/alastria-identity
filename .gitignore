@@ -68,3 +68,13 @@ build/
 
 #PlantUML exports
 out/
+
+#Solium
+.soliumignore
+.soliumrc.json
+
+#Truffle
+truffle.js
+truffle-config.js
+truffle.js.bak
+
