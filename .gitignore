@@ -75,3 +75,6 @@ out/
 
 #Test
 test/
+
+#Truffle
+truffle.js
