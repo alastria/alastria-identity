@@ -2,9 +2,9 @@ pragma solidity ^0.4.23;
 
 import('./proxy.sol');
 
-contract IdentityManager2 {
+contract AlastriaIdentityManager {
 //Variables
-mapping(address => address) identityKeys;
+mapping(address => address) public identityKeys; //change to alastriaID created check bool
 mapping(address => bool) identityProvider;
 uint256 public version;
 address public previousPublishedVersion;
@@ -61,7 +61,7 @@ constructor(uint256 _version, address _previousVersion) {
 function createIdentityWithCall(address owner, address destination, bytes data) public onlyIdentityProvider validAddress(owner){
     proxy identity = new proxy();
     identityKeys[identity] = owner;
-    identity.forward(destination, 0, data);
+    identity.forward(destination, 0, data);//must be alastria registry call
     indentity.transfer(owner);
     emit LogIdentityCreated(identity, msg.sender, owner);
 }
