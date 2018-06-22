@@ -1,75 +1,112 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.24;
 
 contract AlastriaAttestationRegistry{
-  //Variables
-  
-  int public version;	
+
+  // Attestation are registered under Hash(Attestation) in a (subject, hash) mapping
+  // Revocations are registered under Hash (Attestations + AttestationSignature) in a (issuer, hash) mapping
+  // A List of Subject attestation Hashes is gathered in a (subject) mapping
+  // To Do: Return attestation URI. Should only be available to Subject. Mainly as a backup or main index when there are more than one device.
+    // Could be done from attestation mapping in another get function only for subject
+    // or in subjectAttestationList (changing URI from one mapping to the other)
+
+
+  // Variables
+
+  int public version;
   address public previousPublishedVersion;
 
-  enum Status {Valid, AskIssuer, Revoked, DeletedByUser} // Initially Valid, no backwards transitions allowed.
-  struct attestation {
+  // Attestation: Initially Valid: Only DeletedBySubject
+  // Revocations: Initially Valid: Only AskIssuer or Revoked, no backwards transitions.
+  enum Status {Valid, AskIssuer, Revoked, DeletedBySubject}
+  struct Attestation {
     bool exists;
     Status status;
-    bytes32 revocationChallenge;
     string URI;
   }
+  // Mapping subject, hash (JSON attestation)
+  mapping (address => mapping(bytes32 => Attestation)) private attestationRegistry;
+  mapping (address => bytes32[]) private attestationList;
 
-  mapping (address => mapping(bytes32 => attestation)) private registry;
+  struct Revocation {
+    bool exists;
+    Status status;
+  }
+  // Mapping issuer, hash (JSON attestation + AttestationSignature)
+  mapping (address => mapping(bytes32 => Revocation)) private revocationRegistry;
 
-  //Events
+
+  // Events. Just for changes, not for initial set
+  event AttestationDeleted (bytes32 dataHash);
+  event AttestationRevoked (bytes32 revHash, Status status);
 
   //Modifiers
   modifier validAddress(address addr) { //protects against some weird attacks
-      require(addr != address(0));
-      _;
-  }
-
-  modifier onlyAllowed (address subject, bytes32 dataHash, bytes32 rKey) {
-    // Only Subject or Issuer (Revocation Key Owner)
-    require(msg.sender == subject || revocationChallenge(subject, dataHash, rKey));
+    require(addr != address(0));
     _;
   }
 
-  //Functions
-    function AlastriaAttestationRegistry (address _previousPublishedVersion) public {
+  // Functions
+  constructor (address _previousPublishedVersion) public {
     version = 3;
     previousPublishedVersion = _previousPublishedVersion;
-    }
-
-  function set(bytes32 dataHash, bytes32 revocationChallenge, string URI) public {
-    require(!registry[msg.sender][dataHash].exists);
-    registry[msg.sender][dataHash] = attestation(true, Status.Valid, revocationChallenge, URI);
   }
 
-  //If the attestation does not exists the return is a void attestation
-  //If we want a log, should we add an event?
-  function get(address subject, bytes32 dataHash) constant public returns (bool exists, Status status) {
-    attestation storage value = registry[subject][dataHash];
+  function set(bytes32 dataHash, string URI) public {
+    require(!attestationRegistry[msg.sender][dataHash].exists);
+    attestationRegistry[msg.sender][dataHash] = Attestation(true, Status.Valid, URI);
+    attestationList[msg.sender].push(dataHash);
+  }
+
+  function deleteAttestation (bytes32 dataHash) public {
+    Attestation storage value = attestationRegistry[msg.sender][dataHash];
+    // only existent
+    if (value.exists && value.status != Status.DeletedBySubject) {
+      value.status = Status.DeletedBySubject;
+      emit AttestationDeleted (dataHash);
+    }
+  }
+
+  // If the attestation does not exists the return is a void attestation
+  // If we want a log, should we add an event?
+  function subjectAttestationStatus (address subject, bytes32 dataHash) view public returns (bool exists, Status status) {
+    Attestation storage value = attestationRegistry[subject][dataHash];
     return (value.exists, value.status);
   }
 
-  function revoke(address subject, bytes32 dataHash, Status status, bytes32 rKey) public onlyAllowed(subject, dataHash, rKey) {
-    attestation storage value = registry[subject][dataHash];
-	
-    //Need verification
-    if (status <= value.status) {
-        // Do nothing, no backwards transitions allowed
-    } else if (status == Status.DeletedByUser && msg.sender == subject) {
-      value.status = status;
-    } else if(status == Status.Revoked) {
+  function subjectAttestationList () public view returns (uint, bytes32[]) {
+    return (attestationList[msg.sender].length, attestationList[msg.sender]);
+  }
+
+  function revokeAttestation(bytes32 revHash, Status status) public {
+    Revocation storage value = revocationRegistry[msg.sender][revHash];
+    // No backward transition, only AskIssuer or Revoked
+    if (status > value.status) {
+      if (status == Status.AskIssuer || status == Status.Revoked) {
+        value.exists = true;
         value.status = status;
-    } else if(status == Status.AskIssuer && msg.sender != subject) {
-        value.status = status;
+        emit AttestationRevoked (revHash, status);
+      }
     }
   }
 
-  // Simple implementation
-  function revocationChallenge(address subject, bytes32 dataHash, bytes32 rKey) public view returns (bool) {
-    return keccak256 (dataHash, rKey) == registry[subject][dataHash].revocationChallenge;
+  // If the attestation does not exists the return is a void attestation
+  // If we want a log, should we add an event?
+  function issuerRevocationStatus(address issuer, bytes32 revHash) view public returns (bool exists, Status status) {
+    Revocation storage value = revocationRegistry[issuer][revHash];
+    return (value.exists, value.status);
   }
-  
-  // Utility function 
-  function revocationHash(bytes32 dataHash, bytes32 rKey) public pure returns (bytes32) {
-	return keccak256 (dataHash, rKey);
+
+  // Utility functions
+  // Defining three status functions avoid linking the subject to the issuer or the corresponding hashes
+  function attestationStatus (Status subjectStatus, Status issuerStatus) pure public returns (Status) {
+    if (subjectStatus >= issuerStatus) {
+      return subjectStatus;
+    } else {
+      return issuerStatus;
+    }
+  }
+
+  function solidityHash(bytes data) public pure returns (bytes32) {
+    return keccak256 (data);
   }
 }
