@@ -1,0 +1,3 @@
+com\everis\alastria\App.class
+com\everis\api\rest\ResponseController.class
+com\everis\domain\Response.class

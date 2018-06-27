@@ -1,0 +1,25 @@
+.example-card {
+    max-width: 400px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .example-header-image {
+    background-size: cover;
+    font-size: 48px;
+  }
+
+  mat-chip {
+    max-width: 100px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  a{
+    width: 20%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }

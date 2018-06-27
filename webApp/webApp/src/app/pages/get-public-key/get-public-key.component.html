@@ -1,0 +1,23 @@
+<div class="example-container">
+    
+    <h3>get-public-key</h3>
+  
+    <form (ngSubmit)="onSubmit(); clear(myNgForm)" [formGroup]="formGroup" #myNgForm="ngForm">
+  
+      <mat-form-field>
+        <input matInput placeholder="alastria_id" type="text" id="alastria_id" required name="alastria_id"
+                class="form-control" formControlName="alastria_id">
+      </mat-form-field>
+  
+      
+      <button type="submit" class="btn btn-success" color="primary" [disabled]="!(formGroup.valid)">Submit</button>
+  
+    </form>
+  </div>
+
+  <br>
+  
+  <mat-card *ngIf="mostrarPubkey">
+    <p><b>AlastriaId:</b>  {{responsePubKey.pubkey}}</p>
+    <p><b>Public Key:</b>  {{responsePubKey.alastria_id}}</p>
+  </mat-card>

@@ -1,0 +1,24 @@
+.header_container {
+    width: 100%;
+    padding: 0.5em 1em;
+}
+
+.logo {
+    vertical-align: middle;
+}
+
+.title {
+    display: inline-block;
+    word-break: break-word;
+    font-size: 0.8em;
+}
+
+h1 img {
+    height: 80px;
+    width: 96px;
+    margin: 0.3em;
+}
+
+h1{
+    text-align: center;
+}

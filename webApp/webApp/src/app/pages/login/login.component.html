@@ -1,0 +1,50 @@
+<br><br>
+
+<mat-card class="example-card" *ngIf="!loginCorrecto">
+  <mat-card-header>
+    <mat-card-title>ALASTRIA ID</mat-card-title>
+  </mat-card-header>
+  <mat-card-actions>
+    <button mat-button color="primary" (click)="openLoginDialog()">SIGN IN</button>
+    <button mat-button color="primary" >CREATE AN ACCOUNT</button>
+    <!--
+      <button mat-button color="primary" (click)="openCreateAccountDialog()">CREATE AN ACCOUNT</button>
+    -->
+  </mat-card-actions>
+</mat-card>
+
+<br><br>
+
+<mat-card class="example-card" *ngIf="loginCorrecto">
+  <mat-card-header>
+    <div mat-card-avatar class="example-header-image"><mat-icon>perm_identity</mat-icon></div>
+    <mat-card-title>{{myUser.user_name}}</mat-card-title>
+    <mat-card-subtitle>{{myUser.pubkey}}</mat-card-subtitle>
+    <mat-card-subtitle> <b>AlastriaId:</b> {{myUser.alastriaId}}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-actions>
+    <button mat-button color="primary" (click)="checkPublicKey()" [disabled]="checkPubKey">Check Public Key</button>
+  </mat-card-actions>
+  <mat-card-content *ngIf="checkPubKey">
+    <mat-list>
+      <mat-divider></mat-divider>
+      <mat-card-content><br><b>Public Key:</b> <br>{{myUser.pubkey}}</mat-card-content>
+      <mat-divider></mat-divider>
+      <mat-card-content><br><b>Alastria Public Key:</b> {{responsePubKey.pubkey}}</mat-card-content>
+      <mat-divider></mat-divider>
+    </mat-list>
+
+    <br>
+    
+    <mat-chip-list class="mat-chip-list-stacked">
+      <mat-chip color="accent" selected="true" *ngIf="isValidPubKey">Todo OK</mat-chip>
+      <mat-chip color="warn" selected="true" *ngIf="!isValidPubKey">MAL</mat-chip>
+    </mat-chip-list>
+  
+
+  </mat-card-content>
+</mat-card>
+
+<br><br>
+
+<a mat-raised-button color="primary" (click)="exit()" *ngIf="loginCorrecto">Exit</a>

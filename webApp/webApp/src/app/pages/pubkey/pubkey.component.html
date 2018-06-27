@@ -1,0 +1,20 @@
+<div class="example-container">
+    
+    <h3>updatePK</h3>
+  
+    <form (ngSubmit)="onSubmit(); clear(myNgForm)" [formGroup]="formGroup" #myNgForm="ngForm">
+  
+      <mat-form-field>
+        <input matInput placeholder="alastria_id" type="text" id="alastria_id" required name="alastria_id"
+                class="form-control" formControlName="alastria_id">
+      </mat-form-field>
+  
+      <mat-form-field>
+        <input matInput placeholder="public_key" type="text" id="public_key" required name="public_key" 
+                class="form-control" formControlName="public_key">
+      </mat-form-field>
+  
+      <button type="submit" class="btn btn-success" color="primary" [disabled]="!(formGroup.valid)">Submit</button>
+  
+    </form>
+  </div>

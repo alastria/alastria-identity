@@ -1,0 +1,32 @@
+<div class="example-container">
+    
+  <h3>identityCreation</h3>
+
+  <form (ngSubmit)="onSubmit(); clear(myNgForm)" [formGroup]="formGroupIdentity" #myNgForm="ngForm">
+
+    <mat-form-field>
+      <input matInput placeholder="alastria_token" type="text" id="alastria_token" required name="alastria_token"
+              class="form-control" formControlName="alastria_token">
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput placeholder="public_key" type="text" id="public_key" required name="public_key" 
+              class="form-control" formControlName="public_key">
+    </mat-form-field>
+
+    <!--
+    <mat-form-field>
+      <input matInput placeholder="transaction" type="text" id="transaction" required name="transaction" 
+              formControlName="transaction" [(ngModel)]="identityCreation.transaction">
+    </mat-form-field>
+    -->
+
+    <mat-form-field>
+      <textarea  rows="10" matInput placeholder="transaction" type="text" id="transaction" required name="transaction" 
+                  class="form-control" formControlName="transaction"></textarea>
+    </mat-form-field>
+
+    <button type="submit" class="btn btn-success" color="primary" [disabled]="!(formGroupIdentity.valid)">Submit</button>
+
+  </form>
+</div>

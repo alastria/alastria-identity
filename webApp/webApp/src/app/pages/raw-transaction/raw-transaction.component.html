@@ -1,0 +1,22 @@
+<div class="example-container">
+    
+    <h3>RawTransaction</h3>
+  
+    <form (ngSubmit)="onSubmit(); clear(myNgForm)" [formGroup]="formGroup" #myNgForm="ngForm">
+  
+      <!--
+      <mat-form-field>
+        <input matInput placeholder="raw_transaction" type="text" id="raw_transaction" required name="raw_transaction"
+                formControlName="raw_transaction" [(ngModel)]="sendRawTransaction.raw_transaction">
+      </mat-form-field>
+    -->
+
+    <mat-form-field>
+        <textarea  rows="10" matInput placeholder="raw_transaction" type="text" id="raw_transaction" required name="raw_transaction"
+          class="form-control" formControlName="raw_transaction"></textarea>
+      </mat-form-field>
+  
+      <button type="submit" class="btn btn-success" color="primary" [disabled]="!(formGroup.valid)">Submit</button>
+  
+    </form>
+  </div>
