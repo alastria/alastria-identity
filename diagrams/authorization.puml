@@ -1,0 +1,207 @@
+@startuml
+
+actor User <<Móvil>>
+actor User_Web <<Browser/App>>
+boundary  Associate_Web
+boundary  Hydra
+boundary  Consent
+boundary  PushMovileManager
+boundary  Gateway
+boundary  MetaIdentityManager
+boundary  Proxy
+boundary  Registry
+
+autonumber
+
+title
+    Proceso de autorización
+end title
+
+User_Web --> Associate_Web: Accedo a algo que requiere autorización
+activate Associate_Web
+alt token == null
+
+    Associate_Web --> Associate_Web: Redirect to http://hydra/oauth2/auth?client_id=?
+
+    Associate_Web -> Hydra: Inicio del proceso consent: http://hydra/oauth2/auth?client_id=?
+    activate Hydra
+
+    Hydra --> Associate_Web: Requiere autenticación: http://consent/login?consent=...
+    deactivate Hydra
+
+    Associate_Web --> Consent: Se llama a http://consent/login?consent=...
+    deactivate Associate_Web
+    activate Consent 
+    activate Consent
+    
+    group Verificación del challenge y obtención del consent
+        Consent-->Hydra: Verificación del challenge
+        activate Hydra
+        note right Hydra:Necesita: client_id, client_secret, grant_type=client_credentials, scope
+        alt access_token es correcto
+            Hydra-->Consent: Access_token OK
+        else access token es incorrecto
+            Hydra-->Consent: Access_token KO
+            deactivate Hydra
+            Consent-->Hydra: Cancela consent
+            deactivate Consent
+            activate Hydra
+            Hydra-->Associate_Web: Autorización no permitida
+            deactivate Hydra
+            activate Associate_Web
+            Associate_Web-->User_Web: No tienes acceso al recurso
+            deactivate Associate_Web
+        end
+    end
+
+    note right Consent: Se genera el Session key y se calcula la URL mapping service
+    group Utilizando una imágen QR
+        Consent->User_Web: Envío de la imágen QR al navegador.
+        activate User_Web
+        group Lectura del QR por la aplicación móvil
+            User_Web->User: Lectura con el móvil del código QR
+            activate User
+            group Verificación de la información recuperada
+                User->Gateway: Solicito la recuperación de la clave pública de la aplicación.
+                activate Gateway
+                Gateway->MetaIdentityManager: Aceptación de la llamada.
+                deactivate Gateway
+                activate MetaIdentityManager
+                MetaIdentityManager->Proxy: Reenvío al proxy.
+                deactivate MetaIdentityManager
+                activate Proxy
+                Proxy->Registry: Recupero la clave pública del usuario
+                deactivate Proxy
+                activate Registry
+                Registry->Gateway: Clave pública del alastria_id asociada a la aplicación 
+                deactivate Registry
+                activate Gateway
+                Gateway->User: Clave pública de alastria_id asociada a la aplicación
+                deactivate Gateway
+            end
+            User->User: Verificación de la firma del JWT enviado con la clave pública de la aplicación
+            note right User: Se pregunta al usuario si quiere acceder a....
+            alt respuesta is OK
+                User-->Consent: Aceptación del inicio de sesión
+                activate Consent
+                Consent-->Hydra: Confirma la solicitud
+                deactivate Consent
+                activate Hydra
+                Hydra->Consent: Solicitud confirmada: http://hydra/oauth2/auth?client_id=...
+                deactivate Hydra
+                activate Consent
+                Consent-->User_Web: Envío redirect: http://hydra/oauth2/auth?client_id=...
+                deactivate Consent
+                User_Web->Hydra: Se llama con: http://hydra/oauth2/auth?client_id=...
+                activate Hydra
+                Hydra->Hydra: Valida que la solicitud de consent es válida, genera el token JWT firmado
+                Hydra-->User_Web: Envío del token de sesión jwt
+                deactivate Hydra
+
+            else respuesta is KO
+                User-->Consent: Rechazo del inicio de sesión
+                deactivate User
+                activate Consent
+                Consent-->Hydra: Cancela consent
+                deactivate Consent
+                activate Hydra
+                Hydra-->Associate_Web: Autorización no permitida
+                deactivate Hydra
+                activate Associate_Web
+                Associate_Web-->User_Web: No tienes acceso al recurso
+                deactivate Associate_Web
+            end
+        end
+    end
+    group Utilizando una notificación push
+        note right Consent: Se genera una URL en el consent para recuperar la información desde el móvil.
+        Consent-->PushMovileManager: Envío de la URL en el consent para obtener la información desde el móvil.
+        deactivate Consent
+        activate PushMovileManager
+        PushMovileManager->User: Envío de la notificación con la URL al móvil
+        deactivate PushMovileManager
+        activate User
+        User->Consent: Con la URL de la notificación, accedo al consent 
+        deactivate User
+        activate Consent
+        Consent->User: Información de la session key y URL Mapping, junto con la información necesaria para la aceptación de la acción por el usuario.
+        deactivate Consent
+        activate User
+        group Verificación de la información recuperada
+            User->Gateway: Solicito la recuperación de la clave pública de la aplicación.
+            activate Gateway
+            Gateway->MetaIdentityManager: Aceptación de la llamada.
+            deactivate Gateway
+            activate MetaIdentityManager
+            MetaIdentityManager->Proxy: Reenvío al proxy.
+            deactivate MetaIdentityManager
+            activate Proxy
+            Proxy->Registry: Recupero la clave pública del usuario
+            deactivate Proxy
+            activate Registry
+            Registry->Gateway: Clave pública del alastria_id asociada a la aplicación 
+            deactivate Registry
+            activate Gateway
+            Gateway->User: Clave pública de alastria_id asociada a la aplicación
+            deactivate Gateway
+        end
+        group Preguntar al usuario por la acción a realizar  
+            note right User: Se pregunta al usuario si quiere acceder a....
+            alt respuesta is OK
+                User-->Consent: Aceptación del inicio de sesión
+                activate Consent
+
+                group Verificación de la información recuperada del usuario
+                    Consent->Gateway: Solicito la recuperación de la clave pública del usuario.
+                    activate Gateway
+                    Gateway->MetaIdentityManager: Aceptación de la llamada.
+                    deactivate Gateway
+                    activate MetaIdentityManager
+                    MetaIdentityManager->Proxy: Reenvío al proxy.
+                    deactivate MetaIdentityManager
+                    activate Proxy
+                    Proxy->Registry: Recupero la clave pública del usuario
+                    deactivate Proxy
+                    activate Registry
+                    Registry->Proxy: Clave pública del alastria_id asociada a la aplicación 
+                    deactivate Registry
+                    Registry->Gateway: Clave pública del alastria_id asociada a la aplicación 
+                    deactivate Registry
+                    activate Gateway
+                    Gateway->User: Clave pública de alastria_id asociada a la aplicación
+                    deactivate Gateway
+                end
+
+                Consent-->Hydra: Confirma la solicitud
+                deactivate Consent
+                activate Hydra
+                Hydra->Consent: Solicitud confirmada: http://hydra/oauth2/auth?client_id=...
+                deactivate Hydra
+                activate Consent
+                Consent-->User_Web: Envío redirect: http://hydra/oauth2/auth?client_id=...
+                deactivate Consent
+                User_Web->Hydra: Se llama con: http://hydra/oauth2/auth?client_id=...
+                activate Hydra
+                Hydra->Hydra: Valida que la solicitud de consent es válida, genera el token JWT firmado
+                Hydra-->User_Web: Envío del token de sesión jwt
+                deactivate Hydra
+                
+            else respuesta is KO
+                User-->Consent: Rechazo del inicio de sesión
+                deactivate User
+                activate Consent
+                Consent-->Hydra: Cancela consent
+                deactivate Consent
+                activate Hydra
+                Hydra-->Associate_Web: Autorización no permitida
+                deactivate Hydra
+                activate Associate_Web
+                Associate_Web-->User_Web: No tienes acceso al recurso
+                deactivate Associate_Web
+                deactivate User_Web
+            end
+        end
+    end
+    
+end
+@enduml

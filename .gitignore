@@ -57,3 +57,14 @@ typings/
 # dotenv environment variables file
 .env
 
+#notes
+NOTAS.txt
+
+#app
+app/
+
+#Truffle binary 
+build/
+
+#PlantUML exports
+out/

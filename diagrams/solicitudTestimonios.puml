@@ -1,0 +1,101 @@
+@startuml
+
+actor User <<Móvil>>
+actor User_Web <<Browser/App>>
+boundary  Associate_Web
+boundary  PushMovileManager
+boundary  Gateway
+boundary  MetaIdentityManager
+boundary  Proxy
+boundary  Registry
+boundary  Repository
+
+autonumber
+
+title
+    Proceso de autorización
+end title
+
+User_Web --> Associate_Web: Accedo a algo que requiere entrega de testimonios.
+activate Associate_Web
+Associate_Web --> Associate_Web: Construyo la solicitud de testimonios.
+note right Associate_Web: Objeto JWT con los campos y sus niveles EIDAS requeridos
+Associate_Web --> PushMovileManager: Envío URL para recuperar la solicitud.
+deactivate Associate_Web
+activate PushMovileManager
+PushMovileManager --> User: Envío URL para recuperar la solicitud al móvil.
+deactivate PushMovileManager
+activate User
+User -> Associate_Web: Obtención de la información par asolicitar los testimonios.
+deactivate User
+activate Associate_Web
+Associate_Web --> User: Objeto con formato JWT con la lista de testimonios y su nivel EIDAS.
+deactivate Associate_Web
+activate User
+group Verificación de la información recuperada
+    User->Gateway: Solicito la recuperación de la clave pública de la aplicación.
+    activate Gateway
+    Gateway->MetaIdentityManager: Aceptación de la llamada.
+    deactivate Gateway
+    activate MetaIdentityManager
+    MetaIdentityManager->Proxy: Reenvío al proxy.
+    deactivate MetaIdentityManager
+    activate Proxy
+    Proxy->Registry: Recupero la clave pública del usuario
+    deactivate Proxy
+    activate Registry
+    Registry->Gateway: Clave pública del alastria_id asociada a la aplicación 
+    deactivate Registry
+    activate Gateway
+    Gateway->User: Clave pública de alastria_id asociada a la aplicación
+    deactivate Gateway
+end
+group Obtención de los testimonios vigentes
+    User->Gateway: Solicito la recuperación de la lista de testimonios vigentes.
+    activate Gateway
+    Gateway->MetaIdentityManager: Aceptación de la llamada.
+    deactivate Gateway
+    activate MetaIdentityManager
+    MetaIdentityManager->Proxy: Reenvío al proxy.
+    deactivate MetaIdentityManager
+    activate Proxy
+    Proxy->Registry: Recuperación de la lista de testimonios evitando los caducados
+    deactivate Proxy
+    activate Registry
+    Registry->Gateway: Clave pública del alastria_id asociada a la aplicación 
+    deactivate Registry
+    activate Gateway
+    Gateway->User: Clave pública de alastria_id asociada a la aplicación
+    deactivate Gateway
+end
+User --> Repository: Solicitud al repositorio de los testimonios disponibles.
+activate Repository
+Repository --> User: Lista de testimonios disponibles para las claves y niveles soliciados.
+deactivate Repository
+note right User: El sistema pre-selecciona el conjunto de testimonios que mejor encaja con la solicitud.
+User --> User: El usuario podrá cambiar la pre-selección de los testimonios.
+
+User --> User_Web: Se entrega en formato JWT los testimonios.
+deactivate User
+activate User_Web
+group Verificación de la información recuperada
+    User_Web->Gateway: Solicito la recuperación de la clave pública del usuario.
+    activate Gateway
+    Gateway->MetaIdentityManager: Aceptación de la llamada.
+    deactivate Gateway
+    activate MetaIdentityManager
+    MetaIdentityManager->Proxy: Reenvío al proxy.
+    deactivate MetaIdentityManager
+    activate Proxy
+    Proxy->Registry: Recupero la clave pública del usuario
+    deactivate Proxy
+    activate Registry
+    Registry->Gateway: Clave pública del alastria_id asociada a la aplicación 
+    deactivate Registry
+    activate Gateway
+    Gateway->User: Clave pública de alastria_id asociada a la aplicación
+    deactivate Gateway
+end
+note right User_Web: La aplicación verifica la firma del objeto JWT con la clave.
+deactivate User_Web
+@enduml
