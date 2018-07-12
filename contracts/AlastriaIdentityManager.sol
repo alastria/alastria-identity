@@ -83,6 +83,8 @@ function newIdentityProvider(address identityProvider) public onlyIdentityProvid
   identityProvider[identityProvider] = true;
 }
 
+//TODO: fallback revoke
+
 //Internals
 //Checks that address a is the first input in msg.data.
 //Has very minimal gas overhead.
