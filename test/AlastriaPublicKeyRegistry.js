@@ -1,31 +1,28 @@
 "use strict";
-var AlastriaPublicKeyRegistry = artifacts.require('./AlastriaPublicKeyRegistry.sol')
-// var Web3Utils = artifacts.require('web3-utils') not available, use solidity function instead.
-
-// To Do: Check previous times in a more consistent way
+var AlastriaPublicKeyRegistry = artifacts.require('./AlastriaPublicKeyRegistry.sol');
 
 
-contract('AlastriaPublicKeyRegistry', function (accounts) {
+contract('AlastriaPublicKeyRegistry', (accounts) => {
   let PublicKey
 
-  let subject1 = accounts[0]
-  let subject2 = accounts[1]
-  let subject3 = accounts[2]
-  let subject4 = accounts[3]
+  let subject1 = accounts[0];
+  let subject2 = accounts[1];
+  let subject3 = accounts[2];
+  let subject4 = accounts[3];
 
-  var publicKey1 = "PublicKey1"  // Should be web3.eth.abi.encodeParameter("bytes32","WhatEver"))
+  var publicKey1 = "PublicKey1";  // Should be web3.eth.abi.encodeParameter("bytes32","WhatEver")º)
 
-  var publicKey2 = "PublicKey2"
-  var publicKey3 = "PublicKey2"
-  var publicKey4 = "PublicKey4"
+  var publicKey2 = "PublicKey2";
+  var publicKey3 = "PublicKey2";
+  var publicKey4 = "PublicKey4";
 
 
   // Return Variables from Solidity Smart Contract
-  var currentPublicKey
-  var publicKeyStatus
-  var blockInfo
-  var previousBlockInfo
-  var txResult
+  var currentPublicKey;
+  var publicKeyStatus;
+  var blockInfo;
+  var previousBlockInfo;
+  var txResult;
 
 
   //we can't reuse enum in solidity contract so status definition is duplicated here
@@ -37,28 +34,23 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
   function LogStatus(description) {
     console.log("Test           : ", description);
     console.log("Now            : ", blockInfo.timestamp);
-    console.log("currentKey     : ", web3.toUtf8(currentPublicKey), ", " , currentPublicKey)
-    console.log("publicKeyStatus: "+ publicKeyStatus)
-    console.log("publicKeyStatus: ", publicKeyStatus[0], ", " , publicKeyStatus[1], ",", publicKeyStatus[2], ",", publicKeyStatus[3])
-  }
+    console.log("currentKey     : ", web3.toUtf8(currentPublicKey), ", " , currentPublicKey);
+    console.log("publicKeyStatus: "+ publicKeyStatus);
+    console.log("publicKeyStatus: ", publicKeyStatus[0], ", " , publicKeyStatus[1], ",", publicKeyStatus[2], ",", publicKeyStatus[3]);
+  };
 
   before(done => {
-    done()
-  })
+    done();
+  });
 
-  it('Creates AlastriaPublicKeyRegistry correctly', done => {
-    let fakePrevVersion = accounts[3]
-    AlastriaPublicKeyRegistry.new(fakePrevVersion, {from: accounts[0], gas: 3141592}).then(publicKey => {
-      PublicKey = publicKey
-      return PublicKey.version()
-    }).then(version => {
-      assert.equal(version.toNumber(), 3)
-      return PublicKey.previousPublishedVersion()
-    }).then(previousVersion => {
-      assert.equal(previousVersion, fakePrevVersion)
-      done()
-    }).catch(done)
-  })
+  it('Creates AlastriaPublicKeyRegistry correctly', async() => {
+    PublicKey = await AlastriaPublicKeyRegistry.deployed();
+    const version = await PublicKey.version();
+    const previousVersion = await PublicKey.previousPublishedVersion();
+
+    assert.equal(version.toNumber(), 3, 'The `version` must be `3`.');
+    assert.equal(previousVersion, accounts[0], 'The contract was deployed for the 0 account.');
+  });
 
 
 //Test Set 1: subject1, publicKey1, publicKey2
@@ -67,8 +59,9 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
     console.log("Test Set 1: Subject1, PublicKey1, PublicKey2")
     console.log("Subject1  : ", subject1);
     console.log("publicKey1: ", publicKey1)
-    console.log("publicKey2: ", publicKey2)/**/
+    console.log("publicKey2: ", publicKey2)
     console.log("");
+
     PublicKey.set(publicKey1, {from: subject1}).then(r => {
       txResult = r
       blockInfo = web3.eth.getBlock("latest")
@@ -194,7 +187,7 @@ contract('AlastriaPublicKeyRegistry', function (accounts) {
     console.log("Test Set 1: subject2, publicKey3, publicKey4")
     console.log("subject2  : ", subject2);
     console.log("publicKey3: ", publicKey3)
-    console.log("publicKey4: ", publicKey4)/**/
+    console.log("publicKey4: ", publicKey4)
     console.log("");
     PublicKey.set(publicKey3, {from: subject2}).then(r => {
       txResult = r

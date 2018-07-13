@@ -1,43 +1,42 @@
 "use strict";
-var AlastriaAttestationRegistry = artifacts.require('./AlastriaAttestationRegistry.sol')
-// var Web3Utils = artifacts.require('web3-utils') not available, use solidity function instead.
+var AlastriaAttestationRegistry = artifacts.require('./AlastriaAttestationRegistry.sol');
 
 
-contract('AlastriaAttestationRegistry', function (accounts) {
-  let Attestation
+contract('AlastriaAttestationRegistry', (accounts) => {
+  let Attestation;
 
-  let subject1 = accounts[0]
-  let subject2 = accounts[1]
-  let issuer1 = accounts[2]
-  let issuer2 = accounts[3]
+  let subject1 = accounts[0];
+  let subject2 = accounts[1];
+  let issuer1 = accounts[2];
+  let issuer2 = accounts[3];
 
-  var attestation1 = "Attestation1"
-  var attestation2 = "Attestation2"
-  var attestation3 = "Attestation2"
-  var attestation4 = "Attestation4"
+  var attestation1 = "Attestation1";
+  var attestation2 = "Attestation2";
+  var attestation3 = "Attestation2";
+  var attestation4 = "Attestation4";
 
-  var dataHash1 = "dataHash1" // Should be web3.eth.abi.encodeParameter("bytes32",web3.utils.soliditySha3(attestation1))
-  var dataHash2 = "dataHash2" // but readable strings make life easier.
-  var dataHash3 = "dataHash3"
-  var dataHash4 = "dataHash4"
+  var dataHash1 = "dataHash1"; // Should be web3.eth.abi.encodeParameter("bytes32",web3.utils.soliditySha3(attestation1))
+  var dataHash2 = "dataHash2"; // but readable strings make life easier.
+  var dataHash3 = "dataHash3";
+  var dataHash4 = "dataHash4";
 
-  var signature1 = "signature1" // Should be the signature of attestation1
-  var signature2 = "signature2"
-  var signature3 = "signature3"
-  var signature4 = "signature4"
+  var signature1 = "signature1"; // Should be the signature of attestation1
+  var signature2 = "signature2";
+  var signature3 = "signature3";
+  var signature4 = "signature4";
 
-  var revHash1 = "revHash1" // Should be web3.eth.abi.encodeParameter("bytes32",web3-utils.soliditySha3(dataHash1 + signature1))
-  var revHash2 = "revHash2"
-  var revHash3 = "revHash3"
-  var revHash4 = "revHash4"
+  var revHash1 = "revHash1"; // Should be web3.eth.abi.encodeParameter("bytes32",web3-utils.soliditySha3(dataHash1 + signature1))
+  var revHash2 = "revHash2";
+  var revHash3 = "revHash3";
+  var revHash4 = "revHash4";
   var revHash
 
   // Return Variables from Solidity Smart Contract
-  var txResult
-  var subjectStatus
-  var issuerStatus
-  var attestationStatus
-  var attestationList
+  var txResult;
+  var subjectStatus;
+  var issuerStatus;
+  var attestationStatus;
+  var attestationList;
 
   //we can't reuse enum in solidity contract so status definition is duplicated here
   let Status = {
@@ -72,36 +71,13 @@ contract('AlastriaAttestationRegistry', function (accounts) {
     done()
   })
 
-  it('Creates AlastriaAttestationRegistry correctly', done => {
-    let fakePrevVersion = accounts[3]
-    AlastriaAttestationRegistry.new(fakePrevVersion, {from: accounts[0], gas: 3141592}).then(attestation => {
-      Attestation = attestation
-      return Attestation.version()
-    }).then(version => {
-      assert.equal(version.toNumber(), 3)
-      return Attestation.previousPublishedVersion()
-    }).then(previousVersion => {
-      assert.equal(previousVersion, fakePrevVersion)
-/*
-      return Attestation.solidityHash.call(dataHash1, revHash1)
-    }).then(revHash => {
-      revHash1 = revHash
-      console.log("revHash1:"+revHash1)
-      return Attestation.solidityHash.call(dataHash2, revHash2)
-    }).then(revHash => {
-      revHash2 = revHash
-      console.log("revHash2:"+revHash2)
-      return Attestation.solidityHash.call(dataHash3, revHash3)
-    }).then(revHash => {
-      revHash3 = revHash
-      console.log("revHash3:"+revHash3)
-      return Attestation.solidityHash.call(dataHash4, revHash4)
-    }).then(revHash => {
-      revHash4 = revHash
-      console.log("revHash4:"+revHash4)
-*/
-      done()
-    }).catch(done)
+  it('Creates AlastriaAttestationRegistry correctly', async() => {
+    Attestation = await AlastriaAttestationRegistry.deployed();
+    const version = await Attestation.version();
+    const previousVersion = await Attestation.previousPublishedVersion();
+    
+    assert.equal(version.toNumber(), 3, 'The `version` must be `3`.');
+    assert.equal(previousVersion, accounts[0], 'The contract was deployed for the 0 account.');
   })
 
 
