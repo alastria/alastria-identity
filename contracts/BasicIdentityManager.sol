@@ -1,4 +1,5 @@
 pragma solidity ^0.4.8;
+
 import "./proxy.sol";
 
 
@@ -12,11 +13,11 @@ contract BasicIdentityManager {
         address indexed identity,
         address indexed creator,
         address owner
-        );
+    );
 
     event newRegistryAdded(
         address newRegistry
-      );
+    );
 
     mapping(address => mapping(address => uint)) owners;
 
@@ -25,7 +26,7 @@ contract BasicIdentityManager {
         _;
     }
 
-    modifier validAddress(address addr) { //protects against some weird attacks
+    modifier validAddress(address addr) {//protects against some weird attacks
         require(addr != address(0));
         _;
     }
@@ -46,15 +47,16 @@ contract BasicIdentityManager {
     /// @dev Creates a new proxy contract for an owner and recovery
     /// @param owner Key who can use this contract to control proxy. Given full power
     /// Gas cost of ~300,000
-    function createIdentity(address owner) public{
+    function createIdentity(address owner) public {
         proxy identity = new proxy();
-        owners[identity][owner] = now - adminTimeLock; // This is to ensure original owner has full power from day one
+        owners[identity][owner] = now - adminTimeLock;
+        // This is to ensure original owner has full power from day one
         LogIdentityCreated(identity, msg.sender, owner);
     }
 
     /// @dev Allows a user to forward a call through their proxy.
     function forwardTo(address sender, proxy identity, address destination, uint value, bytes data) public
-        onlyOwner(identity, sender)
+    onlyOwner(identity, sender)
     {
         identity.forward(destination, value, data);
     }
@@ -62,8 +64,8 @@ contract BasicIdentityManager {
     // @dev Change the address of the target registry used
     // @param _newRegistry New Registry address
     function changeRegistryPoint(address _newRegistry){
-      registry = _newRegistry;
-      newRegistryAdded(_newRegistry);
+        registry = _newRegistry;
+        newRegistryAdded(_newRegistry);
     }
 
     //Checks that address a is the first input in msg.data.

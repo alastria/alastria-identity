@@ -1,18 +1,19 @@
 pragma solidity ^0.4.8;
+
 import "./BasicIdentityManager.sol";
 import "./proxy.sol";
 
 
-contract AlastriaIdentityManager is BasicIdentityManager{
+contract AlastriaIdentityManager is BasicIdentityManager {
 
     struct Attest {
-      bytes32 attHash;
-      bytes32 attUri;
+        bytes32 attHash;
+        bytes32 attUri;
     }
 
-      mapping(address => mapping(address => uint)) limiter;
+    mapping(address => mapping(address => uint)) limiter;
 
-      modifier onlyOlderOwner(address identity, address sender) {
+    modifier onlyOlderOwner(address identity, address sender) {
         require(isOlderOwner(identity, sender));
         _;
     }
@@ -20,8 +21,9 @@ contract AlastriaIdentityManager is BasicIdentityManager{
     modifier onlyRecovery(proxy identity, address sender, bytes _data) {
         uint eidasLevel;
         uint _valueFix;
-        eidasLevel = 3; //Requesting eidasLevel needed
-        require( eidasLevel == 3);
+        eidasLevel = 3;
+        //Requesting eidasLevel needed
+        require(eidasLevel == 3);
         _;
     }
 
@@ -36,13 +38,13 @@ contract AlastriaIdentityManager is BasicIdentityManager{
 
     // @dev Inherit Basic constructor declaration
     function AlastriaIdentityManager(uint _userTimeLock, uint _adminTimeLock, uint _adminRate, address _registry)
-     BasicIdentityManager(_userTimeLock, _adminTimeLock, _adminRate, _registry) {
+    BasicIdentityManager(_userTimeLock, _adminTimeLock, _adminRate, _registry) {
     }
 
     /// @dev Allows a recoveryKey to add a new owner with userTimeLock waiting time
     function addOwnerFromRecovery(address sender, proxy identity, address newOwner, bytes _data) public
-        onlyRecovery(identity, sender, _data)  //eIDAS
-        rateLimited(identity, sender)
+    onlyRecovery(identity, sender, _data) //eIDAS
+    rateLimited(identity, sender)
     {
         require(!isOlderOwner(identity, newOwner));
         owners[identity][newOwner] = now;
@@ -51,8 +53,8 @@ contract AlastriaIdentityManager is BasicIdentityManager{
 
     /// @dev Allows an olderOwner to add a new owner instantly
     function addOwner(address sender, proxy identity, address newOwner) public
-        onlyOlderOwner(identity, sender)
-        rateLimited(identity, sender)
+    onlyOlderOwner(identity, sender)
+    rateLimited(identity, sender)
     {
         require(!isOwner(identity, newOwner));
         owners[identity][newOwner] = now - userTimeLock;
@@ -61,8 +63,8 @@ contract AlastriaIdentityManager is BasicIdentityManager{
 
     /// @dev Allows an owner to remove another owner instantly
     function removeOwner(address sender, proxy identity, address owner) public
-        onlyOlderOwner(identity, sender)
-        rateLimited(identity, sender)
+    onlyOlderOwner(identity, sender)
+    rateLimited(identity, sender)
     {
         // an owner should not be allowed to remove itself
         require(sender != owner);
