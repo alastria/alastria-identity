@@ -68,7 +68,7 @@ contract AlastriaAttestationRegistry {
 
     // If the attestation does not exists the return is a void attestation
     // If we want a log, should we add an event?
-    function subjectAttestationStatus(address subject, bytes32 dataHash) view public returns (bool exists, Status status) {
+    function subjectAttestationStatus(address subject, bytes32 dataHash) view public validAddress(subject) returns (bool exists, Status status) {
         Attestation storage value = attestationRegistry[subject][dataHash];
         return (value.exists, value.status);
     }
@@ -91,12 +91,12 @@ contract AlastriaAttestationRegistry {
 
     // If the attestation does not exists the return is a void attestation
     // If we want a log, should we add an event?
-    function issuerRevocationStatus(address issuer, bytes32 revHash) view public returns (bool exists, Status status) {
+    function issuerRevocationStatus(address issuer, bytes32 revHash) view public validAddress(issuer) returns (bool exists, Status status) {
         Revocation storage value = revocationRegistry[issuer][revHash];
         return (value.exists, value.status);
     }
 
-    // Utility functions
+    // Utility function
     // Defining three status functions avoid linking the subject to the issuer or the corresponding hashes
     function attestationStatus(Status subjectStatus, Status issuerStatus) pure public returns (Status) {
         if (subjectStatus >= issuerStatus) {
@@ -104,9 +104,5 @@ contract AlastriaAttestationRegistry {
         } else {
             return issuerStatus;
         }
-    }
-
-    function solidityHash(bytes data) public pure returns (bytes32) {
-        return keccak256(data);
     }
 }
