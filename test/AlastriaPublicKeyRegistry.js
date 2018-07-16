@@ -5,6 +5,8 @@ var AlastriaPublicKeyRegistry = artifacts.require('./AlastriaPublicKeyRegistry.s
 contract('AlastriaPublicKeyRegistry', (accounts) => {
   let PublicKey
 
+  var verboseLevel = 1;
+
   let subject1 = accounts[0];
   let subject2 = accounts[1];
   let subject3 = accounts[2];
@@ -31,13 +33,21 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
       "DeletedBySubject": 1
   }
 
-  function LogStatus(description) {
-    console.log("Test           : ", description);
-    console.log("Now            : ", blockInfo.timestamp);
-    console.log("currentKey     : ", web3.toUtf8(currentPublicKey), ", " , currentPublicKey);
-    console.log("publicKeyStatus: "+ publicKeyStatus);
-    console.log("publicKeyStatus: ", publicKeyStatus[0], ", " , publicKeyStatus[1], ",", publicKeyStatus[2], ",", publicKeyStatus[3]);
+  function logStatus (verbosity, description) {
+    if (verbosity <= verboseLevel) {
+      console.log("Test           : ", description);
+      console.log("Now            : ", blockInfo.timestamp);
+      console.log("currentKey     : ", web3.toUtf8(currentPublicKey), ", " , currentPublicKey);
+      console.log("publicKeyStatus: "+ publicKeyStatus);
+      console.log("publicKeyStatus: ", publicKeyStatus[0], ", " , publicKeyStatus[1], ",", publicKeyStatus[2], ",", publicKeyStatus[3]);
+    }
   };
+
+  function log (verbosity, message) {
+    if (verbosity <= verboseLevel) {
+      console.log(message);
+    }
+  }
 
   before(done => {
     done();
@@ -55,12 +65,12 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
 
 //Test Set 1: subject1, publicKey1, publicKey2
   it('Initial Set for subject1, publicKey1', done => {
-    console.log("");
-    console.log("Test Set 1: Subject1, PublicKey1, PublicKey2")
-    console.log("Subject1  : ", subject1);
-    console.log("publicKey1: ", publicKey1)
-    console.log("publicKey2: ", publicKey2)
-    console.log("");
+    log(2,  "");
+    log(2,  "Test Set 1: Subject1, PublicKey1, PublicKey2")
+    log(2,  "Subject1  : ", subject1);
+    log(2,  "publicKey1: ", publicKey1)
+    log(2,  "publicKey2: ", publicKey2)
+    log(2,  "");
 
     PublicKey.set(publicKey1, {from: subject1}).then(r => {
       txResult = r
@@ -72,7 +82,7 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
     }).then(function(r) {
       publicKeyStatus = r
 
-      LogStatus("Subject1")
+      logStatus (2, "Subject1")
       assert.strictEqual(web3.toUtf8(currentPublicKey), publicKey1, 'should be publicKey1')
       assert.strictEqual(publicKeyStatus[0], true, 'should exist')
       assert.strictEqual(publicKeyStatus[1].toNumber(), Status.Valid, 'should be valid')
@@ -86,14 +96,14 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
 
   it('Second equal Set for subject1, PublicKey1, will fail & revert', done => {
     PublicKey.set(publicKey1, {from: subject1}).then(() => {
-    console.log ("")
+    log(2,  "")
     assert (false, "ERROR: Expected exception")
-    console.log ("")
+    log(2,  "")
     done()
     }).catch ( () => {
-      console.log ("")
-      console.log ("Expected exception caught, check nothing changed")
-      console.log ("")
+      log(2,  "")
+      log(2,  "Expected exception caught, check nothing changed")
+      log(2,  "")
       return PublicKey.currentPublicKey.call(subject1)
       .then(function(r) {
         currentPublicKey = r
@@ -101,7 +111,7 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
       }).then(function(r) {
         publicKeyStatus = r
 
-        LogStatus("")
+        logStatus (2, "")
         assert.strictEqual(web3.toUtf8(currentPublicKey), publicKey1, 'should be publicKey1')
         assert.strictEqual(publicKeyStatus[0], true, 'should exist')
         assert.strictEqual(publicKeyStatus[1].toNumber(), Status.Valid, 'should be valid')
@@ -121,7 +131,7 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
       return PublicKey.publicKeyStatus.call(subject1, publicKey1)
     }).then(function(r) {
       publicKeyStatus = r
-      LogStatus("pubkey 1 endDate updated to now")
+      logStatus (2, "pubkey 1 endDate updated to now")
       assert.strictEqual(publicKeyStatus[0], true, 'should exist')
       assert.strictEqual(publicKeyStatus[1].toNumber(), Status.Valid, 'should be valid')
       assert.strictEqual(publicKeyStatus[2].toNumber(), previousBlockInfo.timestamp, 'should be unchanged')
@@ -134,7 +144,7 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
     }).then(function(r) {
       publicKeyStatus = r
 
-      LogStatus("pubKey2 created")
+      logStatus (2, "pubKey2 created")
       assert.strictEqual(web3.toUtf8(currentPublicKey), publicKey2, 'should be publicKey2')
       assert.strictEqual(publicKeyStatus[0], true, 'should exist')
       assert.strictEqual(publicKeyStatus[1].toNumber(), Status.Valid, 'should be valid')
@@ -156,7 +166,7 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
       return PublicKey.publicKeyStatus.call(subject1, publicKey1)
     }).then(function(r) {
       publicKeyStatus = r
-      LogStatus("pubkey 1 deleted")
+      logStatus (2, "pubkey 1 deleted")
       assert.strictEqual(publicKeyStatus[0], true, 'should exist')
       assert.strictEqual(publicKeyStatus[1].toNumber(), Status.DeletedBySubject, 'should be Deleted')
       assert.strictEqual(publicKeyStatus[3].toNumber(), blockInfo.timestamp, 'should be now')
@@ -166,7 +176,7 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
       return PublicKey.publicKeyStatus.call(subject1, publicKey2)
     }).then(function(r) {
       publicKeyStatus = r
-      LogStatus("pubKey2 no change")
+      logStatus (2, "pubKey2 no change")
       assert.strictEqual(web3.toUtf8(currentPublicKey), publicKey2, 'should be publicKey2')
       assert.strictEqual(publicKeyStatus[0], true, 'should exist')
       assert.strictEqual(publicKeyStatus[1].toNumber(), Status.Valid, 'should be valid')
@@ -183,12 +193,12 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
 
   //Test Set 2: subject2, publicKey3, publicKey4
   it('Initial Set for subject2, publicKey3', done => {
-    console.log("");
-    console.log("Test Set 1: subject2, publicKey3, publicKey4")
-    console.log("subject2  : ", subject2);
-    console.log("publicKey3: ", publicKey3)
-    console.log("publicKey4: ", publicKey4)
-    console.log("");
+    log(2,  "");
+    log(2,  "Test Set 1: subject2, publicKey3, publicKey4")
+    log(2,  "subject2  : ", subject2);
+    log(2,  "publicKey3: ", publicKey3)
+    log(2,  "publicKey4: ", publicKey4)
+    log(2,  "");
     PublicKey.set(publicKey3, {from: subject2}).then(r => {
       txResult = r
       blockInfo = web3.eth.getBlock("latest")
@@ -199,7 +209,7 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
     }).then(function(r) {
       publicKeyStatus = r
 
-      LogStatus("subject2 publicKey3 created")
+      logStatus (2, "subject2 publicKey3 created")
       assert.strictEqual(web3.toUtf8(currentPublicKey), publicKey3, 'should be publicKey3')
       assert.strictEqual(publicKeyStatus[0], true, 'should exist')
       assert.strictEqual(publicKeyStatus[1].toNumber(), Status.Valid, 'should be valid')
@@ -222,7 +232,7 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
       return PublicKey.publicKeyStatus.call(subject2, publicKey3)
     }).then(function(r) {
       publicKeyStatus = r
-      LogStatus("pubkey 3 revoked, endDate updated")
+      logStatus (2, "pubkey 3 revoked, endDate updated")
       assert.strictEqual(web3.toUtf8(currentPublicKey), publicKey3, 'should be publicKey3')
       assert.strictEqual(publicKeyStatus[0], true, 'should exist')
       assert.strictEqual(publicKeyStatus[1].toNumber(), Status.Valid, 'should be valid')
@@ -240,7 +250,7 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
       return PublicKey.publicKeyStatus.call(subject2, publicKey3)
     }).then(function(r) {
       publicKeyStatus = r
-      LogStatus("pubkey 1 endDate updated")
+      logStatus (2, "pubkey 1 endDate updated")
       assert.strictEqual(publicKeyStatus[0], true, 'should exist')
       assert.strictEqual(publicKeyStatus[1].toNumber(), Status.Valid, 'should be valid')
       assert.strictEqual(publicKeyStatus[2].toNumber(), previousBlockInfo.timestamp, 'should be unchanged')
@@ -253,7 +263,7 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
     }).then(function(r) {
       publicKeyStatus = r
 
-      LogStatus("pubKey2 created")
+      logStatus (2, "pubKey2 created")
       assert.strictEqual(web3.toUtf8(currentPublicKey), publicKey4, 'should be publicKey4')
       assert.strictEqual(publicKeyStatus[0], true, 'should exist')
       assert.strictEqual(publicKeyStatus[1].toNumber(), Status.Valid, 'should be valid')
@@ -273,7 +283,7 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
       return PublicKey.publicKeyStatus.call(subject2, publicKey3)
     }).then(function(r) {
       publicKeyStatus = r
-      LogStatus("pubkey3 deleted")
+      logStatus (2, "pubkey3 deleted")
       assert.strictEqual(publicKeyStatus[0], true, 'should exist')
       assert.strictEqual(publicKeyStatus[1].toNumber(), Status.DeletedBySubject, 'should be Deleted')
       assert.strictEqual(publicKeyStatus[3].toNumber(), blockInfo.timestamp, 'should be now')
@@ -293,7 +303,7 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
       return PublicKey.publicKeyStatus.call(subject2, publicKey3)
     }).then(function(r) {
       publicKeyStatus = r
-      LogStatus("deleted pubkey3 revoked, no change")
+      logStatus (2, "deleted pubkey3 revoked, no change")
       assert.strictEqual(web3.toUtf8(currentPublicKey), publicKey4, 'should be publicKey4')
       assert.strictEqual(publicKeyStatus[0], true, 'should exist')
       assert.strictEqual(publicKeyStatus[1].toNumber(), Status.DeletedBySubject, 'should be DeletedBySubject')
