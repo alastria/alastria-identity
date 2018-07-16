@@ -5,6 +5,8 @@ var AlastriaAttestationRegistry = artifacts.require('./AlastriaAttestationRegist
 contract('AlastriaAttestationRegistry', (accounts) => {
   let Attestation;
 
+  var verboseLevel = 1;
+
   let subject1 = accounts[0];
   let subject2 = accounts[1];
   let issuer1 = accounts[2];
@@ -38,7 +40,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
   var attestationStatus;
   var attestationList;
 
-  //we can't reuse enum in solidity contract so status definition is duplicated here
+  //we can't reuse enum in solidity contract, so status definition is duplicated here
   let Status = {
       "Valid": 0,
       "AskIssuer": 1,
@@ -46,25 +48,33 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       "DeletedBySubject": 3
   }
 
-  function LogStatus() {
+  function logStatus(verbosity) {
     var i
     var attString
-    /* More detailled view: console.log("subject    : " , subjectStatus[0] , ", " , subjectStatus[1], ",", subjectStatus[1].c)*/
-    console.log("subject    : " + subjectStatus
-    )
-    console.log("issuer     : " + issuerStatus)
-    console.log("att. status: " + attestationStatus)
-    /* console.log("AttList    : ", attestationList) */
-    /* Detailed attestationList one by one in UTF8 */
-    attString = attestationList[0]
-    for (i = 0; i < attestationList[0]; i++) {
-      attString = attString + ", " + web3.toUtf8(attestationList[1][i])
-    }
-    console.log("AttList    : ", attString)
 
-    for (i = 0; i < txResult.logs.length; i++) {
-      console.log("Event      : " + txResult.logs[i].event, ", args: ", txResult.logs[i].args)
+    if (verbosity <= verboseLevel) {
+      /* More detailled view: log(2, "subject    : " , subjectStatus[0] , ", " , subjectStatus[1], ",", subjectStatus[1].c)*/
+      console.log("subject    : " + subjectStatus)
+      console.log("issuer     : " + issuerStatus)
+      console.log("att. status: " + attestationStatus)
+      /* console.log("AttList    : ", attestationList) */
+      /* Detailed attestationList one by one in UTF8 */
+      attString = attestationList[0]
+      for (i = 0; i < attestationList[0]; i++) {
+        attString = attString + ", " + web3.toUtf8(attestationList[1][i])
       }
+      console.log("AttList    : ", attString)
+
+      for (i = 0; i < txResult.logs.length; i++) {
+        console.log("Event      : " + txResult.logs[i].event, ", args: ", txResult.logs[i].args)
+      }
+    }
+  }
+
+  function log (verbosity, message) {
+    if (verbosity <= verboseLevel) {
+      console.log(message);
+    }
   }
 
   before(done => {
@@ -75,7 +85,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
     Attestation = await AlastriaAttestationRegistry.deployed();
     const version = await Attestation.version();
     const previousVersion = await Attestation.previousPublishedVersion();
-    
+
     assert.equal(version.toNumber(), 3, 'The `version` must be `3`.');
     assert.equal(previousVersion, accounts[0], 'The contract was deployed for the 0 account.');
   })
@@ -83,13 +93,13 @@ contract('AlastriaAttestationRegistry', (accounts) => {
 
 //Test Set 1: Subject1, Issuer1, dataHash1, revHash1. One by one transitions
   it('Initial Set for subject1, Issuer1', done => {
-    console.log("");
-    console.log("Test Set 1: Subject1, Issuer1, dataHash1, revHash1. One by one transitions")
-    console.log("Subject1  : "+subject1);
-    console.log("Issuer1   : "+issuer1);
-    console.log("dataHash1 : "+dataHash1);
-    console.log("revHash1  : "+revHash1);
-    console.log("");
+    log(2, "");
+    log(2, "Test Set 1: Subject1, Issuer1, dataHash1, revHash1. One by one transitions")
+    log(2, "Subject1  : "+subject1);
+    log(2, "Issuer1   : "+issuer1);
+    log(2, "dataHash1 : "+dataHash1);
+    log(2, "revHash1  : "+revHash1);
+    log(2, "");
     Attestation.set(dataHash1, "Direccion1", {from: subject1}).then(function(r) {
       txResult = r
       return Attestation.subjectAttestationStatus.call(subject1, dataHash1)
@@ -104,7 +114,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       return Attestation.subjectAttestationList({from: subject1})
     }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be valid')
       assert.strictEqual(issuerStatus[0], false, 'should exist')
@@ -120,14 +130,14 @@ contract('AlastriaAttestationRegistry', (accounts) => {
 
   it('Second equal Set for subject1, Issuer1, will fail & revert', done => {
     Attestation.set(dataHash1, "Direccion1", {from: subject1}).then(() => {
-      console.log ("")
+      log(2, "")
       assert (false, "ERROR: Expected exception")
-      console.log ("")
+      log(2, "")
       done()
     }).catch ( () => {
-      console.log ("")
-      console.log ("Expected exception caught, check nothing changed")
-      console.log ("")
+      log(2, "")
+      log(2, "Expected exception caught, check nothing changed")
+      log(2, "")
       return Attestation.subjectAttestationStatus.call(subject1, dataHash1)
       .then(function(r) {
         subjectStatus = r
@@ -140,7 +150,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
         return Attestation.subjectAttestationList({from: subject1})
       }).then(function(r) {
         attestationList = r
-        LogStatus()
+        logStatus(2)
         assert.strictEqual(subjectStatus[0], true, 'should exist')
         assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be valid')
         assert.strictEqual(issuerStatus[0], false, 'should exist')
@@ -153,6 +163,40 @@ contract('AlastriaAttestationRegistry', (accounts) => {
     }).catch(done)
   })
 
+  it('Change to invalid Status by issuer1, will fail & revert', done => {
+    Attestation.revokeAttestation(revHash1, 10, {from: issuer1}).then(() => {
+      log(2, "")
+      assert (false, "ERROR: Expected exception")
+      log(2, "")
+      done()
+    }).catch ( () => {
+      log(2, "")
+      log(2, "Expected exception caught, check nothing changed")
+      log(2, "")
+      return Attestation.subjectAttestationStatus.call(subject1, dataHash1)
+      .then(function(r) {
+        subjectStatus = r
+        return Attestation.issuerRevocationStatus.call(issuer1, revHash1)
+      }).then(function(r) {
+        issuerStatus = r
+        return Attestation.attestationStatus(subjectStatus[1], issuerStatus[1])
+      }).then(function(r) {
+        attestationStatus = r
+        return Attestation.subjectAttestationList({from: subject1})
+      }).then(function(r) {
+        attestationList = r
+        logStatus(2)
+        assert.strictEqual(subjectStatus[0], true, 'should exist')
+        assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be valid')
+        assert.strictEqual(issuerStatus[0], false, 'should exist')
+        assert.strictEqual(issuerStatus[1].toNumber(), Status.Valid, 'should be valid')
+        assert.strictEqual(attestationStatus.toNumber(), Status.Valid, 'should be valid')
+        assert.strictEqual(attestationList[0].toNumber(), 1, 'should be 1')
+        assert.strictEqual(web3.toUtf8(attestationList[1][0]), dataHash1, 'should be dataHash1')
+        done()
+        })
+    }).catch(done)
+  })
 
   it('Change to AskIssuer by subject, no change', done => {
     Attestation.revokeAttestation(revHash1, Status.AskIssuer, {from: subject1}).then(function(r) {
@@ -169,7 +213,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       return Attestation.subjectAttestationList({from: subject1})
     }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be valid')
       assert.strictEqual(issuerStatus[0], false, 'should exist')
@@ -198,7 +242,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       return Attestation.subjectAttestationList({from: subject1})
     }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be valid')
       assert.strictEqual(issuerStatus[0], true, 'should exist')
@@ -227,7 +271,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       return Attestation.subjectAttestationList({from: subject1})
     }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be valid')
       assert.strictEqual(issuerStatus[0], true, 'should exist')
@@ -256,7 +300,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       return Attestation.subjectAttestationList({from: subject1})
     }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be valid')
       assert.strictEqual(issuerStatus[0], true, 'should exist')
@@ -282,7 +326,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       return Attestation.subjectAttestationList({from: subject1})
     }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.DeletedBySubject, 'should be DeletedBySubject')
       assert.strictEqual(issuerStatus[0], true, 'should exist')
@@ -298,11 +342,11 @@ contract('AlastriaAttestationRegistry', (accounts) => {
 
 //Connjunto 2: Subject1, Issuer2, dataHash2, revHash2. One by one transitions
   it('Initial Set for subject1, Issuer2', done => {
-    console.log("");
-    console.log("Test Set 2: Subject1, Issuer2, dataHash2, revHash2. One by one transitions")
-    console.log("dataHash2 : "+dataHash2);
-    console.log("revHash2  : "+revHash2);
-    console.log("");
+    log(2, "");
+    log(2, "Test Set 2: Subject1, Issuer2, dataHash2, revHash2. One by one transitions")
+    log(2, "dataHash2 : "+dataHash2);
+    log(2, "revHash2  : "+revHash2);
+    log(2, "");
 
     Attestation.set(dataHash2, "Direccion2", {from: subject1}).then(function(r) {
       txResult = r
@@ -318,7 +362,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       return Attestation.subjectAttestationList({from: subject1})
     }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
       assert.strictEqual(issuerStatus[0], false, 'should exist')
@@ -346,7 +390,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       return Attestation.subjectAttestationList({from: subject1})
     }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
       assert.strictEqual(issuerStatus[0], false, 'should exist')
@@ -375,7 +419,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       return Attestation.subjectAttestationList({from: subject1})
     }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
       assert.strictEqual(issuerStatus[0], true, 'should exist')
@@ -404,7 +448,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       return Attestation.subjectAttestationList({from: subject1})
     }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
       assert.strictEqual(issuerStatus[0], true, 'should exist')
@@ -433,7 +477,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       return Attestation.subjectAttestationList({from: subject1})
     }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
       assert.strictEqual(issuerStatus[0], true, 'should exist')
@@ -462,7 +506,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       return Attestation.subjectAttestationList({from: subject1})
     }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
       assert.strictEqual(issuerStatus[0], true, 'should exist')
@@ -491,7 +535,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       return Attestation.subjectAttestationList({from: subject1})
     }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
       assert.strictEqual(issuerStatus[0], true, 'should exist')
@@ -520,12 +564,12 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       return Attestation.subjectAttestationList({from: subject1})
     }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.DeletedBySubject, 'should be DeletedBySubject')
       assert.strictEqual(issuerStatus[0], true, 'should exist')
       assert.strictEqual(issuerStatus[1].toNumber(), Status.Revoked, 'should be Revoked')
-      assert.strictEqual(attestationStatus.toNumber(), Status.DeletedBySubject, 'should be DeletedBySubject')	
+      assert.strictEqual(attestationStatus.toNumber(), Status.DeletedBySubject, 'should be DeletedBySubject')
       assert.strictEqual(txResult.logs.length, 1, 'should be 1')
       assert.strictEqual(txResult.logs[0].event, "AttestationDeleted", 'should be AttestationDeleted')
       assert.strictEqual(web3.toUtf8(txResult.logs[0].args.dataHash), dataHash2, 'should be dataHash2' )
@@ -536,11 +580,11 @@ contract('AlastriaAttestationRegistry', (accounts) => {
 
 //Test Set 3: Subject2, Issuer2, dataHash3, revHash3. Direct jump to Revoked and backtransitions
   it('Initial Set for subject2 ', done => {
-    console.log("");
-    console.log("Test Set 3: Subject2, Issuer2, dataHash3, revHash3. Direct jump to Revoked and backtransitions")
-    console.log("dataHash3 : "+dataHash3);
-    console.log("revHash3  : "+revHash3);
-    console.log("");
+    log(2, "");
+    log(2, "Test Set 3: Subject2, Issuer2, dataHash3, revHash3. Direct jump to Revoked and backtransitions")
+    log(2, "dataHash3 : "+dataHash3);
+    log(2, "revHash3  : "+revHash3);
+    log(2, "");
 
     Attestation.set(dataHash3, "Direccion3", {from: subject2}).then(function(r) {
       txResult = r
@@ -556,7 +600,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       return Attestation.subjectAttestationList({from: subject2})
     }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
       assert.strictEqual(issuerStatus[0], false, 'should exist')
@@ -584,7 +628,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       return Attestation.subjectAttestationList({from: subject2})
     }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
       assert.strictEqual(issuerStatus[0], false, 'should exist')
@@ -612,7 +656,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       attestationStatus = r
       return Attestation.subjectAttestationList({from: subject2})    }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
       assert.strictEqual(issuerStatus[0], false, 'should exist')
@@ -640,7 +684,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       attestationStatus = r
       return Attestation.subjectAttestationList({from: subject2})    }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
       assert.strictEqual(issuerStatus[0], false, 'should exist')
@@ -665,7 +709,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       attestationStatus = r
       return Attestation.subjectAttestationList({from: subject2})    }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
       assert.strictEqual(issuerStatus[0], true, 'should exist')
@@ -693,7 +737,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       attestationStatus = r
       return Attestation.subjectAttestationList({from: subject2})    }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
       assert.strictEqual(issuerStatus[0], true, 'should exist')
@@ -718,7 +762,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       attestationStatus = r
       return Attestation.subjectAttestationList({from: subject2})    }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
       assert.strictEqual(issuerStatus[0], true, 'should exist')
@@ -743,7 +787,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       attestationStatus = r
       return Attestation.subjectAttestationList({from: subject2})    }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.DeletedBySubject, 'should be DeletedBySubject')
       assert.strictEqual(issuerStatus[0], true, 'should exist')
@@ -770,7 +814,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       attestationStatus = r
       return Attestation.subjectAttestationList({from: subject2})    }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.DeletedBySubject, 'should be DeletedBySubject')
       assert.strictEqual(issuerStatus[0], true, 'should exist')
@@ -784,11 +828,11 @@ contract('AlastriaAttestationRegistry', (accounts) => {
 
 //Test Set 4: Subject2, Issuer2, dataHash4, revHash4. Direct jump to DeletedBySubject, registering many hashes in the middle
   it('Initial Set for subject2 dataHash4 ', done => {
-    console.log("");
-    console.log("Test Set 4: Subject2, Issuer2, dataHash4, revHash4. Direct jump to DeletedBySubject, registering many hashes in the middle")
-    console.log("dataHash4 : " +dataHash4);
-    console.log("revHash4  : " +revHash4);
-    console.log("");
+    log(2, "");
+    log(2, "Test Set 4: Subject2, Issuer2, dataHash4, revHash4. Direct jump to DeletedBySubject, registering many hashes in the middle")
+    log(2, "dataHash4 : " +dataHash4);
+    log(2, "revHash4  : " +revHash4);
+    log(2, "");
     Attestation.set("MiddH2", "MidDireccion2", {from: subject2})
     Attestation.set("MiddH3", "MidDireccion3", {from: subject2})
     Attestation.set("MiddH4", "MidDireccion4", {from: subject2})
@@ -810,7 +854,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       attestationStatus = r
       return Attestation.subjectAttestationList({from: subject2})    }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
       assert.strictEqual(issuerStatus[0], false, 'should exist')
@@ -837,7 +881,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       attestationStatus = r
       return Attestation.subjectAttestationList({from: subject2})    }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.Valid, 'should be Valid')
       assert.strictEqual(issuerStatus[0], false, 'should exist')
@@ -862,7 +906,7 @@ contract('AlastriaAttestationRegistry', (accounts) => {
       attestationStatus = r
       return Attestation.subjectAttestationList({from: subject2})    }).then(function(r) {
       attestationList = r
-      LogStatus()
+      logStatus(2)
       assert.strictEqual(subjectStatus[0], true, 'should exist')
       assert.strictEqual(subjectStatus[1].toNumber(), Status.DeletedBySubject, 'should be DeletedBySubject')
       assert.strictEqual(issuerStatus[0], false, 'should exist')
