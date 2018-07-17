@@ -94,6 +94,7 @@
     "truffle-contract": "^1.1.11",
     "web3": "^0.20.0",
     "webpack": "^2.2.1",
-    "webpack-dev-server": "^2.3.0"
+    "webpack-dev-server": "^2.3.0",
+    "solidity-coverage": "^0.5.4"
   }
 }
