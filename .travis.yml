@@ -19,6 +19,7 @@ addons:
       - build-essential
       - g++-4.8
       - software-properties-common
+      - ruby-coveralls
 
 before_install:
   - export CXX="g++-4.8"
