@@ -30,12 +30,12 @@ install:
   - npm install -g truffle
   - npm install -g solium
   - docker pull mythril/myth
-  - sudo apt install ruby-coveralls
+#  - sudo apt install ruby-coveralls
   - npm install 
 
 script:
   - truffle compile
-  - npm run coverage && cat coverage/lcov.info | coveralls
+  - npm run coverage 
   - solium -d contracts/
   - docker run mythril/myth --truffle
 
