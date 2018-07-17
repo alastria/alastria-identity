@@ -69,15 +69,5 @@ build/
 #PlantUML exports
 out/
 
-#Solium
-.soliumignore
-.soliumrc.json
-
-#Test
-test/
-
-#Truffle
-truffle.js
-
 #Notas
 notas.md
