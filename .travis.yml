@@ -33,6 +33,7 @@ install:
   - npm install 
 
 script:
+  - truffle compile
   - npm run coverage && cat coverage/lcov.info | coveralls
   - solium -d contracts/
   - docker run mythril/myth --truffle
