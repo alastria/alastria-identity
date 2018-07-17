@@ -19,7 +19,6 @@ addons:
       - build-essential
       - g++-4.8
       - software-properties-common
-      - ruby-coveralls
 
 before_install:
   - export CXX="g++-4.8"
@@ -31,6 +30,7 @@ install:
   - npm install -g truffle
   - npm install -g solium
   - docker pull mythril/myth
+  - sudo apt install ruby-coveralls
   - npm install 
 
 script:
