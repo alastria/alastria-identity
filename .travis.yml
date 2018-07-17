@@ -1,0 +1,41 @@
+language: node_js
+
+sudo: required
+
+node_js:
+  - "8.11"
+
+env:
+  - CXX=g++-4.8
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - build-essential
+      - g++-4.8
+      - software-properties-common
+
+before_install:
+  - export CXX="g++-4.8"
+  - npm update
+  - add-apt-repository -y ppa:ethereum/ethereum
+  - apt update
+  - apt install -y solc
+  - apt install libssl-dev
+  - apt install -y python3-pip=9.0.1-2 python3-dev
+  - ln -s /usr/bin/python3 /usr/local/bin/python
+  - apt install -y pandoc
+  - apt install -y git
+  - pip3 install mythril
+  - npm install -g npm@latest
+  - npm install -g truffle
+  - npm install -g solium
+
+install:
+  - npm install 
+
+
+script:
+  - ./node_modules/.bin/solidity-coverage
