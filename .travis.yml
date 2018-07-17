@@ -26,7 +26,7 @@ before_install:
   - sudo apt update
   - sudo apt install -y solc
   - sudo apt install libssl-dev
-  - sudo npm install -g npm@latest
+  - npm install -g npm@latest
   - sudo npm install -g truffle
   - sudo npm install -g solium
   - pip3 install mythril
