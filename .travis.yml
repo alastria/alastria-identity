@@ -37,3 +37,9 @@ install:
 
 script:
   - ./node_modules/.bin/solidity-coverage
+  - solium -d contracts/
+  - myth --truffle
+
+notifications:
+  slack:
+    on_success: always
