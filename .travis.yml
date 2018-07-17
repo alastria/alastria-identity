@@ -24,16 +24,16 @@ before_install:
   - export CXX="g++-4.8"
   - npm update
   - sudo apt update
+
+install:
   - npm install -g npm@latest
   - npm install -g truffle
   - npm install -g solium
   - docker pull mythril/myth
-
-install:
   - npm install 
 
 script:
-  - node_modules/.bin/solidity-coverage
+  - npm run coverage && cat coverage/lcov.info | coveralls
   - solium -d contracts/
   - docker run mythril/myth --truffle
 

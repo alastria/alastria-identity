@@ -4,7 +4,8 @@
   "description": "This is the uPort platform adapted to work on the Alastria network",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "coverage": "./node_modules/.bin/solidity-coverage"
   },
   "repository": {
     "type": "git",
@@ -50,11 +51,20 @@
     "chai": "^3.5.0",
     "codecov": "^1.0.1",
     "condition-circle": "^1.5.0",
+    "copy-webpack-plugin": "^4.0.1",
+    "coveralls": "^3.0.2",
+    "css-loader": "^0.26.1",
     "cz-conventional-changelog": "^1.2.0",
-    "eslint": "^3.2.2",
+    "eslint": "^3.14.0",
+    "eslint-config-standard": "^6.0.0",
+    "eslint-plugin-babel": "^4.0.0",
+    "eslint-plugin-mocha": "^4.8.0",
+    "eslint-plugin-promise": "^3.0.0",
+    "eslint-plugin-standard": "^2.0.0",
     "eth-lightwallet": "^2.4.3",
     "ethereumjs-testrpc": "^3.0.3",
     "ethereumjs-tx": "^1.1.1",
+    "html-webpack-plugin": "^2.28.0",
     "istanbul": "^0.4.5",
     "istanbul-instrumenter-loader": "0.2.0",
     "jsdoc": "^3.4.3",
@@ -78,23 +88,13 @@
     "semantic-release": "^4.3.5",
     "sinon": "git+https://github.com/sinonjs/sinon.git#afdf4255e97e8a8738da19ddfafd18efc09c917a",
     "snazzy": "^5.0.0",
+    "solidity-coverage": "^0.5.5",
     "standard": "^8.0.0-beta.5",
-    "supervisor": "^0.12.0",
-    "copy-webpack-plugin": "^4.0.1",
-    "css-loader": "^0.26.1",
-    "eslint": "^3.14.0",
-    "eslint-config-standard": "^6.0.0",
-    "eslint-plugin-babel": "^4.0.0",
-    "eslint-plugin-mocha": "^4.8.0",
-    "eslint-plugin-promise": "^3.0.0",
-    "eslint-plugin-standard": "^2.0.0",
-    "html-webpack-plugin": "^2.28.0",
-    "json-loader": "^0.5.4",
     "style-loader": "^0.13.1",
+    "supervisor": "^0.12.0",
     "truffle-contract": "^1.1.11",
     "web3": "^0.20.0",
     "webpack": "^2.2.1",
-    "webpack-dev-server": "^2.3.0",
-    "solidity-coverage": "^0.5.4"
+    "webpack-dev-server": "^2.3.0"
   }
 }
