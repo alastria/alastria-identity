@@ -1,16 +1,11 @@
 {
   "extends": "solium:all",
-  "plugins": [
-    "security"
-  ],
+  "plugins": ["security"],
   "rules": {
-    "quotes": [
-      "error",
-      "double"
-    ],
-    "indentation": [
-      "error",
-      4
-    ]
+    "imports-on-top": 0,
+    "variable-declarations": 0,
+    "quotes": ["error", "double"],
+    "indentation": ["error", 4],
+    "security/enforce-explicit-visibility": ["error"]
   }
 }
