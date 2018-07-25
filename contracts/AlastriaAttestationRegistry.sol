@@ -1,4 +1,5 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.15;
+
 
 contract AlastriaAttestationRegistry {
 
@@ -8,16 +9,18 @@ contract AlastriaAttestationRegistry {
     // To Do: Return attestation URI. Should only be available to Subject. Mainly as a backup or main index when there are more than one device.
     // Could be done from attestation mapping in another get function only for subject
     // or in subjectAttestationList (changing URI from one mapping to the other)
-
+    // To Do: make AlastriaAttestationRegistry similar to AlastriaClaimRegistry.
 
     // Variables
-
     int public version;
     address public previousPublishedVersion;
 
     // Attestation: Initially Valid: Only DeletedBySubject
     // Revocations: Initially Valid: Only AskIssuer or Revoked, no backwards transitions.
     enum Status {Valid, AskIssuer, Revoked, DeletedBySubject}
+    Status constant STATUS_FIRST = Status.Valid;
+    Status constant STATUS_LAST = Status.DeletedBySubject;
+
     struct Attestation {
         bool exists;
         Status status;
@@ -42,6 +45,11 @@ contract AlastriaAttestationRegistry {
     //Modifiers
     modifier validAddress(address addr) {//protects against some weird attacks
         require(addr != address(0));
+        _;
+    }
+
+    modifier validStatus (Status status) { // solidity currently check on use not at function call
+        require (status >= STATUS_FIRST && status <= STATUS_LAST);
         _;
     }
 
@@ -77,7 +85,7 @@ contract AlastriaAttestationRegistry {
         return (attestationList[msg.sender].length, attestationList[msg.sender]);
     }
 
-    function revokeAttestation(bytes32 revHash, Status status) public {
+    function revokeAttestation(bytes32 revHash, Status status) validStatus (status) public {
         Revocation storage value = revocationRegistry[msg.sender][revHash];
         // No backward transition, only AskIssuer or Revoked
         if (status > value.status) {
@@ -98,7 +106,13 @@ contract AlastriaAttestationRegistry {
 
     // Utility function
     // Defining three status functions avoid linking the subject to the issuer or the corresponding hashes
-    function attestationStatus(Status subjectStatus, Status issuerStatus) pure public returns (Status) {
+    function attestationStatus(Status subjectStatus, Status issuerStatus)
+        pure
+        public
+        validStatus(subjectStatus)
+        validStatus(issuerStatus)
+        returns (Status)
+    {
         if (subjectStatus >= issuerStatus) {
             return subjectStatus;
         } else {
