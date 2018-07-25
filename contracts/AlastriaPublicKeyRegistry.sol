@@ -1,5 +1,6 @@
 pragma solidity ^0.4.24;
 
+
 contract AlastriaPublicKeyRegistry {
 
     // This contracts registers and makes publicly avalaible the AlastriaID Public Keys hash and status, current and past.
@@ -45,7 +46,12 @@ contract AlastriaPublicKeyRegistry {
         require(!publicKeyRegistry[msg.sender][publicKey].exists);
         uint changeDate = now;
         revokePublicKey(currentPublicKey(msg.sender));
-        publicKeyRegistry[msg.sender][publicKey] = PublicKey(true, Status.Valid, changeDate, 0);
+        publicKeyRegistry[msg.sender][publicKey] = PublicKey(
+            true,
+            Status.Valid,
+            changeDate,
+            0
+        );
         publicKeyList[msg.sender].push(publicKey);
     }
 
@@ -76,7 +82,12 @@ contract AlastriaPublicKeyRegistry {
         }
     }
 
-    function publicKeyStatus(address subject, bytes32 publicKey) view public validAddress(subject) returns (bool exists, Status status, uint startDate, uint endDate) {
+    function publicKeyStatus(address subject, bytes32 publicKey)
+        view
+        public
+        validAddress(subject)
+        returns (bool exists, Status status, uint startDate, uint endDate)
+    {
         PublicKey storage value = publicKeyRegistry[subject][publicKey];
         return (value.exists, value.status, value.startDate, value.endDate);
     }
