@@ -1,34 +1,22 @@
-var aim = artifacts.require("./contracts/AlastriaIdentityManager.sol");
-var bim = artifacts.require("./contracts/BasicIdentityManager.sol");
-var proxy = artifacts.require("./contracts/proxy.sol");
-var txrelay = artifacts.require("./contracts/TxRelay.sol");
-var im = artifacts.require("./contracts/IdentityManager.sol");
-var mim = artifacts.require("./contracts/MetaIdentityManager.sol");
-var AlastriaRegistry = artifacts.require("./contracts/AlastriaRegistry.sol");
-var UportRegistry = artifacts.require("./contracts/UportRegistry.sol");
+var Eidas = artifacts.require("./contracts/Eidas.sol");
+var AlastriaIdentityManager = artifacts.require("./contracts/AlastriaIdentityManager.sol");
+var AlastriaIdentityProvider = artifacts.require("./contracts/AlastriaIdentityProvider.sol");
+var IdentityManager = artifacts.require("uport-identity/contracts/IdentityManager.sol");
 
-function deployUport(deployer){
-  deployer.deploy(im);
-  deployer.deploy(mim);
-  deployer.deploy(proxy);
-  deployer.deploy(UportRegistry);
-  deployer.deploy(txrelay);
-};
+module.exports = function(deployer) {
 
-function deployAlastriaIdentity(deployer){
-  deployer.deploy(aim);
-  deployer.deploy(bim);
-  deployer.deploy(proxy);
-  deployer.deploy(AlastriaRegistry);
-};
-
-module.exports = function(deployer, network) {
-
-  if (network === 'alastria.uport') {
-    deployUport(deployer);
-  }
-  else if (network === 'alastria.identity') {
-    deployAlastriaIdentity(deployer);
+  if (AlastriaIdentityManager.network_id === '19535753591') {
+    web3.personal.unlockAccount(web3.eth.accounts[0], "Passw0rd");
   }
 
+  deployer.deploy(Eidas);
+  deployer.link(Eidas, AlastriaIdentityProvider);
+  deployer.link(Eidas, AlastriaIdentityManager);
+  deployer.deploy(AlastriaIdentityProvider);
+
+  const USER_TIME_LOCK = 3600
+  const ADMIN_TIME_LOCK = 129600
+  const ADMIN_RATE = 1200
+
+  deployer.deploy(AlastriaIdentityManager, USER_TIME_LOCK, ADMIN_TIME_LOCK, ADMIN_RATE);
 };

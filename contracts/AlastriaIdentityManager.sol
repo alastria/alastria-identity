@@ -1,77 +1,43 @@
-pragma solidity ^0.4.8;
-import "./BasicIdentityManager.sol";
-import "./proxy.sol";
+pragma solidity 0.4.15;
+
+import "uport-identity/contracts/IdentityManager.sol";
+import "contracts/AlastriaIdentityProvider.sol";
 
 
-contract AlastriaIdentityManager is BasicIdentityManager{
+contract AlastriaIdentityManager is IdentityManager(3600, 129600, 1200), AlastriaIdentityProvider {
 
-    struct Attest {
-      bytes32 attHash;
-      bytes32 attUri;
-    }
+    mapping(address => uint) internal accessTokens;
+    uint internal timeToLive = 10000;
 
-      mapping(address => mapping(address => uint)) limiter;
+    event AccessTokenGenerated(address indexed _signAddress);
 
-      modifier onlyOlderOwner(address identity, address sender) {
-        require(isOlderOwner(identity, sender));
+    modifier isOnTimeToLiveAndIsFromCaller(address _signAddress) {
+        require(accessTokens[_signAddress] > 0 && accessTokens[_signAddress] > now);
         _;
     }
 
-    modifier onlyRecovery(proxy identity, address sender, bytes _data) {
-        uint eidasLevel;
-        uint _valueFix;
-        eidasLevel = 3; //Requesting eidasLevel needed
-        require( eidasLevel == 3);
-        _;
+    function generateAccessToken(address _signAddress) public onlyIdentityProvider(msg.sender) {
+
+        accessTokens[_signAddress] = now + timeToLive;
+        AccessTokenGenerated(_signAddress);
+
     }
 
-    modifier rateLimited(proxy identity, address sender) {
-        require(limiter[identity][sender] < (now - adminRate));
-        limiter[identity][sender] = now;
-        _;
+    function createIdentity() public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
+        //FIXME: This first version don't have the call to the registry.
+        accessTokens[msg.sender] = 0;
+        super.createIdentity(msg.sender, address(this));
+
+    }
+    
+    function createIdentity(address owner, address recoveryKey) public {
+        require(false); // Never use
     }
 
-    event LogOwnerRemoved(proxy identity, address owner, address sender);
-    event LogOwnerAdded(proxy identity, address newOwner, address sender);
+    function createIdentityWithCall(address owner, address recoveryKey, address registryAddress, bytes data) public {
 
-    // @dev Inherit Basic constructor declaration
-    function AlastriaIdentityManager(uint _userTimeLock, uint _adminTimeLock, uint _adminRate, address _registry)
-     BasicIdentityManager(_userTimeLock, _adminTimeLock, _adminRate, _registry) {
-    }
+        require(false);
 
-    /// @dev Allows a recoveryKey to add a new owner with userTimeLock waiting time
-    function addOwnerFromRecovery(address sender, proxy identity, address newOwner, bytes _data) public
-        onlyRecovery(identity, sender, _data)  //eIDAS
-        rateLimited(identity, sender)
-    {
-        require(!isOlderOwner(identity, newOwner));
-        owners[identity][newOwner] = now;
-        LogOwnerAdded(identity, newOwner, sender);
-    }
-
-    /// @dev Allows an olderOwner to add a new owner instantly
-    function addOwner(address sender, proxy identity, address newOwner) public
-        onlyOlderOwner(identity, sender)
-        rateLimited(identity, sender)
-    {
-        require(!isOwner(identity, newOwner));
-        owners[identity][newOwner] = now - userTimeLock;
-        LogOwnerAdded(identity, newOwner, sender);
-    }
-
-    /// @dev Allows an owner to remove another owner instantly
-    function removeOwner(address sender, proxy identity, address owner) public
-        onlyOlderOwner(identity, sender)
-        rateLimited(identity, sender)
-    {
-        // an owner should not be allowed to remove itself
-        require(sender != owner);
-        delete owners[identity][owner];
-        LogOwnerRemoved(identity, owner, sender);
-    }
-
-    function isOlderOwner(address identity, address owner) public constant returns (bool) {
-        return (owners[identity][owner] > 0 && (owners[identity][owner] + adminTimeLock) <= now);
     }
 
 }
