@@ -5,7 +5,7 @@ library Eidas {
 
     enum EidasLevel { Null, Reputational, Low, Substantial, High }
 
-    function onlyReputational(EidasLevel _eidasLevel) returns (bool) {
+    /*function onlyReputational(EidasLevel _eidasLevel) returns (bool) {
         return (_eidasLevel == EidasLevel.Reputational);
     }
 
@@ -19,30 +19,30 @@ library Eidas {
 
     function onlyHigh(EidasLevel _eidasLevel) returns (bool) {
         return (_eidasLevel == EidasLevel.High);
-    }
+    }*/
 
     function atLeastLow(EidasLevel _eidasLevel) returns (bool) {
         return atLeast(_eidasLevel, EidasLevel.Low);
     }
 
-    function alLeastSubstantial(EidasLevel _eidasLevel) returns (bool) {
+    /*function alLeastSubstantial(EidasLevel _eidasLevel) returns (bool) {
         return atLeast(_eidasLevel, EidasLevel.Substantial);
     }
 
     function alLeastHigh(EidasLevel _eidasLevel) returns (bool) {
         return atLeast(_eidasLevel, EidasLevel.High);
-    }
+    }*/
 
     function atLeast(EidasLevel _eidasLevel, EidasLevel _level) returns (bool) {
         return (uint(_eidasLevel) >= uint(_level));
     }
-
+/*
     function notNull(EidasLevel _eidasLevel) returns (bool) {
         return _eidasLevel != EidasLevel.Null;
     }
 
     function toEidasLevel(uint _level) returns (EidasLevel) {
         return EidasLevel(_level);
-    }
+    }*/
 
 }

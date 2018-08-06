@@ -38,4 +38,29 @@ contract('AlastriaIdentityManager', () => {
 
     });
 
+    it ("It should fail if try to create identity with originals uport create", async() => {
+
+        if (AlastriaIdentityManager.network_id === '19535753591') {
+            web3.personal.unlockAccount(web3.eth.accounts[1], "Passw0rd");
+        }
+
+        try {
+            await identityManager.createIdentity( web3.eth.accounts[0], 
+                web3.eth.accounts[1], {from: web3.eth.accounts[1]}
+            );
+            assert.fail("It always fails");
+        } catch (e) {
+            assert.notNull(e, "Allways must generate an exception");
+        }
+        
+        try {
+            await identityManager.createIdentity( web3.eth.accounts[0], 
+                web3.eth.accounts[1], web3.eth.accounts[2], null, {from: web3.eth.accounts[1]}
+            );
+            assert.fail("It always fails");
+        } catch (e) {
+            assert.notNull(e, "Allways must generate an exception");
+        }
+    });
+
 });
