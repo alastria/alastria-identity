@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/alastria/alastria-identity.svg?branch=feature%2FAlastriaIdentityManager)](https://travis-ci.org/alastria/alastria-identity)
+
 # UPORT BASED ALASTRIA IDENTITY V.0.0.0
 Uport platform adapted to Alastria network
 
