@@ -55,3 +55,14 @@ In which the User app is the mobile phone app from the user, that is the one tha
 # NOTAS
 
 Riot channel
+
+# F.A.Q.
+
+For test: 
+
+```
+$ ganache-cli -l 0xfffffff > /dev/null &
+$ npm run test
+```
+
+
