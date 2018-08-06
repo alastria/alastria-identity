@@ -2,9 +2,10 @@ pragma solidity 0.4.15;
 
 import "uport-identity/contracts/IdentityManager.sol";
 import "contracts/AlastriaIdentityProvider.sol";
+import "contracts/AlastriaIdentityAttestator.sol";
 
 
-contract AlastriaIdentityManager is IdentityManager(3600, 129600, 1200), AlastriaIdentityProvider {
+contract AlastriaIdentityManager is IdentityManager(3600, 129600, 1200), AlastriaIdentityProvider, AlastriaIdentityAttestator {
 
     mapping(address => uint) internal accessTokens;
     uint internal timeToLive = 10000;

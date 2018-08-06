@@ -10,58 +10,37 @@ contract AlastriaIdentityProvider {
 
     using Eidas for Eidas.EidasLevel;
 
-    struct IdentityProvider {
-        Eidas.EidasLevel level;
-        bool active;
-    }
-
-    mapping(address => IdentityProvider) internal providers;
+    mapping(address => bool) internal providers;
 
     modifier onlyIdentityProvider(address _identityProvider) {
-        require (providers[_identityProvider].active);
+        require (isIdentityProvider(_identityProvider));
         _;
     }
 
     modifier notIdentityProvider(address _identityProvider) {
-        require (!providers[_identityProvider].active);
-        _;
-    }
-
-    modifier alLeastLow(Eidas.EidasLevel _level) {
-        require (_level.atLeastLow());
+        require (!isIdentityProvider(_identityProvider));
         _;
     }
 
     function AlastriaIdentityProvider() {
         // FIXME: This must be an Alastria_ID created from AlastriaIdentityManager.
-        addIdentityProvider(msg.sender, Eidas.EidasLevel.High);
+        addIdentityProvider(msg.sender);
     }
 
-    function addIdentityProvider(address _identityProvider, Eidas.EidasLevel _level) public alLeastLow(_level) notIdentityProvider(_identityProvider) {
+    function addIdentityProvider(address _identityProvider) public notIdentityProvider(_identityProvider) {
 
-        IdentityProvider storage identityProvider = providers[_identityProvider];
-        identityProvider.level = _level;
-        identityProvider.active = true;
-
-    }
-
-    function modifyIdentityProviderEidasLevel(address _identityProvider, Eidas.EidasLevel _level) public alLeastLow(_level) onlyIdentityProvider(_identityProvider) {
-
-        IdentityProvider storage identityProvider = providers[_identityProvider];
-        identityProvider.level = _level;
+        providers[_identityProvider] = true;
 
     }
 
     function removeIdentityProvider(address _identityProvider) public onlyIdentityProvider(_identityProvider) {
 
-        IdentityProvider storage identityProvider = providers[_identityProvider];
-        identityProvider.level = Eidas.EidasLevel.Null;
-        identityProvider.active = false;
+        providers[_identityProvider] = false;
 
     }
 
-    function getEidasLevel(address _identityProvider) public constant onlyIdentityProvider(_identityProvider) returns (Eidas.EidasLevel) {
-        return providers[_identityProvider].level;
+    function isIdentityProvider(address _identityProvider) public constant returns (bool) {
+        return providers[_identityProvider];
     }
 
 }

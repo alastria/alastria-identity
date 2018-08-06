@@ -12,32 +12,20 @@ contract('AlastriaIdentityProvider', () => {
 
         identityProvider = await AlastriaIdentityProvider.new();
         
-        await identityProvider.addIdentityProvider(identityProvider.address, 4);
+        await identityProvider.addIdentityProvider(identityProvider.address);
 
-        const level = await identityProvider.getEidasLevel(identityProvider.address);
+        const isProvider = await identityProvider.isIdentityProvider(identityProvider.address);
         
-        assert.equal(level, 4, "The level must be `4`.");    
-    });
-
-    it("It should modify an Indentity Provider", async () => {
-
-        await identityProvider.modifyIdentityProviderEidasLevel(identityProvider.address, 2);
-
-        const level = await identityProvider.getEidasLevel(identityProvider.address);
-        
-        assert.equal(level, 2, "The level must be `2`.");    
-
+        assert.equal(isProvider, true, "The isProvider must be `true`.");    
     });
 
     it("It should remove an Indentity Provider", async () => {
 
         await identityProvider.removeIdentityProvider(identityProvider.address);
-        try {
-            await identityProvider.getEidasLevel(identityProvider.address);
-            assert.fail("The call to getEidasLevel must fail if the address in't an identity provider.");
-        } catch (e) {
-            assert.isNotNull(e, "'e' must be an error.");
-        }
+        
+        const isProvider = await identityProvider.isIdentityProvider(identityProvider.address);
+        
+        assert.equal(isProvider, false, "The isProvider must be `false`.");    
 
     });
 
