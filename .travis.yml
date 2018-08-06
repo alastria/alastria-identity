@@ -27,14 +27,10 @@ before_install:
 
 install:
   - npm install -g npm@latest
-  - npm install -g truffle
-  - npm install -g solium
   - docker pull mythril/myth
-#  - sudo apt install ruby-coveralls
   - npm install 
 
 script:
-  - npm run compile
   - npm run coverage 
   - npm run lint
   - docker run mythril/myth --truffle
