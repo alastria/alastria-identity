@@ -27,13 +27,13 @@ before_install:
 
 install:
   - npm install -g npm@latest
-  - docker pull mythril/myth
+#  - docker pull mythril/myth
   - npm install 
 
 script:
   - npm run coverage 
   - npm run lint
-  - docker run mythril/myth --truffle
+#  - docker run mythril/myth --truffle
 
 notifications:
   slack:
