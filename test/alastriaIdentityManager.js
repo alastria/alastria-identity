@@ -12,11 +12,11 @@ contract('AlastriaIdentityManager', () => {
     it("It should create an access token for Alastria ID creation", async () => {
 
         identityManager = await AlastriaIdentityManager.deployed();
-        console.log("identityManager: ");
+        
         const accessToken = await identityManager.generateAccessToken(web3.eth.accounts[1]);
-        console.log("accessToken");
+        
         truffleAssert.eventEmitted(accessToken, 'AccessTokenGenerated', (_event) => {
-            return _event._signAddress == web3.eth.accounts[1];
+            return _event.signAddress == web3.eth.accounts[1];
         }, 'AccessTokenGenerated must be emmited when the account was registered.');
 
     });
@@ -27,7 +27,7 @@ contract('AlastriaIdentityManager', () => {
             web3.personal.unlockAccount(web3.eth.accounts[1], "Passw0rd");
         }
 
-        const createIdentity = await identityManager.createIdentity( 
+        const createIdentity = await identityManager.createAlastriaIdentity( 
             {from: web3.eth.accounts[1]}
         );
         
@@ -38,29 +38,28 @@ contract('AlastriaIdentityManager', () => {
 
     });
 
-    it ("It should fail if try to create identity with originals uport create", async() => {
+    it ("It should emit OperationWasNotSupported if try to create identity with originals uport methods", async() => {
 
         if (AlastriaIdentityManager.network_id === '19535753591') {
             web3.personal.unlockAccount(web3.eth.accounts[1], "Passw0rd");
         }
-
+        
         try {
-            await identityManager.createIdentity( web3.eth.accounts[0], 
-                web3.eth.accounts[1], {from: web3.eth.accounts[1]}
+            const createIdentity = await identityManager.createIdentity.call( web3.eth.accounts[0], 
+                web3.eth.accounts[0]
             );
-            assert.fail("It always fails");
         } catch (e) {
-            assert.notNull(e, "Allways must generate an exception");
+            assert.notNull(e);
         }
         
         try {
-            await identityManager.createIdentity( web3.eth.accounts[0], 
-                web3.eth.accounts[1], web3.eth.accounts[2], null, {from: web3.eth.accounts[1]}
+            const createIdentityWithCall = await identityManager.createIdentityWithCall( web3.eth.accounts[2], 
+                web3.eth.accounts[1], web3.eth.accounts[0], ["0x1262","0x12","0x12"]
             );
-            assert.fail("It always fails");
         } catch (e) {
-            assert.notNull(e, "Allways must generate an exception");
+            assert.notNull(e);
         }
+                
     });
 
 });

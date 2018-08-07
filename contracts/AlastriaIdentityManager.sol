@@ -10,7 +10,9 @@ contract AlastriaIdentityManager is IdentityManager(3600, 129600, 1200), Alastri
     mapping(address => uint) internal accessTokens;
     uint internal timeToLive = 10000;
 
-    event AccessTokenGenerated(address indexed _signAddress);
+    event AccessTokenGenerated(address indexed signAddress);
+
+    event OperationWasNotSupported(string indexed method);
 
     modifier isOnTimeToLiveAndIsFromCaller(address _signAddress) {
         require(accessTokens[_signAddress] > 0 && accessTokens[_signAddress] > now);
@@ -24,7 +26,7 @@ contract AlastriaIdentityManager is IdentityManager(3600, 129600, 1200), Alastri
 
     }
 
-    function createIdentity() public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
+    function createAlastriaIdentity() public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
         //FIXME: This first version don't have the call to the registry.
         accessTokens[msg.sender] = 0;
         super.createIdentity(msg.sender, address(this));
@@ -32,12 +34,12 @@ contract AlastriaIdentityManager is IdentityManager(3600, 129600, 1200), Alastri
     }
     
     function createIdentity(address owner, address recoveryKey) public {
-        require(false); // Never use
+        OperationWasNotSupported("createIdentity");
     }
 
     function createIdentityWithCall(address owner, address recoveryKey, address registryAddress, bytes data) public {
 
-        require(false);
+        OperationWasNotSupported("createIdentityWithCall");
 
     }
 
