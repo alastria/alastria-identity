@@ -53,7 +53,7 @@ contract('AlastriaIdentityManager', () => {
         }
         
         try {
-            const createIdentityWithCall = await identityManager.createIdentityWithCall( web3.eth.accounts[2], 
+            const createIdentityWithCall = await identityManager.createIdentityWithCall.call( web3.eth.accounts[2], 
                 web3.eth.accounts[1], web3.eth.accounts[0], ["0x1262","0x12","0x12"]
             );
         } catch (e) {
