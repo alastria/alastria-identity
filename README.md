@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/alastria/alastria-identity.svg?branch=feature%2FAlastriaIdentityManager)](https://travis-ci.org/alastria/alastria-identity)
+
 # UPORT BASED ALASTRIA IDENTITY V.0.0.0
 Uport platform adapted to Alastria network
 
@@ -92,3 +94,14 @@ In which the User app is the mobile phone app from the user, that is the one tha
 # NOTAS
 
 Riot channel
+
+# F.A.Q.
+
+For test: 
+
+```
+$ ganache-cli -l 0xfffffff > /dev/null &
+$ npm run test
+```
+
+

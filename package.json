@@ -4,37 +4,30 @@
   "description": "This is the uPort platform adapted to work on the Alastria network",
   "main": "index.js",
   "scripts": {
+<<<<<<< HEAD
     "test": "echo \"Error: no test specified\" && exit 1",
     "coverage": "./node_modules/.bin/solidity-coverage"
+=======
+    "compile": "./node_modules/.bin/truffle compile",
+    "local": "./node_modules/.bin/truffle migrate --network alastria_general1",
+    "test": "./node_modules/.bin/truffle test",
+    "lint": "./node_modules/.bin/solium -d contracts/",
+    "coverage": "./coverage-verify.sh 100",
+    "security": "myth --truffle"
+>>>>>>> feature/AlastriaIdentityManager
   },
   "repository": {
     "type": "git",
-    "url": "www.github.com/alastria/alastria-uport"
+    "url": "git+https://github.com/alastria/alastria-identity"
   },
   "keywords": [
     "uport",
     "alastria"
   ],
-  "author": "Nefera606",
+  "author": "Alastria",
   "license": "MIT",
-  "dependencies": {
-    "easyweb3": "^1.1.4",
-    "web3": "^1.0.0-beta.26",
-    "async": "^2.1.4",
-    "ethjs-abi": "^0.1.8",
-    "ethjs-util": "^0.1.3",
-    "ipfs-mini": "^1.0.1",
-    "json-loader": "^0.5.4",
-    "mnid": "^0.1.1",
-    "mobile-detect": "^1.3.5",
-    "nets": "^3.2.0",
-    "qr-image": "^3.1.0",
-    "qs": "^6.2.1",
-    "request": "^2.75.0",
-    "uport": "^0.6.0",
-    "yarn": "^1.3.2"
-  },
   "devDependencies": {
+<<<<<<< HEAD
     "babel-cli": "^6.18.0",
     "babel-core": "^6.21.0",
     "babel-eslint": "^7.1.1",
@@ -96,5 +89,29 @@
     "web3": "^0.20.0",
     "webpack": "^2.2.1",
     "webpack-dev-server": "^2.3.0"
+=======
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-preset-stage-3": "^6.24.1",
+    "bluebird": "^3.5.0",
+    "directory-tree": "^2.0.0",
+    "eth-lightwallet": "^3.0.1",
+    "eth-signer": "^0.3.4",
+    "ethjs-abi": "^0.1.9",
+    "ganache-cli": "^6.0.3",
+    "node-plantuml": "^0.5.0",
+    "solc": "^0.4.24",
+    "solidity-coverage": "^0.4.3",
+    "solidity-parser": "^0.4.0",
+    "solidity-sha3": "^0.4.1",
+    "solium": "^1.0.0",
+    "truffle": "^3.4.11",
+    "truffle-contract": "^1.1.10",
+    "truffle-hdwallet-provider": "0.0.3"
+  },
+  "dependencies": {
+    "truffle-assertions": "^0.3.1",
+    "uport-identity": "^2.0.1"
+>>>>>>> feature/AlastriaIdentityManager
   }
 }
