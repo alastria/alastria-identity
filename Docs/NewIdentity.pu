@@ -1,0 +1,26 @@
+@startuml
+== First Create Identity ==
+activate User_app
+User_app -> Alastria_Partner_Node: call API PUT AIM.createIdentity()
+Alastria_Partner_Node -> SC_AIM: call createIdentity()
+SC_AIM -> SC_Proxy: call proxy()
+SC_AIM -> Blockchain: call LogIdentityCreated()
+User_app -> Alastria_Partner_Node: call API GET AIM.LogIdentityCreated(),,,
+Alastria_Partner_Node -> Blockchain: call get_LogIdentityCreated()
+Blockchain --> Alastria_Partner_Node: return LogIdentityCreated
+Alastria_Partner_Node --> User_app: return ID_created_status = "succes"
+== Second Create Identity ==
+User_app -> Core_socio: Idenitify against the userList
+Core_socio -> User_app: URL: Alastria + QR_sesion
+User_app -> Core_socio: Sign in Alastria
+Core_socio -> User_app: QR scanning
+User_app -> Core_socio: Sesion + QR
+Core_socio -> User_app: JSON minimal Data signed individualy
+User_app -> IPFS: JSON
+IPFS -> User_app: Hash from JSON
+User_app -> GW_Alastria: From user to AIM JSON
+GW_Alastria -> Node: Validate sign + Gas
+Node -> SC_AIM: Send transactions
+Node -> GW_Alastria:
+GW_Alastria -> User_app:
+@enduml

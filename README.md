@@ -3,43 +3,6 @@
 # UPORT BASED ALASTRIA IDENTITY V.0.0.0
 Uport platform adapted to Alastria network
 
-[Code quality rules](./CODE_QUALITY.md)
-
-## Up & Running
-
-Download:
-
-```
-$ git clone https://github.com/alastria/alastria-identity.git
-$ cd alastria-identity
-$ npm install
-```
-
-Truffle liveclycle:
-
-```
-$ truffle compile
-$ ganache-cli > ganache-cli.log &
-$ truffle test
-$ pkill -f ganache-cli
-```
-
-Code Quality:
-
-``` 
-$ node_modules/.bin/solidity-coverage
-$ solium -d contracts/
-$ myth --truffle
-```
-
-Deploy new version of contracts:
-
-```
-$ truffle migrate
-```
-
-We need to commit the build folder with the changes.
-
 ## UportRaw contracts
 The adresses of the contracts (as Uport provide them) in the alastria test-net are:
 ```
