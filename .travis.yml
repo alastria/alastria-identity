@@ -35,6 +35,13 @@ script:
   - npm run lint
 #  - docker run mythril/myth --truffle
 
+<<<<<<< HEAD
+
 notifications:
   slack:
     on_success: always
+=======
+notifications:
+  slack:
+    on_success: always
+>>>>>>> feature/AlastriaIdentityManager

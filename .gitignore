@@ -63,8 +63,11 @@ NOTAS.txt
 #app
 app/
 
-#Truffle binary 
+#Truffle binary
 build/
 
 #PlantUML exports
 out/
+
+#Notas
+notas.md
