@@ -1,6 +1,5 @@
 pragma solidity 0.4.15;
 
-<<<<<<< HEAD
 import "contracts/AlastriaIdentityProvider.sol";
 import "contracts/AlastriaIdentityAttestator.sol";
 import "contracts/proxy.sol";
@@ -8,10 +7,10 @@ import "contracts/libs/Owned.sol";
 
 contract AlastriaIdentityManager is AlastriaIdentityProvider, AlastriaIdentityAttestator, Owned {
     //Variables
-    mapping(address => address) public identityKeys; //change to alastriaID created check bool
     uint256 public version;
-    mapping(address => uint) internal accessTokens;
     uint internal timeToLive = 10000;
+    mapping(address => address) public identityKeys; //change to alastriaID created check bool
+    mapping(address => uint) internal accessTokens;
 
     //Events
     event AccessTokenGenerated(address indexed signAddress);
@@ -30,8 +29,8 @@ contract AlastriaIdentityManager is AlastriaIdentityProvider, AlastriaIdentityAt
     }
 
     modifier validAddress(address addr) { //protects against some weird attacks
-    require(addr != address(0));
-    _;
+        require(addr != address(0));
+        _;
     }
 
     //Constructor
@@ -42,65 +41,36 @@ contract AlastriaIdentityManager is AlastriaIdentityProvider, AlastriaIdentityAt
 
     //Methods
     function generateAccessToken(address _signAddress) public onlyIdentityProvider(msg.sender) {
-
-        accessTokens[_signAddress] = now + timeToLive;
-        emit AccessTokenGenerated(_signAddress);
-=======
-import "uport-identity/contracts/IdentityManager.sol";
-import "contracts/AlastriaIdentityProvider.sol";
-import "contracts/AlastriaIdentityAttestator.sol";
-
-
-contract AlastriaIdentityManager is IdentityManager(3600, 129600, 1200), AlastriaIdentityProvider, AlastriaIdentityAttestator {
-
-    mapping(address => uint) internal accessTokens;
-    uint internal timeToLive = 10000;
-
-    event AccessTokenGenerated(address indexed signAddress);
-
-    event OperationWasNotSupported(string indexed method);
-
-    modifier isOnTimeToLiveAndIsFromCaller(address _signAddress) {
-        require(accessTokens[_signAddress] > 0 && accessTokens[_signAddress] > now);
-        _;
-    }
-
-    function generateAccessToken(address _signAddress) public onlyIdentityProvider(msg.sender) {
-
         accessTokens[_signAddress] = now + timeToLive;
         AccessTokenGenerated(_signAddress);
-
     }
 
     function createAlastriaIdentity() public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
         //FIXME: This first version don't have the call to the registry.
         accessTokens[msg.sender] = 0;
-        super.createIdentity(msg.sender, address(this));
->>>>>>> feature/AlastriaIdentityManager
-
+        createIdentity(msg.sender, address(this));
     }
     
     function createIdentity(address owner, address recoveryKey) public {
-        OperationWasNotSupported("createIdentity");
+        proxy identity = new proxy();
+        identityKeys[msg.sender] = identity;
+        LogIdentityCreated(identity, recoveryKey, owner);
     }
 
-    function createIdentityWithCall(address owner, address recoveryKey, address registryAddress, bytes data) public {
-
-        OperationWasNotSupported("createIdentityWithCall");
-
-<<<<<<< HEAD
     /// @dev Creates a new proxy contract for an owner and recovery and allows an initial forward call which would be to set the registry in our case
     /// @param owner Key who can use this contract to control proxy. Given full power
     /// @param destination Address of contract to be called after proxy is created
     /// @param data of function to be called at the destination contract
-    function createIdentityWithCall(address owner, address destination, bytes data) public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
+    function createIdentityWithCall(
+        address owner, 
+        address destination, 
+        bytes data) 
+    public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
         proxy identity = new proxy();
         identityKeys[identity] = owner;
         identity.forward(destination, 0, data);//must be alastria registry call
-        indentity.transfer(owner);
-        emit LogIdentityCreated(identity, msg.sender, owner);
-=======
->>>>>>> feature/AlastriaIdentityManager
+        identity.transfer(owner);
+        LogIdentityCreated(identity, msg.sender, owner);
     }
 
     //Internals

@@ -1,8 +1,10 @@
-pragma solidity ^0.4.8;
+pragma solidity 0.4.15;
 // Deleted dependency to import "./libs/Owned.sol";
 
+import "contracts/libs/Owned.sol";
 
-contract proxy {
+
+contract proxy is Owned {
     address public owner;
     address public recover;
 
@@ -15,13 +17,13 @@ contract proxy {
     }
 
     modifier onlyOwnerOrRecover() {
-      require(isOwner(msg.sender)||isRecover(msg.sender));
-      _;
+        require(isOwner(msg.sender)||isRecover(msg.sender));
+        _;
     }
 
-    constructor () {
-      owner = msg.sender;
-      recover = msg.sender;
+    function proxy () {
+        owner = msg.sender;
+        recover = msg.sender;
     }
 
     function () payable { Received(msg.sender, msg.value); }
@@ -31,21 +33,7 @@ contract proxy {
         Forwarded(destination, value, data);
     }
 
-    function Owned() {
-      owner = msg.sender;
-    }
-
-    function isOwner(address addr) public returns(bool) {
-      return addr == owner;
-    }
-
     function isRecover(address addr) public returns(bool) {
-      return addr == recover;
-    }
-
-    function transfer(address newOwner) public onlyOwnerOrRecover {
-        if (newOwner != address(this)) {
-            owner = newOwner;
-        }
+        return addr == recover;
     }
 }

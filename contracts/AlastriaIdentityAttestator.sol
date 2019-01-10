@@ -64,8 +64,4 @@ contract AlastriaIdentityAttestator {
         return providers[_identityAttestator].level;
     }
 
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> feature/AlastriaIdentityManager

@@ -43,8 +43,4 @@ contract AlastriaIdentityProvider {
         return providers[_identityProvider];
     }
 
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> feature/AlastriaIdentityManager

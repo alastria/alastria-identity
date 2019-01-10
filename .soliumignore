@@ -1,6 +1,2 @@
 node_modules
-<<<<<<< HEAD
-contracts/Migrations.sol
-=======
 contracts/misc/Migrations.sol
->>>>>>> feature/AlastriaIdentityManager
