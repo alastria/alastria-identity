@@ -19,11 +19,11 @@ contract AlastriaPublicKeyRegistry {
         uint startDate;
         uint endDate;
     }
+
     // Mapping (subject, publickey)
     mapping(address => mapping(bytes32 => PublicKey)) private publicKeyRegistry;
     // mapping subject => publickey
     mapping(address => bytes32[]) public publicKeyList;
-
 
     //Events, just for revocation and deletion
     event PublicKeyDeleted (bytes32 publicKey);
@@ -42,10 +42,10 @@ contract AlastriaPublicKeyRegistry {
     }
 
     // Sets new key and revokes previous
-    function set(bytes32 publicKey) public {
+    function addKey(bytes32 publicKey) public {
         require(!publicKeyRegistry[msg.sender][publicKey].exists);
         uint changeDate = now;
-        revokePublicKey(currentPublicKey(msg.sender));
+        revokePublicKey(getCurrentPublicKey(msg.sender));
         publicKeyRegistry[msg.sender][publicKey] = PublicKey(
             true,
             Status.Valid,
@@ -74,7 +74,7 @@ contract AlastriaPublicKeyRegistry {
         }
     }
 
-    function currentPublicKey(address subject) view public validAddress(subject) returns (bytes32) {
+    function getCurrentPublicKey(address subject) view public validAddress(subject) returns (bytes32) {
         if (publicKeyList[subject].length > 0) {
             return publicKeyList[subject][publicKeyList[subject].length - 1];
         } else {
@@ -82,12 +82,8 @@ contract AlastriaPublicKeyRegistry {
         }
     }
 
-    function publicKeyStatus(address subject, bytes32 publicKey)
-        view
-        public
-        validAddress(subject)
-        returns (bool exists, Status status, uint startDate, uint endDate)
-    {
+    function getPublicKeyStatus(address subject, bytes32 publicKey) view public validAddress(subject)
+        returns (bool exists, Status status, uint startDate, uint endDate){
         PublicKey storage value = publicKeyRegistry[subject][publicKey];
         return (value.exists, value.status, value.startDate, value.endDate);
     }

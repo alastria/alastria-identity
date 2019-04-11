@@ -72,13 +72,13 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
     log(2,  "publicKey2: ", publicKey2)
     log(2,  "");
 
-    PublicKey.set(publicKey1, {from: subject1}).then(r => {
+    PublicKey.addKey(publicKey1, {from: subject1}).then(r => {
       txResult = r
       blockInfo = web3.eth.getBlock("latest")
-      return PublicKey.currentPublicKey.call(subject1)
+      return PublicKey.getCurrentPublicKey.call(subject1)
     }).then(function(r) {
       currentPublicKey = r
-      return PublicKey.publicKeyStatus.call(subject1, publicKey1)
+      return PublicKey.getPublicKeyStatus.call(subject1, publicKey1)
     }).then(function(r) {
       publicKeyStatus = r
 
@@ -95,7 +95,7 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
   })
 
   it('Second equal Set for subject1, PublicKey1, will fail & revert', done => {
-    PublicKey.set(publicKey1, {from: subject1}).then(() => {
+    PublicKey.addKey(publicKey1, {from: subject1}).then(() => {
     log(2,  "")
     assert (false, "ERROR: Expected exception")
     log(2,  "")
@@ -104,10 +104,10 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
       log(2,  "")
       log(2,  "Expected exception caught, check nothing changed")
       log(2,  "")
-      return PublicKey.currentPublicKey.call(subject1)
+      return PublicKey.getCurrentPublicKey.call(subject1)
       .then(function(r) {
         currentPublicKey = r
-        return PublicKey.publicKeyStatus.call(subject1, publicKey1)
+        return PublicKey.getPublicKeyStatus.call(subject1, publicKey1)
       }).then(function(r) {
         publicKeyStatus = r
 
@@ -125,10 +125,10 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
 
   it('Set for subject1, publicKey2; publicKey1 implicitly revoked', done => {
     previousBlockInfo = blockInfo
-    PublicKey.set(publicKey2, {from: subject1}).then(r => {
+    PublicKey.addKey(publicKey2, {from: subject1}).then(r => {
       txResult = r
       blockInfo = web3.eth.getBlock("latest")
-      return PublicKey.publicKeyStatus.call(subject1, publicKey1)
+      return PublicKey.getPublicKeyStatus.call(subject1, publicKey1)
     }).then(function(r) {
       publicKeyStatus = r
       logStatus (2, "pubkey 1 endDate updated to now")
@@ -137,10 +137,10 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
       assert.strictEqual(publicKeyStatus[2].toNumber(), previousBlockInfo.timestamp, 'should be unchanged')
       assert.strictEqual(publicKeyStatus[3].toNumber(), blockInfo.timestamp, 'should be now')
 
-      return PublicKey.currentPublicKey.call(subject1)
+      return PublicKey.getCurrentPublicKey.call(subject1)
     }).then(function(r) {
       currentPublicKey = r
-      return PublicKey.publicKeyStatus.call(subject1, publicKey2)
+      return PublicKey.getPublicKeyStatus.call(subject1, publicKey2)
     }).then(function(r) {
       publicKeyStatus = r
 
@@ -163,17 +163,17 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
     PublicKey.deletePublicKey(publicKey1, {from: subject1}).then(r => {
       txResult = r
       blockInfo = web3.eth.getBlock("latest")
-      return PublicKey.publicKeyStatus.call(subject1, publicKey1)
+      return PublicKey.getPublicKeyStatus.call(subject1, publicKey1)
     }).then(function(r) {
       publicKeyStatus = r
       logStatus (2, "pubkey 1 deleted")
       assert.strictEqual(publicKeyStatus[0], true, 'should exist')
       assert.strictEqual(publicKeyStatus[1].toNumber(), Status.DeletedBySubject, 'should be Deleted')
       assert.strictEqual(publicKeyStatus[3].toNumber(), blockInfo.timestamp, 'should be now')
-      return PublicKey.currentPublicKey.call(subject1)
+      return PublicKey.getCurrentPublicKey.call(subject1)
     }).then(function(r) {
       currentPublicKey = r
-      return PublicKey.publicKeyStatus.call(subject1, publicKey2)
+      return PublicKey.getPublicKeyStatus.call(subject1, publicKey2)
     }).then(function(r) {
       publicKeyStatus = r
       logStatus (2, "pubKey2 no change")
@@ -199,13 +199,13 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
     log(2,  "publicKey3: ", publicKey3)
     log(2,  "publicKey4: ", publicKey4)
     log(2,  "");
-    PublicKey.set(publicKey3, {from: subject2}).then(r => {
+    PublicKey.addKey(publicKey3, {from: subject2}).then(r => {
       txResult = r
       blockInfo = web3.eth.getBlock("latest")
-      return PublicKey.currentPublicKey.call(subject2)
+      return PublicKey.getCurrentPublicKey.call(subject2)
     }).then(function(r) {
       currentPublicKey = r
-      return PublicKey.publicKeyStatus.call(subject2, publicKey3)
+      return PublicKey.getPublicKeyStatus.call(subject2, publicKey3)
     }).then(function(r) {
       publicKeyStatus = r
 
@@ -226,10 +226,10 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
     PublicKey.revokePublicKey(publicKey3, {from: subject2}).then(r => {
       txResult = r
       blockInfo = web3.eth.getBlock("latest")
-      return PublicKey.currentPublicKey.call(subject2)
+      return PublicKey.getCurrentPublicKey.call(subject2)
     }).then(function(r) {
       currentPublicKey = r
-      return PublicKey.publicKeyStatus.call(subject2, publicKey3)
+      return PublicKey.getPublicKeyStatus.call(subject2, publicKey3)
     }).then(function(r) {
       publicKeyStatus = r
       logStatus (2, "pubkey 3 revoked, endDate updated")
@@ -244,10 +244,10 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
   })
 
   it('Set for subject2, publicKey4', done => {
-    PublicKey.set(publicKey4, {from: subject2}).then(r => {
+    PublicKey.addKey(publicKey4, {from: subject2}).then(r => {
       txResult = r
       blockInfo = web3.eth.getBlock("latest")
-      return PublicKey.publicKeyStatus.call(subject2, publicKey3)
+      return PublicKey.getPublicKeyStatus.call(subject2, publicKey3)
     }).then(function(r) {
       publicKeyStatus = r
       logStatus (2, "pubkey 1 endDate updated")
@@ -256,10 +256,10 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
       assert.strictEqual(publicKeyStatus[2].toNumber(), previousBlockInfo.timestamp, 'should be unchanged')
       assert.strictEqual(publicKeyStatus[3].toNumber(), blockInfo.timestamp, 'should be now')
 
-      return PublicKey.currentPublicKey.call(subject2)
+      return PublicKey.getCurrentPublicKey.call(subject2)
     }).then(function(r) {
       currentPublicKey = r
-      return PublicKey.publicKeyStatus.call(subject2, publicKey4)
+      return PublicKey.getPublicKeyStatus.call(subject2, publicKey4)
     }).then(function(r) {
       publicKeyStatus = r
 
@@ -280,7 +280,7 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
       txResult = r
       blockInfo = web3.eth.getBlock("latest")
 
-      return PublicKey.publicKeyStatus.call(subject2, publicKey3)
+      return PublicKey.getPublicKeyStatus.call(subject2, publicKey3)
     }).then(function(r) {
       publicKeyStatus = r
       logStatus (2, "pubkey3 deleted")
@@ -297,10 +297,10 @@ contract('AlastriaPublicKeyRegistry', (accounts) => {
     PublicKey.revokePublicKey(publicKey3, {from: subject2}).then(r => {
       txResult = r
       blockInfo = web3.eth.getBlock("latest")
-      return PublicKey.currentPublicKey.call(subject2)
+      return PublicKey.getCurrentPublicKey.call(subject2)
     }).then(function(r) {
       currentPublicKey = r
-      return PublicKey.publicKeyStatus.call(subject2, publicKey3)
+      return PublicKey.getPublicKeyStatus.call(subject2, publicKey3)
     }).then(function(r) {
       publicKeyStatus = r
       logStatus (2, "deleted pubkey3 revoked, no change")
