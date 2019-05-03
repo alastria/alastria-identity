@@ -1,4 +1,4 @@
-pragma solidity ^0.4.8;
+pragma solidity ^0.4.23;
 
 
 contract Owned {
@@ -8,9 +8,13 @@ contract Owned {
         _;
     }
 
-    function Owned() { owner = msg.sender; }
+    constructor () public {
+        owner = msg.sender;
+    }
 
-    function isOwner(address addr) public returns(bool) { return addr == owner; }
+    function isOwner(address addr) public view returns(bool) {
+        return addr == owner;
+    }
 
     function transfer(address newOwner) public onlyOwner {
         if (newOwner != address(this)) {
