@@ -1,7 +1,7 @@
-var Eidas = artifacts.require("./contracts/Eidas.sol");
-var AlastriaIdentityManager = artifacts.require("./contracts/AlastriaIdentityManager.sol");
-var AlastriaIdentityProvider = artifacts.require("./contracts/AlastriaIdentityProvider.sol");
-var AlastriaIdentityAttestator = artifacts.require("./contracts/AlastriaIdentityAttestator.sol");
+var Eidas = artifacts.require("contracts/libs/Eidas.sol");
+var AlastriaIdentityManager = artifacts.require("contracts/identityManager/AlastriaIdentityManager.sol");
+var AlastriaIdentityServiceProvider = artifacts.require("contracts/identityManager/AlastriaIdentityServiceProvider.sol");
+var AlastriaIdentityIssuer = artifacts.require("contracts/identityManager/AlastriaIdentityIssuer.sol");
 
 module.exports = function(deployer) {
 
@@ -10,14 +10,15 @@ module.exports = function(deployer) {
   }
 
   deployer.deploy(Eidas);
-  deployer.link(Eidas, AlastriaIdentityAttestator);
+  deployer.link(Eidas, AlastriaIdentityIssuer);
   deployer.link(Eidas, AlastriaIdentityManager);
-  deployer.deploy(AlastriaIdentityProvider);
-  deployer.deploy(AlastriaIdentityAttestator);
+  deployer.deploy(AlastriaIdentityServiceProvider);
+  deployer.deploy(AlastriaIdentityIssuer);
 
-  const USER_TIME_LOCK = 3600
+  /*const USER_TIME_LOCK = 3600
   const ADMIN_TIME_LOCK = 129600
   const ADMIN_RATE = 1200
 
-  deployer.deploy(AlastriaIdentityManager, USER_TIME_LOCK, ADMIN_TIME_LOCK, ADMIN_RATE);
+  deployer.deploy(AlastriaIdentityManager, USER_TIME_LOCK, ADMIN_TIME_LOCK, ADMIN_RATE);*/
+  deployer.deploy(AlastriaIdentityManager, 0);
 };

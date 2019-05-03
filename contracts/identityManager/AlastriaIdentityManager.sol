@@ -1,8 +1,8 @@
 pragma solidity ^0.4.23;
 
-import "contracts/AlastriaIdentityServiceProvider.sol";
-import "contracts/AlastriaIdentityIssuer.sol";
-import "contracts/AlastriaProxy.sol";
+import "contracts/identityManager/AlastriaIdentityServiceProvider.sol";
+import "contracts/identityManager/AlastriaIdentityIssuer.sol";
+import "contracts/identityManager/AlastriaProxy.sol";
 import "contracts/libs/Owned.sol";
 
 contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIdentityIssuer, Owned {
@@ -17,10 +17,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
 
     event OperationWasNotSupported(string indexed method);
 
-    event LogIdentityCreated(
-    address indexed identity,
-    address indexed creator,
-    address owner);
+    event IdentityCreated(address indexed identity, address indexed creator, address owner);
 
     //Modifiers
     modifier isOnTimeToLiveAndIsFromCaller(address _signAddress) {
@@ -40,7 +37,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     }
 
     //Methods
-    function generateAccessToken(address _signAddress) public onlyIdentityProvider(msg.sender) {
+    function generateAccessToken(address _signAddress) public onlyIdentityServiceProvider(msg.sender) {
         accessTokens[_signAddress] = now + timeToLive;
         emit AccessTokenGenerated(_signAddress);
     }
@@ -56,26 +53,22 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     function createIdentity(address owner, address recoveryKey) public {
         AlastriaProxy identity = new AlastriaProxy();
         identityKeys[msg.sender] = identity;
-        emit LogIdentityCreated(identity, recoveryKey, owner);
+        emit IdentityCreated(identity, recoveryKey, owner);
     }
 
     /// @dev Creates a new AlastriaProxy contract for an owner and recovery and allows an initial forward call which would be to set the registry in our case
     /// @param owner Key who can use this contract to control AlastriaProxy. Given full power
     /// @param destination Address of contract to be called after AlastriaProxy is created
     /// @param data of function to be called at the destination contract
-    function createIdentityWithCall(
-        address owner,
-        address destination,
-        bytes data)
-    public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
+    function createIdentityWithCall(address owner, address destination, bytes data) public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
         AlastriaProxy identity = new AlastriaProxy();
         identityKeys[identity] = owner;
         identity.forward(destination, 0, data);//must be alastria registry call
         identity.transfer(owner);
-       emit LogIdentityCreated(identity, msg.sender, owner);
+       emit IdentityCreated(identity, msg.sender, owner);
     }
 
-    //Internals
+    //Internals TODO: warning recommending change visibility to pure
     //Checks that address a is the first input in msg.data.
     //Has very minimal gas overhead.
     function checkMessageData(address a) internal constant returns (bool t) {

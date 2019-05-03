@@ -1,6 +1,5 @@
 pragma solidity ^0.4.23;
 
-
 library Eidas {
 
     enum EidasLevel { Null, Reputational, Low, Substantial, High }
