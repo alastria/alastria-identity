@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/alastria/alastria-identity.svg?branch=feature%2FAlastriaIdentityManager)](https://travis-ci.org/alastria/alastria-identity)
+
 # UPORT BASED ALASTRIA IDENTITY V.0.0.0
 Uport platform adapted to Alastria network
 
@@ -24,7 +26,7 @@ $ pkill -f ganache-cli
 
 Code Quality:
 
-``` 
+```
 $ node_modules/.bin/solidity-coverage
 $ solium -d contracts/
 $ myth --truffle
@@ -88,3 +90,16 @@ For creating an identity, the sequence diagram is the one that follows
 ![alt text](https://github.com/alastria/alastria-identity/blob/develop/Docs/NewIdentity.png)
 
 In which the User app is the mobile phone app from the user, that is the one that has the logic for management the attestation to be stored and sended when required. Also, the app asks for user aceptance.
+
+# NOTAS
+
+Riot channel
+
+# F.A.Q.
+
+For test:
+
+```
+$ ganache-cli -l 0xfffffff > /dev/null &
+$ npm run test
+```
