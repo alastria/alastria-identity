@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for contracts/AlastriaIdentityManager.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">contracts/</a> AlastriaIdentityManager.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">66.67% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>10/15</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">33.33% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>2/6</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">75% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>6/8</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">63.16% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>12/19</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">pragma solidity 0.4.15;
+&nbsp;
+import "contracts/AlastriaIdentityProvider.sol";
+import "contracts/AlastriaIdentityAttestator.sol";
+import "contracts/proxy.sol";
+import "contracts/libs/Owned.sol";
+&nbsp;
+contract AlastriaIdentityManager is AlastriaIdentityProvider, AlastriaIdentityAttestator, Owned {
+    //Variables
+    uint256 public version;
+    uint internal timeToLive = 10000;
+    mapping(address =&gt; address) public identityKeys; //change to alastriaID created check bool
+    mapping(address =&gt; uint) internal accessTokens;
+&nbsp;
+    //Events
+    event AccessTokenGenerated(address indexed signAddress);
+&nbsp;
+    event OperationWasNotSupported(string indexed method);
+&nbsp;
+    event LogIdentityCreated(
+    address indexed identity,
+    address indexed creator,
+    address owner);
+&nbsp;
+    //Modifiers
+    modifier isOnTimeToLiveAndIsFromCaller(address _signAddress) {
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(accessTokens[_signAddress] &gt; 0 &amp;&amp; accessTokens[_signAddress] &gt; now);
+        _;
+    }
+&nbsp;
+    modifier validAddress(address addr) { //protects against some weird attacks
+    <span class="missing-if-branch" title="else path not taken" >E</span>require(addr != address(0));
+    _;
+    }
+&nbsp;
+    //Constructor
+    function AlastriaIdentityManager(uint256 _version) {
+        //TODO require(_version &gt; getPreviousVersion(_previousVersion));
+        version = _version;
+    }
+&nbsp;
+    //Methods
+    function generateAccessToken(address _signAddress) public onlyIdentityProvider(msg.sender) {
+        accessTokens[_signAddress] = now + timeToLive;
+        AccessTokenGenerated(_signAddress);
+    }
+&nbsp;
+    function createAlastriaIdentity() public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
+        //FIXME: This first version don't have the call to the registry.
+        accessTokens[msg.sender] = 0;
+        createIdentity(msg.sender, address(this));
+    }
+    
+    function createIdentity(address owner, address recoveryKey) public {
+        proxy identity = new proxy();
+        identityKeys[msg.sender] = identity;
+        LogIdentityCreated(identity, recoveryKey, owner);
+    }
+&nbsp;
+    /// @dev Creates a new proxy contract for an owner and recovery and allows an initial forward call which would be to set the registry in our case
+    /// @param owner Key who can use this contract to control proxy. Given full power
+    /// @param destination Address of contract to be called after proxy is created
+    /// @param data of function to be called at the destination contract
+<span class="fstat-no" title="function not covered" >    function createIdentityWithCall(</span>
+    address owner, 
+    address destination, 
+    bytes data) 
+    public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
+<span class="cstat-no" title="statement not covered" >        proxy identity = new proxy()</span>;
+<span class="cstat-no" title="statement not covered" >        identityKeys[identity] = owner</span>;
+        identity.forward(destination, 0, data);//must be alastria registry call
+        identity.transfer(owner);
+<span class="cstat-no" title="statement not covered" >        LogIdentityCreated(identity, msg.sender, owner)</span>;
+    }
+&nbsp;
+    //Internals
+    //Checks that address a is the first input in msg.data.
+    //Has very minimal gas overhead.
+<span class="fstat-no" title="function not covered" >    function checkMessageData(address a) internal constant returns (bool t</span>) {
+<span class="cstat-no" title="statement not covered" >        if (msg.data.length &lt; 36) <span class="cstat-no" title="statement not covered" >return false;</span></span>
+        assembly {
+            let mask := 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+            t := eq(a, and(mask, calldataload(4)))
+        }
+    }
+}</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Jan 10 2019 11:40:21 GMT+0100 (CET)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

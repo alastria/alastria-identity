@@ -31,13 +31,24 @@ install:
   - npm install -g solium
   - docker pull mythril/myth
 #  - sudo apt install ruby-coveralls
-  - npm install 
+  - npm install
 
 script:
   - truffle compile
-  - npm run coverage 
+  - npm run coverage
   - solium -d contracts/
   - docker run mythril/myth --truffle
+
+notifications:
+  slack:
+    on_success: always
+#  - docker pull mythril/myth
+  - npm install
+
+script:
+  - npm run coverage
+  - npm run lint
+#  - docker run mythril/myth --truffle
 
 notifications:
   slack:
