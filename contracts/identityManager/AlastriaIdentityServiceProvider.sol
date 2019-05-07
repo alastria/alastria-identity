@@ -1,6 +1,6 @@
 pragma solidity ^0.4.23;
 
-import "contracts/libs/Eidas.sol";
+import "../libs/Eidas.sol";
 
 contract AlastriaIdentityServiceProvider {
 

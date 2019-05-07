@@ -1,6 +1,6 @@
 pragma solidity ^0.4.23;
 
-import "contracts/libs/Owned.sol";
+import "../libs/Owned.sol";
 
 contract AlastriaProxy is Owned {
     address public owner;

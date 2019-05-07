@@ -1,9 +1,9 @@
 pragma solidity ^0.4.23;
 
-import "contracts/identityManager/AlastriaIdentityServiceProvider.sol";
-import "contracts/identityManager/AlastriaIdentityIssuer.sol";
-import "contracts/identityManager/AlastriaProxy.sol";
-import "contracts/libs/Owned.sol";
+import "../identityManager/AlastriaIdentityServiceProvider.sol";
+import "../identityManager/AlastriaIdentityIssuer.sol";
+import "../identityManager/AlastriaProxy.sol";
+import "../libs/Owned.sol";
 
 contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIdentityIssuer, Owned {
     //Variables
@@ -42,19 +42,20 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
         emit AccessTokenGenerated(_signAddress);
     }
 
-    // TODO: Document this function
+    // TODO: Delete this function?
     function createAlastriaIdentity() public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
         //FIXME: This first version don't have the call to the registry.
         accessTokens[msg.sender] = 0;
         createIdentity(msg.sender, address(this));
     }
 
-    // TODO: Document this function
+    // TODO: Delete this function?
     function createIdentity(address owner, address recoveryKey) public {
         AlastriaProxy identity = new AlastriaProxy();
         identityKeys[msg.sender] = identity;
         emit IdentityCreated(identity, recoveryKey, owner);
     }
+    
 
     /// @dev Creates a new AlastriaProxy contract for an owner and recovery and allows an initial forward call which would be to set the registry in our case
     /// @param owner Key who can use this contract to control AlastriaProxy. Given full power
