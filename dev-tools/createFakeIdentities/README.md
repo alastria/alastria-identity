@@ -1,5 +1,5 @@
 # Create Fake Identities for developing purposes
-
+## What it does
 This program initially creates 5 fake identities
 ```
 accounts[0] is Entity 1 (Issuer and Service Provider)
@@ -13,6 +13,7 @@ You can add more entities or subjects calling the last two functions.
 function createFakeEntity(){...}
 function createFakeSubject(){...}
 ```
+## How to use it
 Launch an HTTP Server and open your favourite browser
 ```
 python -m http.server 8080
