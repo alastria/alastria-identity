@@ -1,7 +1,6 @@
-
 /*
 
-This program creates 5 fake identities to test
+This program initially creates 5 fake identities to test
 
 accounts[0] is Entity 1 account (Issuer and Service Provider)
 accounts[1] is Entity 2 account (Issuer and Service Provider)
@@ -9,8 +8,9 @@ accounts[2] is user 1 account
 accounts[3] is user 2 account
 accounts[4] is user 3 account
 
-*/
+You can add more entities or subjects using the last two funcions.
 
+*/
 
 // Environment selection
 const envs = {
@@ -137,4 +137,12 @@ function initFakeIdentities(){
 
 		var msg ='ENTITY1: ' + E1 + '<br>ENTITY2: ' + E2 + '<br>USER1: ' + U1 + '<br>USER2: ' + U2 + '<br>USER3: ' + U3 + '<br>--------<br>';
 		print(msg);
+}
+
+function createFakeEntity(){
+
+}
+
+function createFakeSubject(){
+
 }
