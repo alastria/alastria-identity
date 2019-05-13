@@ -4,11 +4,11 @@ This program initially creates 5 fake identities to test
 
 accounts[0] is Entity 1 account (Issuer and Service Provider)
 accounts[1] is Entity 2 account (Issuer and Service Provider)
-accounts[2] is user 1 account
-accounts[3] is user 2 account
-accounts[4] is user 3 account
+accounts[2] is Subject 1 account
+accounts[3] is Subject 2 account
+accounts[4] is Subject 3 account
 
-You can add more entities or subjects using the last two funcions.
+You can add more entities or subjects using the last two functions.
 
 */
 
@@ -86,44 +86,68 @@ function print(msg){
 }
 
 function initFakeIdentities(){
-
 		// Init accounts
 		var E1 = accounts[0];
 		var E2 = accounts[1];
-		var U1 = accounts[2];
-		var U2 = accounts[3];
-		var U3 = accounts[4];
+		var S1 = accounts[2];
+		var S2 = accounts[3];
+		var S3 = accounts[4];
+		var E1_ID, E2_ID, S1_ID, S2_ID, S3_ID;
 
-		console.log('ACCOUNTS HAVE BEEN INIT\n' + 'ENTITY1: ' + E1 + '\nENTITY2: ' + E2 + '\nUSER1: ' + U1 + '\nUSER2: ' + U2 + '\nUSER3: ' + U3 + '\n--------\n');
+		console.log('ACCOUNTS HAVE BEEN INIT\n' + 'ENTITY1: ' + E1 + '\nENTITY2: ' + E2 + '\nSUBJECT1: ' + S1 +
+			'\nSUBJECT2: ' + S2 + '\nSUBJECT3: ' + S3 + '\n--------\n');
 
 		// Public keys generation
-		var publicKey_E1 = 'publickey_e1';
-		var publicKey_E2 = 'publickey_e2';
-		var publicKey_U1 = 'publickey_u1';
-		var publicKey_U2 = 'publickey_u2';
-		var publicKey_U3 = 'publickey_u3';
+		var publicKey_E1 = 'publicKey_E1';
+		var publicKey_E2 = 'publicKey_E2';
+		var publicKey_S1 = 'publicKey_S1';
+		var publicKey_S2 = 'publicKey_S2';
+		var publicKey_S3 = 'publicKey_S3';
 
 		/*
 		publicKey.addKey.sendTransaction(publicKey_E1, {from:E1});
 		publicKey.addKey.sendTransaction(publicKey_E1, {from:E2});
-		publicKey.addKey.sendTransaction(publicKey_U1, {from:U1});
-		publicKey.addKey.sendTransaction(publicKey_U2, {from:U2});
-		publicKey.addKey.sendTransaction(publicKey_U3, {from:U3});
+		publicKey.addKey.sendTransaction(publicKey_S1, {from:S1});
+		publicKey.addKey.sendTransaction(publicKey_S2, {from:S2});
+		publicKey.addKey.sendTransaction(publicKey_S3, {from:S3});
 		*/
 
-		console.log('PUBLIC KEYS HAVE BEEN REGISTERED\n' + 'ENTITY1: ' + publicKey_E1 + '\nENTITY2: ' + publicKey_E2 + '\nUSER1: '
-			+ publicKey_U1 + '\nUSER2: ' + publicKey_U2 + '\nUSER3: ' + publicKey_U3 + '\n--------\n');
+		console.log('PUBLIC KEYS HAVE BEEN REGISTERED\n' + 'ENTITY1: ' + publicKey_E1 + '\nENTITY2: ' + publicKey_E2 +
+			'\nSUBJECT1: ' + publicKey_S1 + '\nSUBJECT2: ' + publicKey_S2 + '\nSUBJECT3: ' + publicKey_S3 + '\n--------\n');
 
 		// Identites creations. Proxy deployment for each identity
 		/*
 		var proxy_E1 = idManager.createIdentity().call(E1);
 		var proxy_E2 = idManager.createIdentity().call(E2);
-		var proxy_U1 = idManager.createIdentity().call(U1);
-		var proxy_U2 = idManager.createIdentity().call(U2);
-		var proxy_U3 = idManager.createIdentity().call(U3);
+		var proxy_S1 = idManager.createIdentity().call(S1);
+		var proxy_S2 = idManager.createIdentity().call(S2);
+		var proxy_S3 = idManager.createIdentity().call(S3);
 
-		console.log('IDENTITIES HAVE BEEN CREATED\n' + '\nENTITY1: ' + proxy_E1 + '\nENTITY2: ' + proxy_E2 + '\nUSER1: ' + proxy_U1 + '\nUSER2: ' + proxy_U2 + '\nUSER3: ' + proxy_U3 + '\n--------');
+		idManager.createIdentity().call(E1, {from: E1},
+  			function (error,result){
+  				if (!error){
+  					var event = idManager.IdentityCreated({},{fromBlock:'latest', toBlock:'latest'},
+  						function(error, result){
+  							if (!error){
+									E1_ID = result.args._identity;
+  								var msg = "E1 Identity + " has been created: " + E1_ID + "";
+  						    imprimir(msg);
+  							}else{
+  								console.log("Error" + error);
+  							}
+  						});
+  				} else {
+  					console.error("Error" + error);
+  				}
+  			}
+  		);
+
+
+		console.log('IDENTITIES HAVE BEEN CREATED\n' + '\nENTITY1: ' + proxy_E1 + '\nENTITY2: ' + proxy_E2 + '\nSUBJECT1: '
+			+ proxy_S1 + '\nSUBJECT2: ' + proxy_S2 + '\nSUBJECT3: ' + proxy_S3 + '\n--------');
 		*/
+
+
 		// Add Service Providers and Issuers
 		/*
 		idManager.addIdentityServiceProvider().call(E1);
@@ -135,14 +159,15 @@ function initFakeIdentities(){
 		console.log('E1 AND E2 HAVE BEEN REGISTERED AS ISSUERS AND SERVICE PROVIDERS' + '\n--------');
 		*/
 
-		var msg ='ENTITY1: ' + E1 + '<br>ENTITY2: ' + E2 + '<br>USER1: ' + U1 + '<br>USER2: ' + U2 + '<br>USER3: ' + U3 + '<br>--------<br>';
+		var msg ='ENTITY1: ' + E1 + '<br>ENTITY2: ' + E2 + '<br>SUBJECT1: ' + S1 + '<br>SUBJECT2: ' + S2 + '<br>SUBJECT3: '
+			+ S3 + '<br>--------<br>';
 		print(msg);
 }
 
 function createFakeEntity(){
-
+	print("TO DO CREATE NEW ENTITY IDENTITY");
 }
 
 function createFakeSubject(){
-
+	print("TO DO CREATE NEW SUBJECT IDENTITY")
 }

@@ -1,4 +1,4 @@
-# Create Fake Identities for developing purposes
+# Create fake identities for developing purposes
 ## What it does
 This program initially creates 5 fake identities
 ```
@@ -14,11 +14,11 @@ function createFakeEntity(){...}
 function createFakeSubject(){...}
 ```
 ## How to use it
-Launch an HTTP Server and open your favourite browser
+Launch an HTTP Server, open your favourite browser and interact with the buttons.
 ```
 python -m http.server 8080
 ```
-The script is configured to work with Ganache. If you want a different one, just change line 21 of createFakeIdentities.js to choose your option
+The script is configured to work with Ganache by default. If you want to use a different environment, just change line 21 of createFakeIdentities.js to choose your option
 ```javascript
 // Environment selection
 const envs = {
@@ -28,6 +28,6 @@ const envs = {
 }
 var env = envs.GANACHE;
 ```
-If your option is not preconfigured, please, be a good guy: add a new case sentence in the switch(env) and create a pull request in this repository :two_hearts:
+If your option is not preconfigured, please, be a good guy: add a new case sentence in the switch(env) and create a pull request in this repository :innocent:
 
 Enjoy it!
