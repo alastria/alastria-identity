@@ -1,4 +1,5 @@
 #!/bin/bash
-contracts=find "./contracts" -name '*.sol' -exec printf '%s ' {} \;  
-echo $contracts
-#º./node_modules/solc/solcjs
+rm -rf ./contracts/bin/
+rm -rf ./contracts/abi/
+./node_modules/solc/solcjs ./contracts/registry/AlastriaPresentationRegistry.sol ./contracts/registry/AlastriaCredentialRegistry.sol ./contracts/registry/AlastriaPublicKeyRegistry.sol ./contracts/misc/Migrations.sol ./contracts/identityManager/AlastriaIdentityServiceProvider.sol ./contracts/identityManager/AlastriaProxy.sol ./contracts/identityManager/AlastriaIdentityManager.sol ./contracts/identityManager/AlastriaIdentityIssuer.sol ./contracts/libs/Owned.sol ./contracts/libs/Eidas.sol --bin -o ./contracts/bin/ --optimize
+./node_modules/solc/solcjs ./contracts/registry/AlastriaPresentationRegistry.sol ./contracts/registry/AlastriaCredentialRegistry.sol ./contracts/registry/AlastriaPublicKeyRegistry.sol ./contracts/misc/Migrations.sol ./contracts/identityManager/AlastriaIdentityServiceProvider.sol ./contracts/identityManager/AlastriaProxy.sol ./contracts/identityManager/AlastriaIdentityManager.sol ./contracts/identityManager/AlastriaIdentityIssuer.sol ./contracts/libs/Owned.sol ./contracts/libs/Eidas.sol --abi -o ./contracts/abi/ --optimize
