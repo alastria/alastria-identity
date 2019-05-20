@@ -67,6 +67,12 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
         emit IdentityCreated(identity, recoveryKey, owner);
     }
 
+    /// @dev This method send a transaction trough the proxy of the sender
+    function delegateCall(address _destination, uint256 _value, bytes _data) public {
+        require(identityLeys[msg.sender]!=address(0))
+        identityLeys[msg.sender].forward(_destination,_value,_data);
+    }
+
     //Internals TODO: warning recommending change visibility to pure
     //Checks that address a is the first input in msg.data.
     //Has very minimal gas overhead.
