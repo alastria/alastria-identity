@@ -3,12 +3,18 @@ pragma solidity 0.4.23;
 import "../identityManager/AlastriaIdentityServiceProvider.sol";
 import "../identityManager/AlastriaIdentityIssuer.sol";
 import "../identityManager/AlastriaProxy.sol";
+import "../registry/AlastriaCredentialRegistry.sol";
+import "../registry/AlastriaPresentationRegistry.sol";
+import "../registry/AlastriaPublicKeyRegistry.sol";
 import "../libs/Owned.sol";
 
 contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIdentityIssuer, Owned {
     //Variables
     uint256 public version;
     uint internal timeToLive = 10000;
+    AlastriaCredentialRegistry public alastriaCredentialRegistry;
+    AlastriaPresentationRegistry public alastriaPresentationRegistry;
+    AlastriaPublicKeyRegistry public alastriaPublicKeyRegistry;
     mapping(address => address) public identityKeys; //change to alastriaID created check bool
     mapping(address => uint) internal accessTokens;
 
@@ -33,6 +39,9 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     //Constructor
     constructor (uint256 _version) public{
         //TODO require(_version > getPreviousVersion(_previousVersion));
+        alastriaCredentialRegistry = new AlastriaCredentialRegistry(address(0));
+        alastriaPresentationRegistry = new AlastriaPresentationRegistry(address(0));
+        alastriaPublicKeyRegistry = new AlastriaPublicKeyRegistry(address(0));
         version = _version;
     }
 
