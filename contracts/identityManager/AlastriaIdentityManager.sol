@@ -70,7 +70,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     /// @dev This method send a transaction trough the proxy of the sender
     function delegateCall(address _destination, uint256 _value, bytes _data) public {
         require(identityKeys[msg.sender]!=address(0));
-        identityLeys[msg.sender].forward(_destination,_value,_data);
+        identityKeys[msg.sender].call(bytes4(keccak256("forward(address,uint256,bytes)")),_destination,_value,_data);
     }
 
     //Internals TODO: warning recommending change visibility to pure
