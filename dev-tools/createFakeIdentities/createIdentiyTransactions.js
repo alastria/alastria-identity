@@ -1,11 +1,12 @@
 const accounts = require('./accounts');
-var alastriaIdentityManager = '0xee91a06dc0b8ca8a2e3a499c42fae538e0287701';
+var alastriaIdentityManager = '0xf18bd0f5a4f3944f3074453ce2015e8af12ed196';
 
-const createPublicKeyDidDocument = (PublicKey, identity, _nonce) => {
+const createPublicKeyDidDocument = (identity, _nonce) => {
     return {
         from: accounts[identity].address,
         to: alastriaIdentityManager,
-        data: `0x60e6cfd8${PublicKey}`,
+        //TODO: formating for any publickey
+        data: `0x6d69d99a0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002460e6cfd87fdf96e9f8749d267319088775ad1cc245e5cd9fa0d6567426788a3ea10e675e00000000000000000000000000000000000000000000000000000000`,
         nonce: _nonce
     }
 }

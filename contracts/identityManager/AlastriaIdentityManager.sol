@@ -1,12 +1,12 @@
 pragma solidity 0.4.23;
 
-import "../identityManager/AlastriaIdentityServiceProvider.sol";
-import "../identityManager/AlastriaIdentityIssuer.sol";
-import "../identityManager/AlastriaProxy.sol";
-import "../registry/AlastriaCredentialRegistry.sol";
-import "../registry/AlastriaPresentationRegistry.sol";
-import "../registry/AlastriaPublicKeyRegistry.sol";
-import "../libs/Owned.sol";
+import "browser/AlastriaIdentityServiceProvider.sol";
+import "browser/AlastriaIdentityIssuer.sol";
+import "browser/AlastriaProxy.sol";
+import "browser/AlastriaCredentialRegistry.sol";
+import "browser/AlastriaPresentationRegistry.sol";
+import "browser/AlastriaPublicKeyRegistry.sol";
+import "browser/Owned.sol";
 
 contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIdentityIssuer, Owned {
     //Variables
@@ -16,7 +16,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     AlastriaPresentationRegistry public alastriaPresentationRegistry;
     AlastriaPublicKeyRegistry public alastriaPublicKeyRegistry;
     mapping(address => address) public identityKeys; //change to alastriaID created check bool
-    mapping(address => uint) internal accessTokens;
+    mapping(address => uint) public accessTokens;
 
     //Events
     event AccessTokenGenerated(address indexed signAddress);
@@ -39,10 +39,10 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     //Constructor
     constructor (uint256 _version) public{
         //TODO require(_version > getPreviousVersion(_previousVersion));
+        version = _version;
         alastriaCredentialRegistry = new AlastriaCredentialRegistry(address(0));
         alastriaPresentationRegistry = new AlastriaPresentationRegistry(address(0));
         alastriaPublicKeyRegistry = new AlastriaPublicKeyRegistry(address(0));
-        version = _version;
     }
 
     //Methods
@@ -52,12 +52,11 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     }
 
     /// @dev Creates a new AlastriaProxy contract for an owner and recovery and allows an initial forward call which would be to set the registry in our case
-    /// @param destination Address of contract to be called after AlastriaProxy is created
     /// @param publicKeyData of function to be called at the destination contract
-    function createAlastriaIdentity(address destination, bytes publicKeyData) public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
+    function createAlastriaIdentity(bytes publicKeyData) public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
         AlastriaProxy identity = createIdentity(msg.sender, address(this));
         accessTokens[msg.sender] = 0;
-        identity.forward(destination, 0, publicKeyData);//must be alastria registry call
+        identity.forward(alastriaPublicKeyRegistry, 0, publicKeyData);//must be alastria registry call
     } 
 
     /// @dev This method would be private in production
@@ -66,12 +65,14 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
         identityKeys[msg.sender] = identity;
         emit IdentityCreated(identity, recoveryKey, owner);
     }
-
+    
+    
     /// @dev This method send a transaction trough the proxy of the sender
     function delegateCall(address _destination, uint256 _value, bytes _data) public {
-        require(identityLeys[msg.sender]!=address(0))
-        identityLeys[msg.sender].forward(_destination,_value,_data);
+        require(identityKeys[msg.sender]!=address(0));
+        require(identityKeys[msg.sender].call(bytes4(keccak256("forward(address,uint256,bytes)")),_destination,_value,_data));
     }
+
 
     //Internals TODO: warning recommending change visibility to pure
     //Checks that address a is the first input in msg.data.
