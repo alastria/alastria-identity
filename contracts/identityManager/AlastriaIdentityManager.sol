@@ -1,12 +1,12 @@
 pragma solidity 0.4.23;
 
-import "browser/AlastriaIdentityServiceProvider.sol";
-import "browser/AlastriaIdentityIssuer.sol";
-import "browser/AlastriaProxy.sol";
-import "browser/AlastriaCredentialRegistry.sol";
-import "browser/AlastriaPresentationRegistry.sol";
-import "browser/AlastriaPublicKeyRegistry.sol";
-import "browser/Owned.sol";
+import "./AlastriaIdentityServiceProvider.sol";
+import "./AlastriaIdentityIssuer.sol";
+import "./AlastriaProxy.sol";
+import "../registry/AlastriaCredentialRegistry.sol";
+import "../registry/AlastriaPresentationRegistry.sol";
+import "../registry/AlastriaPublicKeyRegistry.sol";
+import "../libs/Owned.sol";
 
 contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIdentityIssuer, Owned {
     //Variables
