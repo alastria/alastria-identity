@@ -1,16 +1,22 @@
-pragma solidity ^0.4.23;
+pragma solidity 0.4.23;
 
-import "../identityManager/AlastriaIdentityServiceProvider.sol";
-import "../identityManager/AlastriaIdentityIssuer.sol";
-import "../identityManager/AlastriaProxy.sol";
+import "./AlastriaIdentityServiceProvider.sol";
+import "./AlastriaIdentityIssuer.sol";
+import "./AlastriaProxy.sol";
+import "../registry/AlastriaCredentialRegistry.sol";
+import "../registry/AlastriaPresentationRegistry.sol";
+import "../registry/AlastriaPublicKeyRegistry.sol";
 import "../libs/Owned.sol";
 
 contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIdentityIssuer, Owned {
     //Variables
     uint256 public version;
     uint internal timeToLive = 10000;
+    AlastriaCredentialRegistry public alastriaCredentialRegistry;
+    AlastriaPresentationRegistry public alastriaPresentationRegistry;
+    AlastriaPublicKeyRegistry public alastriaPublicKeyRegistry;
     mapping(address => address) public identityKeys; //change to alastriaID created check bool
-    mapping(address => uint) internal accessTokens;
+    mapping(address => uint) public accessTokens;
 
     //Events
     event AccessTokenGenerated(address indexed signAddress);
@@ -34,6 +40,9 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     constructor (uint256 _version) public{
         //TODO require(_version > getPreviousVersion(_previousVersion));
         version = _version;
+        alastriaCredentialRegistry = new AlastriaCredentialRegistry(address(0));
+        alastriaPresentationRegistry = new AlastriaPresentationRegistry(address(0));
+        alastriaPublicKeyRegistry = new AlastriaPublicKeyRegistry(address(0));
     }
 
     //Methods
@@ -42,37 +51,33 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
         emit AccessTokenGenerated(_signAddress);
     }
 
-    // TODO: Delete this function?
-    function createAlastriaIdentity() public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
-        //FIXME: This first version don't have the call to the registry.
+    /// @dev Creates a new AlastriaProxy contract for an owner and recovery and allows an initial forward call which would be to set the registry in our case
+    /// @param publicKeyData of function to be called at the destination contract
+    function createAlastriaIdentity(bytes publicKeyData) public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
+        AlastriaProxy identity = createIdentity(msg.sender, address(this));
         accessTokens[msg.sender] = 0;
-        createIdentity(msg.sender, address(this));
-    }
+        identity.forward(alastriaPublicKeyRegistry, 0, publicKeyData);//must be alastria registry call
+    } 
 
-    // TODO: Delete this function?
-    function createIdentity(address owner, address recoveryKey) public {
-        AlastriaProxy identity = new AlastriaProxy();
+    /// @dev This method would be private in production
+    function createIdentity(address owner, address recoveryKey) public returns (AlastriaProxy identity){
+        identity = new AlastriaProxy();
         identityKeys[msg.sender] = identity;
         emit IdentityCreated(identity, recoveryKey, owner);
     }
     
-
-    /// @dev Creates a new AlastriaProxy contract for an owner and recovery and allows an initial forward call which would be to set the registry in our case
-    /// @param owner Key who can use this contract to control AlastriaProxy. Given full power
-    /// @param destination Address of contract to be called after AlastriaProxy is created
-    /// @param data of function to be called at the destination contract
-    function createIdentityWithCall(address owner, address destination, bytes data) public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
-        AlastriaProxy identity = new AlastriaProxy();
-        identityKeys[identity] = owner;
-        identity.forward(destination, 0, data);//must be alastria registry call
-        identity.transfer(owner);
-       emit IdentityCreated(identity, msg.sender, owner);
+    
+    /// @dev This method send a transaction trough the proxy of the sender
+    function delegateCall(address _destination, uint256 _value, bytes _data) public {
+        require(identityKeys[msg.sender]!=address(0));
+        require(identityKeys[msg.sender].call(bytes4(keccak256("forward(address,uint256,bytes)")),_destination,_value,_data));
     }
+
 
     //Internals TODO: warning recommending change visibility to pure
     //Checks that address a is the first input in msg.data.
     //Has very minimal gas overhead.
-    function checkMessageData(address a) internal constant returns (bool t) {
+    function checkMessageData(address a) internal pure returns (bool t) {
         if (msg.data.length < 36) return false;
         assembly {
             let mask := 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF

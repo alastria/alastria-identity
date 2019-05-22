@@ -1,0 +1,28 @@
+
+</<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+    <script src="createFakeIdentities.js"></script>
+  </head>
+  <body>
+    <div id ="buttons">
+      <h2> Fake identities creation </h2>
+      <label>There are two kinds of identities: subjects and entities. An entity has both roles: Service Provider and Issuer.</label>
+      <br><br>
+      <button type="button" onclick="initFakeIdentities()" >Init Fake Identities</button>
+      <label>Create 2 entities and 3 subjects</label>
+      <br><br>
+      <button type="button" onclick="createFakeEntity()" >Create entity</button>
+      <label>Create a new entity </label>
+      <br><br>
+      <button type="button" onclick="createFakeSubject()" >Create subject</button>
+      <label>Create a new subject </label>
+    </div>
+    <div id="console">
+    <h2> Accounts </h2>
+	   <p id="result"></p>
+  </div>
+  </body>
+</html>
