@@ -1,0 +1,16 @@
+{
+  "name": "alastria-identity",
+  "version": "0.0.1",
+  "description": "This is the uPort platform adapted to work on the Alastria network",
+  "keywords": [
+    "uport",
+    "alastria"
+  ],
+  "author": "Alastria",
+  "license": "MIT",
+  "dependencies": {
+    "solc": "0.4.23",
+    "web3": "^0.x.x"
+  },
+  "devDependencies": {}
+}
