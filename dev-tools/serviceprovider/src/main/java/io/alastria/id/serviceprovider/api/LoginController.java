@@ -26,5 +26,6 @@ public class LoginController {
 	@ApiResponse(code = 200, message = "Identity is valid")
 	public void save(@ApiParam(value = "DID Document", required = true) @RequestBody AlastriaDIDDocument user) {
 		log.info(user.toString());
+		Storage.addToAuthorized(user.id);
 	}
 }
