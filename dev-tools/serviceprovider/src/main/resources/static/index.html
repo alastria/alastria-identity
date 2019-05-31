@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+<head>
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alastria Service Provider dummy</title>
+  
+  <link rel="shortcut icon" href="//alastria.io/wp-content/uploads/elementor/thumbs/logo-alastria3-nvmgr56yca1591iq6698cqa46idopb3vylvh49ttc6.png">
+  <link rel="icon" href="//alastria.io/wp-content/uploads/elementor/thumbs/logo-alastria3-nvmgr56yca1591iq6698cqa46idopb3vylvh49ttc6.png">
+  
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="//unpkg.com/qrcode-generator@1.4.3/qrcode.js"></script>
+  <script src="//kjur.github.io/jsrsasign/jsrsasign-latest-all-min.js"></script>
+  
+  <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.8/css/all.css">
+  
+</head>
+<body>
+  <script>
+
+    let login = function() {
+      let user = document.querySelector("#user").value
+      let password = document.querySelector("#password").value
+      if(user === 'satoshi' && password === 'nakamoto') {
+        console.log('login successful')
+        document.querySelector("#userpane").classList.remove('invisible')
+        document.querySelector('#loginpane').classList.add('invisible')
+      } else {
+        alert('login failed')
+      }
+    }
+
+    let alastriaCreateQR = function(button) {
+
+      var typeNumber = 0;
+      var errorCorrectionLevel = 'L'; // ('L', 'M', 'Q', 'H')
+      var qr = qrcode(typeNumber, errorCorrectionLevel)
+      const token = createToken()
+      console.log('Generated token was:', token)
+      qr.addData(token)
+      qr.make();
+      document.querySelector(button).innerHTML = qr.createSvgTag({cellSize: 8});
+      document.querySelectorAll('svg').forEach((node) => {
+        node.style="width: 100%; height: 100%"
+        node.addEventListener('click', (event) => {
+          open('https://jwt.io/#debugger-io?token=' + token)
+          })
+        })
+    }
+
+    let createToken = function() {
+
+      /** Using a jwt.io compatible static key */
+      
+      let key = {rstr: "your-256-bit-secret"}
+
+      let oHeader = {
+        typ: "JWT",
+        alg: "HS256"
+      }
+
+      let oPayload = {
+        iss: 'did:ala:quor:telsius:0x12345', //issuer identity, depends on US-06 (https://trello.com/c/B0Sq5n4y)
+        gwu: 'https://regular.telsius.blockchainbyeveris.io:2000', // gateway
+        cbu:'https://serviceprovider.alastria.blockchainbyeveris.io/api/login', //callback
+        iat: Math.floor(Date.now() / 1000), //issued at
+        nbf: Math.floor(Date.now() / 1000), //not before
+        exp: Math.floor(Date.now() / 1000) + 600, //expiration
+        jti: Math.random().toString(36).substring(2) //token unique identifier
+      }
+
+      let sHeader = JSON.stringify(oHeader);
+      let sPayload = JSON.stringify(oPayload);
+      return KJUR.jws.JWS.sign(oHeader.alg, sHeader, sPayload, key);
+    }
+    
+    addEventListener('DOMContentLoaded', (domEvent) => {
+      
+      document.querySelector('form').addEventListener('submit', (event) => {
+        event.preventDefault()
+        login()
+      }, true)
+
+      document.querySelectorAll('.social').forEach( (node) => { 
+        node.addEventListener('click', (event) => {
+          console.log('Social networks not implemented')
+          event.preventDefault()
+        }, true) 
+      } ) 
+
+      document.querySelector('#alastriabutton').addEventListener('click', (event) => {
+        event.preventDefault();
+        alastriaCreateQR('#alastria_auth')
+      }, true)
+
+      document.querySelector('#signup').addEventListener('click', (event) => { 
+        event.preventDefault()
+        console.log('signup disabled')
+      }, true)
+
+      document.querySelector('#forgot').addEventListener('click', (event) => {
+        event.preventDefault()
+        console.log('account recovery not implemented')
+      }, true)
+
+      document.querySelector('#alastriacreate').addEventListener('click', (event) => {
+        event.preventDefault();
+        alastriaCreateQR('#qr_create_user')
+      }, true)
+    })
+  </script>
+  
+  <div class="container">
+    <h1>Service provider login page</h1>
+    <br>
+    <div class="row">
+      <aside id="loginpane" class="col-sm-4">
+        
+        <div class="card">
+          <article class="card-body">
+            <a href="" id="signup" class="float-right btn btn-outline-primary">Sign up</a>
+            <h4 class="card-title mb-4 mt-1">Sign in</h4>
+            <p>
+              <a href="" id="twitterbutton" class="btn btn-block btn-outline-info social"> <i class="fab fa-twitter"></i>   Login via Twitter</a>
+              <a href="" id="fbbutton" class="btn btn-block btn-outline-primary social"> <i class="fab fa-facebook-f"></i>   Login via facebook</a>
+              <a href="" id="alastriabutton" class="btn btn-block btn-outline-primary"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAADsElEQVRIicWXz28bRRTHV1oHDr31D6BCCA78OCHUAweEOFRICMGBU0FCIIQqIVXhBifEjwo1QpWCyCVSi0C0RU1DobRNAYWGxAnFSWOvf8VOYy+OYzu2s06c2Buvd96Hg1PjCoQ3v8qTRiPN085n5833vZnR+J9M2+4HAizU6pxKmxjVKkrUvQE7ongjnqB3YZ5njDAbrntvwLPVKk+HDKymy6vxOD+Vigiyv2BBeP/2bb7N5VCiuFEu80osiq22H27PYAHmaxs8HAxRdBogQl0pjhgRbq6u7idYOGWafJHJtAMrCN8vL3M8maS5TZF5AgtCrmHzQDCIadehY08rzSZPBA1i69X9AX+VW+LDVBqRu4UkIpzOZvk4ldqWxDyB15ouT4ZChNfX/9W/ZNscmg2S2bTBI74rWES4vFzgWDJx1z52Tq9EOGmaDGaznlOrK7iuFM9HIkxZlfaYK4qx2SS202yPJWs1Hg2FWGk6uwcrEX6zLF6ORtnsyNVoJo/vnQFGQ/MIrfGmKHrnkwzl8//QwbbBjghvzs1xvVRqT6ZE8cGFX/G9d4ajA5dwOn5oZq3SKqOqexn9T7DlOJzPLbHeUY9Na40Dn55DP3EO34mzTJu5tq8hwlA+z5Jt7w681nTwWxabW6ISgYGJEHr/RbT+YfT+Yd79YbwtOleEqUqFUmNzd2BbKV6KxJisWIgIxbrNg19fQz9zBW2r9Xx5leRKBQHiG+s8HjSwPAisq7iuFou8FYviiMv5uQX0oV9a7eLf/cnpCK4oPllIcXpxEeUhpbqmU9V1eSrwB+PFEodHf0cbmUAbmUDf6rWRCQ5e9+Mvlzk0NUVus3uYPYFFhG8WUjwyOoY+eRPNH8DnD3A2m+fgZADd32oP3RinLxLxlEoewZCr17l/ZgYtHEY3DF5PJGmIy0emiW4Y6GEDX/AW4UoFj1wPYITJ9Sq+dAItncSXTjBWXUMJxOob3JdKoqUT6Kkkw6srng+KrmBXhGOVHHopjVZMc2RlkZpSgKAQjlt5tGLL91x5kdpehTqrmhyoF/DZBXx2ns9z6Q6vcKmwSE89h88u0GPnCTreTqiuYIWQVw5Zt8FENsPhvj6qTgOhdeM8OjjI5XiErOuwpByae7XiTnNFePvKj1wzTZQIgeVlnr0wxIbTKhh7fhHoNH+hwIvTAWrKpTcc5TvT9JxCuwLXlcsLRpjPMn/y2K0gluPt/N01WESYWV3ltXiMn8vlHa12R+A7cFfUjl4Qd+wvh3phRRyibq8AAAAASUVORK5CYII="/>   Login via AlastriaID</a>
+              <div id="alastria_auth"></div>
+            </p>
+            <hr>
+            <form>
+              <div class="form-group">
+                <input name="" id="user" class="form-control" placeholder="Email or login" type="text">
+              </div> <!-- form-group// -->
+              <div class="form-group">
+                <input name="" id="password" class="form-control" placeholder="******" type="password">
+              </div> <!-- form-group// -->                                      
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block" onsubmit="return false;"> Login  </button>
+                  </div> <!-- form-group// -->
+                </div>
+                <div class="col-md-6 text-right">
+                  <a id="forgot" class="small" href="#">Forgot password?</a>
+                </div>                                            
+              </div> <!-- .row// -->                                                                  
+            </form>
+          </article>
+        </div> <!-- card.// --> 
+      </aside> <!-- col.// -->
+
+      <aside id="userpane" class="col-sm-4 invisible">
+          <div class="card">
+              <article class="card-body">
+                <a href="" id="signout" class="float-right btn btn-outline-primary">Sign out</a>
+                <h4 class="card-title mb-4 mt-1">User data</h4>
+                <form>
+                  <fieldset disabled>
+                    <div class="form-group">
+                      <label for="name">Name:</label>
+                      <input id="name" class="form-control" type="text" value="satoshi">
+                    </div> <!-- form-group// -->
+                    <div class="form-group">
+                      <label for="email">Email:</label>
+                      <input name="" id="email" class="form-control" type="text" value="satoshi@bitcoin.org">
+                    </div> <!-- form-group// -->                                      
+                  </fieldset>                                                                 
+                  </form>
+                  <hr>
+                  <p>
+                      <a href="" id="alastriacreate" class="btn btn-block btn-outline-primary"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAADsElEQVRIicWXz28bRRTHV1oHDr31D6BCCA78OCHUAweEOFRICMGBU0FCIIQqIVXhBifEjwo1QpWCyCVSi0C0RU1DobRNAYWGxAnFSWOvf8VOYy+OYzu2s06c2Buvd96Hg1PjCoQ3v8qTRiPN085n5833vZnR+J9M2+4HAizU6pxKmxjVKkrUvQE7ongjnqB3YZ5njDAbrntvwLPVKk+HDKymy6vxOD+Vigiyv2BBeP/2bb7N5VCiuFEu80osiq22H27PYAHmaxs8HAxRdBogQl0pjhgRbq6u7idYOGWafJHJtAMrCN8vL3M8maS5TZF5AgtCrmHzQDCIadehY08rzSZPBA1i69X9AX+VW+LDVBqRu4UkIpzOZvk4ldqWxDyB15ouT4ZChNfX/9W/ZNscmg2S2bTBI74rWES4vFzgWDJx1z52Tq9EOGmaDGaznlOrK7iuFM9HIkxZlfaYK4qx2SS202yPJWs1Hg2FWGk6uwcrEX6zLF6ORtnsyNVoJo/vnQFGQ/MIrfGmKHrnkwzl8//QwbbBjghvzs1xvVRqT6ZE8cGFX/G9d4ajA5dwOn5oZq3SKqOqexn9T7DlOJzPLbHeUY9Na40Dn55DP3EO34mzTJu5tq8hwlA+z5Jt7w681nTwWxabW6ISgYGJEHr/RbT+YfT+Yd79YbwtOleEqUqFUmNzd2BbKV6KxJisWIgIxbrNg19fQz9zBW2r9Xx5leRKBQHiG+s8HjSwPAisq7iuFou8FYviiMv5uQX0oV9a7eLf/cnpCK4oPllIcXpxEeUhpbqmU9V1eSrwB+PFEodHf0cbmUAbmUDf6rWRCQ5e9+Mvlzk0NUVus3uYPYFFhG8WUjwyOoY+eRPNH8DnD3A2m+fgZADd32oP3RinLxLxlEoewZCr17l/ZgYtHEY3DF5PJGmIy0emiW4Y6GEDX/AW4UoFj1wPYITJ9Sq+dAItncSXTjBWXUMJxOob3JdKoqUT6Kkkw6srng+KrmBXhGOVHHopjVZMc2RlkZpSgKAQjlt5tGLL91x5kdpehTqrmhyoF/DZBXx2ns9z6Q6vcKmwSE89h88u0GPnCTreTqiuYIWQVw5Zt8FENsPhvj6qTgOhdeM8OjjI5XiErOuwpByae7XiTnNFePvKj1wzTZQIgeVlnr0wxIbTKhh7fhHoNH+hwIvTAWrKpTcc5TvT9JxCuwLXlcsLRpjPMn/y2K0gluPt/N01WESYWV3ltXiMn8vlHa12R+A7cFfUjl4Qd+wvh3phRRyibq8AAAAASUVORK5CYII="/>   Crear identidad en AlastriaID</a>
+                  </p>
+                  <div id="qr_create_user"></div>
+              </article>
+            </div> <!-- card.// -->
+      </aside> 
+  </div> 
+  <!--container end.//-->
+</body>
+</html>
