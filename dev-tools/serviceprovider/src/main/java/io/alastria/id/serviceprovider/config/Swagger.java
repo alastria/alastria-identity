@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.google.common.base.Predicates;
 
+import springfox.documentation.service.Contact;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -19,20 +20,23 @@ public class Swagger {
 	
 	@Bean
 	public Docket api() {
-		return new Docket(DocumentationType.SWAGGER_2).select()
+		return new Docket(DocumentationType.SWAGGER_2)
+				.useDefaultResponseMessages(false)
+				.select()
 				.apis(RequestHandlerSelectors.basePackage("io.alastria.id.serviceprovider.api"))
 				.paths(Predicates.not(PathSelectors.regex("/error")))
 				.build()
 				.apiInfo(apiInfo());
 	}
 
-	// TODO: We need a terms-of-service and license URLs/texts
 	private ApiInfo apiInfo() {
+		
 		return new ApiInfoBuilder().title("Service Provider API")
 				.description("Providing services in AlastriaID Ecosystem")
 				.version("1.0")
 				.license("Apache-2.0")				
 				.licenseUrl("https://apache.org/licenses/LICENSE-2.0")
+				.contact(new Contact("Eduardo Sánchez Mata", "https://github.com/esanchma", "eduardo.sanchez.mata@everis.com"))
 				.build();
 	}
 

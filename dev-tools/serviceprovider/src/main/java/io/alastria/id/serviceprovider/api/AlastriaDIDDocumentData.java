@@ -9,7 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-public class AlastriaDIDDocument {
+public class AlastriaDIDDocumentData {
 
 	@JsonProperty(value = "@context",required = false)
 	@ApiModelProperty(example = "https://w3id.org/did/v1", required = false)
@@ -18,8 +18,11 @@ public class AlastriaDIDDocument {
 	@ApiModelProperty(required = true, value="issuer", example = "did:ala:quor:telsius:0x123ABC")
 	String iss;
 	
-	@ApiModelProperty(required = true, value="shared private secret", example = "your-256-bit-secret")
-	String pku;
+	@ApiModelProperty(required = true, value="gateway", example = "https://regular.telsius.blockchainbyeveris.io/rpc")
+	String gwu;
+	
+	@ApiModelProperty(required = true, value="callback", example = "https://serviceprovider.alastria.blockchainbyeveris.io/api/login")
+	String cbu;
 	
 	@JsonDeserialize(using = UnixTimestampDeserializer.class)
 	@ApiModelProperty(required = true, value="issued at (in timestamp format)", example = "1559555201491")
@@ -32,6 +35,8 @@ public class AlastriaDIDDocument {
 	@JsonDeserialize(using = UnixTimestampDeserializer.class)
 	@ApiModelProperty(required = true, value="not before (in timestamp format)", example = "1559555201491")
 	Date nbf;
+	String jti;
 	
-	AlastriaDIDDocumentData data;
+	
+	
 }

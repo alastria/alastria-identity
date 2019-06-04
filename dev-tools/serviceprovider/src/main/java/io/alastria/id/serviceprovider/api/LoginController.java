@@ -11,6 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -22,10 +23,12 @@ public class LoginController {
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation(value = "Receives a DID Document for login")
-	
-	@ApiResponse(code = 200, message = "Identity is valid")
+
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Identity is valid"),
+			@ApiResponse(code = 404, message = "Identity is not valid") })
+
 	public void save(@ApiParam(value = "DID Document", required = true) @RequestBody AlastriaDIDDocument user) {
 		log.info(user.toString());
-		Storage.addToAuthorized(user.id);
+		// TODO: Storage.addToAuthorized(user.id);
 	}
 }
