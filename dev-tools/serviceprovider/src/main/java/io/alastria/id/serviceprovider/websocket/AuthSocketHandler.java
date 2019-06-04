@@ -26,7 +26,7 @@ public class AuthSocketHandler implements WebSocketHandler {
 		if (message instanceof TextMessage) {
 			TextMessage textMessage = (TextMessage) message;
 			String text = textMessage.getPayload();
-			log.debug("incoming websocket message: {}", text);
+			log.trace("incoming websocket message: {}", text);
 			if(Storage.isAuthorized(text)) {
 				session.sendMessage(new TextMessage("OK".getBytes()));
 			}

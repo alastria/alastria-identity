@@ -43,7 +43,7 @@
 			}
 		}
 		
-		let configureWS = function(jti) {
+		let configureWS = function(iss) {
 			let intervalTimer;
 			ws = new WebSocket(wsAddress())
 			ws.onmessage = function(data) {
@@ -56,9 +56,9 @@
 
 				}
 			}
-			console.log("websocket connected, user id is: ", jti)
+			console.log("websocket connected, user id is: ", iss)
 			intervalTimer = setInterval(function(){
-				ws.send(jti)
+				ws.send(iss)
 			}, 1000)
 			
 			

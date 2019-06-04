@@ -20,6 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 @Api(tags = { "login callback" })
 public class LoginController {
 
+	/**
+	 * login service Receives a DID Document from the user to login
+	 *
+	 * @param user DID Document with the user identity
+	 */
+
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation(value = "Receives a DID Document for login")
@@ -29,6 +35,13 @@ public class LoginController {
 
 	public void save(@ApiParam(value = "DID Document", required = true) @RequestBody AlastriaDIDDocument user) {
 		log.info(user.toString());
-		// TODO: Storage.addToAuthorized(user.id);
+
+		// business authorization logic goes here. we are going to just check that the Issuer has an
+		// alastriaid DID as an example
+
+		Authorization auth = new Authorization(user);
+		if(auth.isValid()) {
+			Storage.addToAuthorized(auth);
+		}
 	}
 }
