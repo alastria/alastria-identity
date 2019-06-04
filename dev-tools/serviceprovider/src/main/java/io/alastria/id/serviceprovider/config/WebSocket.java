@@ -13,7 +13,7 @@ public class WebSocket implements WebSocketConfigurer {
 
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-		registry.addHandler(new AuthSocketHandler(), "/auth");
+		registry.addHandler(new AuthSocketHandler(), "/auth").setAllowedOrigins("*");
 
 	}
 
