@@ -19,4 +19,10 @@ public class Storage {
 		return allowedIDs.contains(id);
 	}
 
+
+	public static void remove(String text) {
+		allowedIDs.remove(text);
+
+	}
+
 }

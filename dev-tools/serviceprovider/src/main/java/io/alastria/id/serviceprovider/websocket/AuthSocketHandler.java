@@ -18,7 +18,7 @@ public class AuthSocketHandler implements WebSocketHandler {
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		log.debug("Incoming websocket connection from {}", session.getRemoteAddress());
 		session.sendMessage(new TextMessage("CONNECTED".getBytes()));
-		
+
 	}
 
 	@Override
@@ -29,12 +29,13 @@ public class AuthSocketHandler implements WebSocketHandler {
 			log.trace("incoming websocket message: {}", text);
 			if(Storage.isAuthorized(text)) {
 				session.sendMessage(new TextMessage("OK".getBytes()));
+				Storage.remove(text);
 			}
-			
+
 		} else {
 			log.error("Incoming websocket message has an extraneous type");
 		}
-		
+
 	}
 
 	@Override
