@@ -1,6 +1,7 @@
 package io.alastria.id.serviceprovider.api;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,9 +32,9 @@ public class LoginController {
 	@ApiOperation(value = "Receives a DID Document for login")
 
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Identity is valid"),
-			@ApiResponse(code = 404, message = "Identity is not valid") })
+			@ApiResponse(code = 401, message = "Identity is not valid") })
 
-	public void save(@ApiParam(value = "DID Document", required = true) @RequestBody AlastriaDIDDocument user) {
+	public ResponseEntity<Void> save(@ApiParam(value = "DID Document", required = true) @RequestBody AlastriaDIDDocument user) {
 		log.info(user.toString());
 
 		// business authorization logic goes here. we are going to just check that the Issuer has an
@@ -42,6 +43,9 @@ public class LoginController {
 		Authorization auth = new Authorization(user);
 		if(auth.isValid()) {
 			Storage.addToAuthorized(auth);
+			return new ResponseEntity<Void>(HttpStatus.OK);
+		} else {
+			return new ResponseEntity<Void>(HttpStatus.UNAUTHORIZED);
 		}
 	}
 }
