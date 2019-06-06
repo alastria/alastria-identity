@@ -36,7 +36,7 @@ This SSI model has been implemented with three groups of contracts:
  The previous contracts use the same lib/contracts which are:
  
 | Contract      | What it does          | 
-| ------------- |:-------------| 
+|:------------- |:-------------| 
 | Eidas.sol     | It manages Eidas level of assurance for credentials| 
 | Owned.sol     | It assures that just the account which deployed a contract can update the version | 
 
@@ -52,7 +52,7 @@ $ npm install
 On the dev-tools directory you can find some interesting functionalities for developers and quick testing:
 
 | dev-tool      | What it does          | 
-| ------------- |:-------------| 
+|:------------- |:-------------| 
 | createFakeIdentities     | Create some fake Alastria identities to play with | 
 | deployContracts      | Deploy the contracts on the chosen network and, if it is Alastria T-Network, it updates their address, ABI and version on this repository|  
 | serviceprovider | TODO |   
