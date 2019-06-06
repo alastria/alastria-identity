@@ -1,5 +1,5 @@
 
-# ALASTRIA IDENTITY V.0.0.1
+# ALASTRIA IDENTITY V.0.1
 Self-sovereign identity (SSI) implementation on Alastria network.
 
 At this moment, this solution is being developed and tested for Quorum (Geth) on Alastria T-Network. More information about its nodes and the network in the [alastria-node repository](https://github.com/alastria/alastria-node).
