@@ -12,7 +12,9 @@ To interact with the identity contracts, there is a library to use from the wall
 To deepen the model, you have all the information in [the wiki](https://github.com/alastria/alastria-identity/wiki). 
 
 ## Contracts
-The version, the addresses and the ABIs of the deployed contracts are always updated at [TODO](./CODE_QUALITY.md). Any contribution must follow the [code quality rules](./CODE_QUALITY.md) for developers
+Contracts should be deployed using dev-tools/deployContracts. The version, the addresses and the ABIs of the deployed contracts are always updated at [./contracts/TODO.md](./contracts/TODO.md) and at the [contracts/abi](https://github.com/alastria/alastria-identity/tree/develop/contracts/abi) directory.
+
+Any contribution must follow the [code quality rules](./CODE_QUALITY.md) for developers
 
 This SSI model has been implemented with three groups of contracts:
 ### 1. Identity Manager
