@@ -2,7 +2,7 @@
 # ALASTRIA IDENTITY V.0.1
 Self-sovereign identity (SSI) implementation on Alastria network.
 
-At this moment, this solution is being developed and tested for Quorum (Geth) on Alastria T-Network. More information about its nodes and the network in the [alastria-node repository](https://github.com/alastria/alastria-node).
+At this moment, this solution is being developed and tested for Quorum (Geth) on Alastria T-Network. More information about its nodes and the network in the [alastria-node repository](https://github.com/alastria/alastria-node). In the future, the objetive is that this works with other Alastria networks: Parity, Hyperledger Fabric...
 
 To interact with the identity contracts, you have a library in the [alastria-identity-lib repository (https://github.com/alastria/alastria-identity-lib).
 
