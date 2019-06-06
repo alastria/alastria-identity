@@ -41,7 +41,7 @@ This SSI model has been implemented with three groups of contracts:
 | Owned.sol     | It assures that just the account which deployed a contract can update the version | 
 
 ## Up & Running
-Download and istall:
+Download and install:
 ```
 $ git clone https://github.com/alastria/alastria-identity.git
 $ cd alastria-identity
