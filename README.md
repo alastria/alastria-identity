@@ -59,5 +59,5 @@ On the dev-tools directory you can find some interesting functionalities for dev
 
 
 ## Need Help?
-Our SCRUM team will be happy to listen to you at [slack #identidaddigital](https://github.com/alastria/alastria-node/wiki/HELP)
+Our identity core team will be happy to listen to you at [slack #identidaddigital](https://github.com/alastria/alastria-node/wiki/HELP)
 
