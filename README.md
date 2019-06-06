@@ -4,7 +4,7 @@ Self-sovereign identity (SSI) implementation on Alastria network.
 
 At this moment, this solution is being developed and tested for Quorum (Geth) on Alastria T-Network. More information about its nodes and the network in the [alastria-node repository](https://github.com/alastria/alastria-node). In the future, the objetive is that this works with other Alastria networks: Parity, Hyperledger Fabric...
 
-A mobile Alastria Wallet on IONIQ has been developed as a reference implementation to exploit and explore the self-sovereign identity concept. It is the one that has the logic for management the credential to be stored and sended when required. Also, the app asks for user aceptance. Code is available on the [alastria-wallet repository](https://github.com/alastria/alastria-wallet).
+A mobile Alastria Wallet on IONIQ has been developed as a reference implementation to exploit and explore the self-sovereign identity concept. It has the logic for management the credential to be stored and sended when required. Also, the app asks for user aceptance. Code is available on the [alastria-wallet repository](https://github.com/alastria/alastria-wallet).
 
 To interact with the identity contracts, there is a library to use from the wallet in the [alastria-identity-lib repository](https://github.com/alastria/alastria-identity-lib).
 
