@@ -75,7 +75,7 @@
 		let alastriaCreateQR = function(button) {
 			
 			var typeNumber = 0;
-			var errorCorrectionLevel = 'L'; // ('L', 'M', 'Q', 'H')
+			var errorCorrectionLevel = 'H'; // ('L', 'M', 'Q', 'H')
 			var qr = qrcode(typeNumber, errorCorrectionLevel)
 			const token = createToken()
 			console.log('Generated token was:', token)
