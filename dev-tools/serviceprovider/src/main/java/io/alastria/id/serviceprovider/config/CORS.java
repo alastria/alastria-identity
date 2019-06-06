@@ -10,7 +10,7 @@ public class CORS implements WebMvcConfigurer {
 	 @Override
 	  public void addCorsMappings(CorsRegistry registry) {
 
-	    registry.addMapping("/api/login")
+	    registry.addMapping("/api/login/")
 	        .allowedOrigins("*")
 	        .allowedMethods("*")
 	        .allowedHeaders("*")

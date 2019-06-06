@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/api/login")
+@RequestMapping(value = "/api/login/")
 @Api(tags = { "login callback" })
 public class LoginController {
 
@@ -31,7 +31,7 @@ public class LoginController {
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation(value = "Receives a DID Document for login")
 
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Identity is valid"),
+	@ApiResponses(value = { @ApiResponse(code = 204, message = "Identity is valid"),
 			@ApiResponse(code = 401, message = "Identity is not valid") })
 
 	public ResponseEntity<Void> save(@ApiParam(value = "DID Document", required = true) @RequestBody AlastriaDIDDocument user) {
@@ -43,7 +43,7 @@ public class LoginController {
 		Authorization auth = new Authorization(user);
 		if(auth.isValid()) {
 			Storage.addToAuthorized(auth);
-			return new ResponseEntity<Void>(HttpStatus.OK);
+			return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
 		} else {
 			return new ResponseEntity<Void>(HttpStatus.UNAUTHORIZED);
 		}

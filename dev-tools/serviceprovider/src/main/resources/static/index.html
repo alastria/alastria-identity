@@ -81,7 +81,7 @@
 			console.log('Generated token was:', token)
 			qr.addData(token)
 			qr.make();
-			document.querySelector(button).innerHTML = qr.createSvgTag({cellSize: 8});
+			document.querySelector(button).innerHTML = qr.createSvgTag({cellSize: 10});
 			document.querySelectorAll('svg').forEach((node) => {
 				node.style="width: 100%; height: 100%"
 				node.addEventListener('click', (event) => {
@@ -104,7 +104,7 @@
 			let oPayload = {
 				iss: 'did:ala:quor:telsius:0x12345', //issuer identity, depends on US-06 (https://trello.com/c/B0Sq5n4y)
 				gwu: 'https://regular.telsius.blockchainbyeveris.io:2000', // gateway
-				cbu:'https://serviceprovider.alastria.blockchainbyeveris.io/api/login', //callback
+				cbu:'https://serviceprovider.alastria.blockchainbyeveris.io/api/login/', //callback
 				iat: Math.floor(Date.now() / 1000), //issued at
 				nbf: Math.floor(Date.now() / 1000), //not before
 				exp: Math.floor(Date.now() / 1000) + 600, //expiration
