@@ -2,8 +2,8 @@
 const Web3 = require('web3')
 const fs = require('fs')
 const solc = require('solc')
-const adminPath = './mocked-identity-keys/admin-6e3976aeaa3a59e4af51783cc46ee0ffabc5dc11';
-const { networks } = require('../../truffle');
+// const adminPath = './mocked-identity-keys/admin-6e3976aeaa3a59e4af51783cc46ee0ffabc5dc11';
+// const { networks } = require('../../truffle');
 
 let web3
 let nodeUrl = 'http://127.0.0.1:8545'
@@ -122,15 +122,9 @@ function deployManager(address, compiled, contractEidas) {
 
 function saveDataInFile(address, data) {
   console.log('Saving contract data ...')
-  // let contract = {
-  //   name: data.name,
-  //   address: address, 
-  //   abi: data.abi
-  // }
-  // fs.appendFile('ContractInfo.json', JSON.stringify(contract), function(err) {
-  
-    let contractInfo = `${data.name} -- ${address} -- ${JSON.stringify(data.abi)}\n\n`
-  fs.appendFile('ContractInfo.md', contractInfo, function(err) {
+  let contract = `| ${data.name} | ${address} | ${JSON.stringify(data.abi)} |\n`
+
+  fs.appendFile('../../contracts/ContractInfo.md', contract, function(err) {
     if(err) throw err;
     console.log('Contract data saved!!')
   })
@@ -139,12 +133,14 @@ function saveDataInFile(address, data) {
 function findEidas() {
   return new Promise((resolve, reject) => {
     try {
-      // let file = fs.readFileSync('ContractInfo.json', 'utf-8')
-      // let eidasName = file.substr(9, 5)
-      // let eidasAddress = file.substr(27,42)
-      let file = fs.readFileSync('ContractInfo.md', 'utf-8')
-      let eidasName = file.substr(0, 5)
-      let eidasAddress = file.substr(9, 42)
+      let file = fs.readFileSync('../../contracts/ContractInfo.md', 'utf-8')
+      let eidasName, eidasAddress
+      let findEidas = file.search('Eidas')
+      if (findEidas > 0) {
+        eidasName = file.substr(70, 5)
+        eidasAddress = file.substr(78, 42)
+      }
+
       let eidasData = {
         name: eidasName,
         address: eidasAddress

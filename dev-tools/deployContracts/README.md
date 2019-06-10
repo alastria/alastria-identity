@@ -2,7 +2,7 @@
 
 ## What it does?
 
-This script allow compile and deploy the SmartContract AlastriaIdentityManager.sol and save in [ContractInfo.md](./ContractInfo.md) the name, address and ABI of that contract.
+This script allow compile and deploy the SmartContract AlastriaIdentityManager.sol and save in [ContractInfo.md](../../contracts/ContractInfo.md) the name, address and ABI of that contract.
 
 First of all check if the contract Eidas.sol is deployed. 
 
