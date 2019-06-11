@@ -1,105 +1,63 @@
-[![Build Status](https://travis-ci.org/alastria/alastria-identity.svg?branch=feature%2FAlastriaIdentityManager)](https://travis-ci.org/alastria/alastria-identity)
 
-# UPORT BASED ALASTRIA IDENTITY V.0.0.0
-Uport platform adapted to Alastria network
+# ALASTRIA IDENTITY 0.1
+Self-sovereign identity (SSI) implementation on Alastria network.
 
-[Code quality rules](./CODE_QUALITY.md)
+At this moment, this solution is being developed and tested for Quorum (Geth) on Alastria T-Network. More information about its nodes and the network in the [alastria-node repository](https://github.com/alastria/alastria-node). In the future, the objetive is that this works with other Alastria networks: Parity, Hyperledger Fabric...
+
+A mobile Alastria Wallet on IONIQ has been developed as a reference implementation to exploit and explore the self-sovereign identity concept. It has the logic for managing credentials to be stored and sended when required. Also, the app asks for user aceptance. Code is available on the [alastria-wallet repository](https://github.com/alastria/alastria-wallet).
+
+To interact with the identity contracts, there is a library to use from the wallet in the [alastria-identity-lib repository](https://github.com/alastria/alastria-identity-lib).
+
+## Alastria Self-Sovereign Identity Model
+To deepen the model, you have all the information in [the wiki](https://github.com/alastria/alastria-identity/wiki). 
+
+## Contracts
+Contracts should be deployed using dev-tools/deployContracts. The version, the addresses and the ABIs of the deployed contracts are always updated at [./contracts/TODO.md](./contracts/TODO.md) and at the [contracts/abi](https://github.com/alastria/alastria-identity/tree/develop/contracts/abi) directory.
+
+Any contribution must follow the [code quality rules](./CODE_QUALITY.md) for developers
+
+This SSI model has been implemented with three groups of contracts:
+### 1. Identity Manager
+|Contract      | What it does          | 
+| :------------- |:-------------| 
+| AlastriaIdentityManager.sol     |It generate access tokens, creates identities, deploy an AlastriaProxy for each identity and sends transactions through the proxy of the sender| 
+| AlastriaProxy.sol     |It is the Alastria ID itself. Only receive transactions from the IdentityManager and resend them to the target  | 
+| AlastriaIdentityIssuer.sol     | It keeps a registry of the issuers identities | 
+| AlastriaIdentityServiceProvider.sol     |It keeps a registry of the service providers identities | 
+
+### 2. Registry
+|Contract      | What it does          | 
+|:------------- |:-------------| 
+| AlastriaCredentialRegistry.sol     |It manages all the credentials and keeps the registry and the status | 
+| AlastriaPresentationRegistry.sol     |It manages all the presentations and keeps the registry and the status | 
+| AlastriaPublicKeyRegistry.sol     | It manages all the public keys and keeps the registry | 
+
+### 3. Libs 
+ The previous contracts use the same lib/contracts which are:
+ 
+| Contract      | What it does          | 
+|:------------- |:-------------| 
+| Eidas.sol     | It manages Eidas level of assurance for credentials| 
+| Owned.sol     | It assures that just the account which deployed a contract can update the version | 
 
 ## Up & Running
-
-Download:
-
+Download and install:
 ```
 $ git clone https://github.com/alastria/alastria-identity.git
 $ cd alastria-identity
 $ npm install
 ```
 
-Truffle liveclycle:
+## Developers tools
+On the dev-tools directory you can find some interesting functionalities for developers and quick testing:
 
-```
-$ truffle compile
-$ ganache-cli > ganache-cli.log &
-$ truffle test
-$ pkill -f ganache-cli
-```
+| dev-tool      | What it does          | 
+|:------------- |:-------------| 
+| createFakeIdentities     | Create some fake Alastria identities to play with. You have 5 mock-identities already created! | 
+| deployContracts      | Deploy the contracts on the chosen network and, if it is Alastria T-Network, it updates their address, ABI and version on this repository|  
+| serviceprovider | TODO |   
 
-Code Quality:
 
-```
-$ node_modules/.bin/solidity-coverage
-$ solium -d contracts/
-$ myth --truffle
-```
+## Need Help?
+Our identity core team will be happy to listen to you at [slack #identidaddigital](https://github.com/alastria/alastria-node/wiki/HELP)
 
-Deploy new version of contracts:
-
-```
-$ truffle migrate
-```
-
-We need to commit the build folder with the changes.
-
-## UportRaw contracts
-The adresses of the contracts (as Uport provide them) in the alastria test-net are:
-```
-  IdentityManager: 0xb08c53b75030eb406f4c856a524f57a35410f474
-  MetaIdentityManager: 0x28d38d5cfe3c721506665fe2c1ca165ea3c81ea6
-  proxy: 0xfc5940d3180fd294aad65d2fcc6b8c7664828cf8
-  UportRegistry: 0x4dedc4b2e4122158d0df02c3cfdd5f07326497c0
-  TxRelay: 0x815af292ba858a3256fc0d03e40b75b07fcdf317
-```
-
-## Basic Identity Manager
-Forked from uPort
-
-This is the basic identity which gives the Alastria identity manager the main features for working in the blockchain.
-
-The migrate feature has been disable for this version of alastria ID. Need to set the ownership and responsability of the identity creation.
-
-The recovery feature has been moved to the Alastria Identity Manager, to be managed with the eIDAS level.
-
-The registerIdentity feature has been removed for this version, there is not supposed to exists multiple id in multiple identity managers to be moved.
-
-This contract is not used by it self, only inherited by the Alastria Identity Manager.
-
-## Alastria Identity Manager
-Inherit from Basic Identity Manager
-
-Allows user to interface the main functions of the registry
-
-Allows user to manage different wallets o
-
-## AlastriaRegistry
-Has all the information about the IDs
-
-Has the proccess to create, validate and revoke attestations for the users
-
-The attestations points to off-chain resources (URI)
-
-## proxy
-Is the AlastriaID itself
-
-Is the interface with the world for an AlastriaID
-
-Only receive transactions and resend them to the target
-
-## How to use
-For creating an identity, the sequence diagram is the one that follows
-
-![alt text](https://github.com/alastria/alastria-identity/blob/develop/Docs/NewIdentity.png)
-
-In which the User app is the mobile phone app from the user, that is the one that has the logic for management the attestation to be stored and sended when required. Also, the app asks for user aceptance.
-
-# NOTAS
-
-Riot channel
-
-# F.A.Q.
-
-For test:
-
-```
-$ ganache-cli -l 0xfffffff > /dev/null &
-$ npm run test
-```
