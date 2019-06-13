@@ -38,6 +38,8 @@
 				console.log('login successful')
 				document.querySelector("#userpane").classList.remove('invisible')
 				document.querySelector('#loginpane').classList.add('invisible')
+				document.querySelector('#create_alastria_from_credentials').classList.remove('invisible')
+				createAlastriaID = true
 			} else {
 				alert('login failed')
 			}
@@ -51,9 +53,10 @@
 				if(data.data === "OK") {
 					document.querySelector("#userpane").classList.remove('invisible')
 					document.querySelector('#loginpane').classList.add('invisible')
+					document.querySelector('#create_alastria_from_credentials').classList.add('invisible')
 					clearInterval(intervalTimer)
 					ws.close()
-
+					
 				}
 			}
 			console.log("websocket connected, user id is: ", iss)
@@ -232,13 +235,15 @@
 						</fieldset>
 					</form>
 					<hr>
-					<p>
-						<a href="" id="alastriacreate"
-						class="btn btn-block btn-outline-primary"><img
-						src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAADsElEQVRIicWXz28bRRTHV1oHDr31D6BCCA78OCHUAweEOFRICMGBU0FCIIQqIVXhBifEjwo1QpWCyCVSi0C0RU1DobRNAYWGxAnFSWOvf8VOYy+OYzu2s06c2Buvd96Hg1PjCoQ3v8qTRiPN085n5833vZnR+J9M2+4HAizU6pxKmxjVKkrUvQE7ongjnqB3YZ5njDAbrntvwLPVKk+HDKymy6vxOD+Vigiyv2BBeP/2bb7N5VCiuFEu80osiq22H27PYAHmaxs8HAxRdBogQl0pjhgRbq6u7idYOGWafJHJtAMrCN8vL3M8maS5TZF5AgtCrmHzQDCIadehY08rzSZPBA1i69X9AX+VW+LDVBqRu4UkIpzOZvk4ldqWxDyB15ouT4ZChNfX/9W/ZNscmg2S2bTBI74rWES4vFzgWDJx1z52Tq9EOGmaDGaznlOrK7iuFM9HIkxZlfaYK4qx2SS202yPJWs1Hg2FWGk6uwcrEX6zLF6ORtnsyNVoJo/vnQFGQ/MIrfGmKHrnkwzl8//QwbbBjghvzs1xvVRqT6ZE8cGFX/G9d4ajA5dwOn5oZq3SKqOqexn9T7DlOJzPLbHeUY9Na40Dn55DP3EO34mzTJu5tq8hwlA+z5Jt7w681nTwWxabW6ISgYGJEHr/RbT+YfT+Yd79YbwtOleEqUqFUmNzd2BbKV6KxJisWIgIxbrNg19fQz9zBW2r9Xx5leRKBQHiG+s8HjSwPAisq7iuFou8FYviiMv5uQX0oV9a7eLf/cnpCK4oPllIcXpxEeUhpbqmU9V1eSrwB+PFEodHf0cbmUAbmUDf6rWRCQ5e9+Mvlzk0NUVus3uYPYFFhG8WUjwyOoY+eRPNH8DnD3A2m+fgZADd32oP3RinLxLxlEoewZCr17l/ZgYtHEY3DF5PJGmIy0emiW4Y6GEDX/AW4UoFj1wPYITJ9Sq+dAItncSXTjBWXUMJxOob3JdKoqUT6Kkkw6srng+KrmBXhGOVHHopjVZMc2RlkZpSgKAQjlt5tGLL91x5kdpehTqrmhyoF/DZBXx2ns9z6Q6vcKmwSE89h88u0GPnCTreTqiuYIWQVw5Zt8FENsPhvj6qTgOhdeM8OjjI5XiErOuwpByae7XiTnNFePvKj1wzTZQIgeVlnr0wxIbTKhh7fhHoNH+hwIvTAWrKpTcc5TvT9JxCuwLXlcsLRpjPMn/y2K0gluPt/N01WESYWV3ltXiMn8vlHa12R+A7cFfUjl4Qd+wvh3phRRyibq8AAAAASUVORK5CYII=" />
-						  Crear AlastriaID</a>
-					</p>
-					<div id="qr_create_user"></div>
+					<div id="create_alastria_from_credentials" class="invisible">
+						<p>
+							<a href="" id="alastriacreate"
+							class="btn btn-block btn-outline-primary"><img
+							src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAADsElEQVRIicWXz28bRRTHV1oHDr31D6BCCA78OCHUAweEOFRICMGBU0FCIIQqIVXhBifEjwo1QpWCyCVSi0C0RU1DobRNAYWGxAnFSWOvf8VOYy+OYzu2s06c2Buvd96Hg1PjCoQ3v8qTRiPN085n5833vZnR+J9M2+4HAizU6pxKmxjVKkrUvQE7ongjnqB3YZ5njDAbrntvwLPVKk+HDKymy6vxOD+Vigiyv2BBeP/2bb7N5VCiuFEu80osiq22H27PYAHmaxs8HAxRdBogQl0pjhgRbq6u7idYOGWafJHJtAMrCN8vL3M8maS5TZF5AgtCrmHzQDCIadehY08rzSZPBA1i69X9AX+VW+LDVBqRu4UkIpzOZvk4ldqWxDyB15ouT4ZChNfX/9W/ZNscmg2S2bTBI74rWES4vFzgWDJx1z52Tq9EOGmaDGaznlOrK7iuFM9HIkxZlfaYK4qx2SS202yPJWs1Hg2FWGk6uwcrEX6zLF6ORtnsyNVoJo/vnQFGQ/MIrfGmKHrnkwzl8//QwbbBjghvzs1xvVRqT6ZE8cGFX/G9d4ajA5dwOn5oZq3SKqOqexn9T7DlOJzPLbHeUY9Na40Dn55DP3EO34mzTJu5tq8hwlA+z5Jt7w681nTwWxabW6ISgYGJEHr/RbT+YfT+Yd79YbwtOleEqUqFUmNzd2BbKV6KxJisWIgIxbrNg19fQz9zBW2r9Xx5leRKBQHiG+s8HjSwPAisq7iuFou8FYviiMv5uQX0oV9a7eLf/cnpCK4oPllIcXpxEeUhpbqmU9V1eSrwB+PFEodHf0cbmUAbmUDf6rWRCQ5e9+Mvlzk0NUVus3uYPYFFhG8WUjwyOoY+eRPNH8DnD3A2m+fgZADd32oP3RinLxLxlEoewZCr17l/ZgYtHEY3DF5PJGmIy0emiW4Y6GEDX/AW4UoFj1wPYITJ9Sq+dAItncSXTjBWXUMJxOob3JdKoqUT6Kkkw6srng+KrmBXhGOVHHopjVZMc2RlkZpSgKAQjlt5tGLL91x5kdpehTqrmhyoF/DZBXx2ns9z6Q6vcKmwSE89h88u0GPnCTreTqiuYIWQVw5Zt8FENsPhvj6qTgOhdeM8OjjI5XiErOuwpByae7XiTnNFePvKj1wzTZQIgeVlnr0wxIbTKhh7fhHoNH+hwIvTAWrKpTcc5TvT9JxCuwLXlcsLRpjPMn/y2K0gluPt/N01WESYWV3ltXiMn8vlHa12R+A7cFfUjl4Qd+wvh3phRRyibq8AAAAASUVORK5CYII=" />
+							  Crear AlastriaID</a>
+						</p>
+						<div id="qr_create_user"></div>
+					</div>
 				</article>
 			</div>
 			<!-- card.// -->
