@@ -36,13 +36,28 @@ Also, you have a bunch of deployed identities and identity smart contracts in Te
 
 # Alastria Identities 
 
-##Alastria Identity Manager: 0xf18bd0f5a4f3944f3074453ce2015e8af12ed196
+## Alastria Identity Manager: 
+```
+0xf18bd0f5a4f3944f3074453ce2015e8af12ed196
+```
 
-##Alastria Public Key Registry: 0x0b337E2aC98a9725615dE042E950dD8C8b66b0fA
-##Alastria Credential Registry: 0xE4f91b47399Dc2560025Aafb4fFA7Cd5C483330e
-##Alastria Presentation Registry: 0x8e78E1BfBdcD1564309d86d4925fCF533a6dcBC8
+## Alastria Public Key Registry: 
+```
+0x0b337E2aC98a9725615dE042E950dD8C8b66b0fA
+```
+## Alastria Credential Registry: 
+```
+0xE4f91b47399Dc2560025Aafb4fFA7Cd5C483330e
+```
+## Alastria Presentation Registry: 
+```
+0x8e78E1BfBdcD1564309d86d4925fCF533a6dcBC8
+```
 
-##Service Provider: 0x643266eb3105f4bf8b4f4fec50886e453f0da9ad
+## Service Provider: 
+```
+0x643266eb3105f4bf8b4f4fec50886e453f0da9ad
+```
 Password: Passw0rd
 Added in tx hash: 
 ```
@@ -56,7 +71,7 @@ Added in tx hash:
 0xfe01429627d8150952cd15cc52c35a6076f655812ce5cff5a4feb9d82abb5af9
 ```
 
-##Identity 1: 0xa9728125c573924b2b1ad6a8a8cd9bf6858ced49
+## Identity 1: 0xa9728125c573924b2b1ad6a8a8cd9bf6858ced49
 Password: Passw0rd
 Create identity transaction:
 ```
@@ -79,7 +94,7 @@ PublicKey(Used as raw signature):
 ```
 7fdf96e9f8749d267319088775ad1cc245e5cd9fa0d6567426788a3ea10e675e
 ```
-##Identity 2: 0xad88f1a89cf02a32010b971d8c8af3a2c7b3bd94
+## Identity 2: 0xad88f1a89cf02a32010b971d8c8af3a2c7b3bd94
 Password: Passw0rd
 Create identity transaction:
 ```
@@ -102,7 +117,7 @@ PublicKey(Used as raw signature):
 ```
 7fdf96e9f8749d267319088775ad1cc245e5cd9fa0d6567426788a3ea10e675e
 ```
-##Identity 3: 0xde7ab34219563ac50ccc7b51d23b9a61d22a383e
+## Identity 3: 0xde7ab34219563ac50ccc7b51d23b9a61d22a383e
 Password: Passw0rd
 Generated acces token in tx hash: 0x960e6fcdd1a8a527a78d82fe644893ddad06926cc28a7d75bf7cf3ac41461d3b
 Create identity transaction:
