@@ -12,7 +12,7 @@ To interact with the identity contracts, there is a library to use from the wall
 To deepen the model, you have all the information in [the wiki](https://github.com/alastria/alastria-identity/wiki). 
 
 ## Contracts
-Contracts should be deployed using dev-tools/deployContracts. The version, the addresses and the ABIs of the deployed contracts are always updated at [./contracts/ContractInfo.md](https://github.com/alastria/alastria-identity/blob/feature/deployContracts/contracts/ContractInfo.md) and at the [contracts/abi](https://github.com/alastria/alastria-identity/tree/develop/contracts/abi) directory.
+Contracts must be deployed by Alastria. The version, the addresses and the ABIs of the deployed contracts are always updated at [./contracts/ContractInfo.md](https://github.com/alastria/alastria-identity/blob/develop/contracts/ContractInfo.md) and at the [contracts/abi](https://github.com/alastria/alastria-identity/tree/develop/contracts/abi) directory. If you want to deploy them in your test-environment you can use dev-tools/deployContracts.
 
 Any contribution must follow the [code quality rules](./CODE_QUALITY.md) for developers
 
