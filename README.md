@@ -53,7 +53,7 @@ On the dev-tools directory you can find some interesting functionalities for dev
 
 | dev-tool      | What it does          | 
 |:------------- |:-------------| 
-| createFakeIdentities     | Create some fake Alastria identities to play with. You have 5 mock-identities already created! | 
+| createFakeIdentities     | Create some fake Alastria identities to play with. You already have 5 mock-identities to play with! | 
 | deployContracts      | Deploy the contracts on the chosen network and, if it is Alastria T-Network, it updates their address, ABI and version on this repository|  
 | serviceprovider | Service Provider page, capable of doing login and sending credentials |   
 
