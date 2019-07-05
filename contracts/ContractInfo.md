@@ -1,5 +1,5 @@
 | Contract Name | Address | ABI |
-| :------------ | :-------| --- |
+| :------------ | :-------| :--- |
 | AlastriaPublicKeyRegistry | 0x0b337E2aC98a9725615dE042E950dD8C8b66b0fA | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/__contracts_registry_AlastriaPublicKeyRegistry_sol_AlastriaPublicKeyRegistry.abi |
 | AlastriaCredentialRegistry | 0xE4f91b47399Dc2560025Aafb4fFA7Cd5C483330e | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/__contracts_registry_AlastriaCredentialRegistry_sol_AlastriaCredentialRegistry.abi |
 | AlastriaPresentationRegistry | 0x8e78E1BfBdcD1564309d86d4925fCF533a6dcBC8 | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/__contracts_registry_AlastriaPresentationRegistry_sol_AlastriaPresentationRegistry.abi |
