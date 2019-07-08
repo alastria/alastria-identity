@@ -29,19 +29,6 @@ function unlockAccount() {
   web3.personal.unlockAccount(address, password, '0x0')
 }
 
-// async function flatten(files, filePath, writeTofile) {
-//   const spinner = ora(`Flattening .sol file ${filePath} ...`).start()
-//   const flattened = await truffleFlattener(files)
-//   if(writeTofile) {
-//     fs.writeFileSync(filePath, flattened)
-//     spinner.succeed()
-//     console.log(`Flattened file ${filePath} written!`)
-//   } else {
-//     spinner.fail()
-//   }
-//   return flattened
-// }
-
 function flatten(files, filePath, writeTofile) {
   return new Promise((resolve, reject) => {
     const spinner = ora(`Flattening .sol file ${filePath} ...`).start()
