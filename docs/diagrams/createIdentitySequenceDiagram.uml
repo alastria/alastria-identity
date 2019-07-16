@@ -13,5 +13,11 @@ Subject (Wallet) -> -Service Provider : Send SignedAlastriaToken + SignedCreateA
 
 Service Provider -> Blockchain: Execute setupAlastriaIdentity(publicKey)
 Service Provider -> Blockchain : SendTx SignedCreateAlastriaIdentityTx
+Blockchain --> Service Provider : return AlastriaID (address proxy)
+Service Provider  --> Subject (Wallet): return AlastriaID (address proxy) + Service Provider AOA address
 
-Blockchain --> Subject (Wallet): return AlastriaID (address proxy)
+
+
+
+
+
