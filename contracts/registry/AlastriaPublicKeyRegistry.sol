@@ -26,8 +26,8 @@ contract AlastriaPublicKeyRegistry {
     mapping(address => bytes32[]) public publicKeyList;
 
     //Events, just for revocation and deletion
-    event PublicKeyDeleted (bytes32 publicKey);
-    event PublicKeyRevoked (bytes32 publicKey);
+    event PublicKeyDeleted (bytes32 publicKeyHash);
+    event PublicKeyRevoked (bytes32 publicKeyHash);
 
     //Modifiers
     modifier validAddress(address addr) {//protects against some weird attacks
@@ -42,11 +42,11 @@ contract AlastriaPublicKeyRegistry {
     }
 
     // Sets new key and revokes previous
-    function addKey(bytes32 publicKey) public {
-        require(!publicKeyRegistry[msg.sender][publicKey].exists);
+    function addKey(string publicKey) public {
+        require(!publicKeyRegistry[msg.sender][getStringHash(publicKey)].exists);
         uint changeDate = now;
         revokePublicKey(getCurrentPublicKey(msg.sender));
-        publicKeyRegistry[msg.sender][publicKey] = PublicKey(
+        publicKeyRegistry[msg.sender][getStringHash(publicKey)] = PublicKey(
             true,
             Status.Valid,
             changeDate,
@@ -55,8 +55,8 @@ contract AlastriaPublicKeyRegistry {
         publicKeyList[msg.sender].push(publicKey);
     }
 
-    function revokePublicKey(bytes32 publicKey) public {
-        PublicKey storage value = publicKeyRegistry[msg.sender][publicKey];
+    function revokePublicKey(string publicKey) public {
+        PublicKey storage value = publicKeyRegistry[msg.sender][getStringHash(publicKey)];
         // only existent no backtransition
         if (value.exists && value.status != Status.DeletedBySubject) {
             value.endDate = now;
@@ -64,8 +64,8 @@ contract AlastriaPublicKeyRegistry {
         }
     }
 
-    function deletePublicKey(bytes32 publicKey) public {
-        PublicKey storage value = publicKeyRegistry[msg.sender][publicKey];
+    function deletePublicKey(string publicKey) public {
+        PublicKey storage value = publicKeyRegistry[msg.sender][getStringHash(publicKey)];
         // only existent
         if (value.exists) {
             value.status = Status.DeletedBySubject;
@@ -82,10 +82,14 @@ contract AlastriaPublicKeyRegistry {
         }
     }
 
-    function getPublicKeyStatus(address subject, bytes32 publicKey) view public validAddress(subject)
+    function getPublicKeyStatus(address subject, string publicKey) view public validAddress(subject)
         returns (bool exists, Status status, uint startDate, uint endDate){
-        PublicKey storage value = publicKeyRegistry[subject][publicKey];
+        PublicKey storage value = publicKeyRegistry[subject][getStringHash(publicKey)];
         return (value.exists, value.status, value.startDate, value.endDate);
     }
 
+    function getStringHash(string memory inputString) internal pure returns(bytes32) {
+        return keccak256(inputString);
+    }
+    
 }

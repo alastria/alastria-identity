@@ -106,8 +106,8 @@ contract AlastriaPresentationRegistry {
         return (value.exists, value.status);
     }
 
-    function getSubjectPresentationList() public view returns (uint, bytes32[]) {
-        return (subjectPresentationListRegistry[msg.sender].length, subjectPresentationListRegistry[msg.sender]);
+    function getSubjectPresentationList(address subject) public view returns (uint, bytes32[]) {
+        return (subjectPresentationListRegistry[subject].length, subjectPresentationListRegistry[subject]);
     }
 
     //

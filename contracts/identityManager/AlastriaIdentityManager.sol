@@ -53,26 +53,18 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
 
     /// @dev Creates a new AlastriaProxy contract for an owner and recovery and allows an initial forward call which would be to set the registry in our case
     /// @param publicKeyData of function to be called at the destination contract
-    function createAlastriaIdentity(bytes publicKeyData) public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
-        AlastriaProxy identity = createIdentity(msg.sender, address(this));
+    function createAlastriaIdentity(string publicKeyData) public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
+        AlastriaProxy identity = new AlastriaProxy();
+        identityKeys[msg.sender] = identity;
         accessTokens[msg.sender] = 0;
         identity.forward(alastriaPublicKeyRegistry, 0, publicKeyData);//must be alastria registry call
     } 
-
-    /// @dev This method would be private in production
-    function createIdentity(address owner, address recoveryKey) public returns (AlastriaProxy identity){
-        identity = new AlastriaProxy();
-        identityKeys[msg.sender] = identity;
-        emit IdentityCreated(identity, recoveryKey, owner);
-    }
-    
-    
+      
     /// @dev This method send a transaction trough the proxy of the sender
     function delegateCall(address _destination, uint256 _value, bytes _data) public {
         require(identityKeys[msg.sender]!=address(0));
         require(identityKeys[msg.sender].call(bytes4(keccak256("forward(address,uint256,bytes)")),_destination,_value,_data));
     }
-
 
     //Internals TODO: warning recommending change visibility to pure
     //Checks that address a is the first input in msg.data.
@@ -84,4 +76,5 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
             t := eq(a, and(mask, calldataload(4)))
         }
     }
+
 }
