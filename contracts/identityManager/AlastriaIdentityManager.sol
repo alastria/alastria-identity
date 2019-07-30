@@ -53,7 +53,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
 
     /// @dev Creates a new AlastriaProxy contract for an owner and recovery and allows an initial forward call which would be to set the registry in our case
     /// @param publicKeyData of function to be called at the destination contract
-    function createAlastriaIdentity(string publicKeyData) public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
+    function createAlastriaIdentity(bytes publicKeyData) public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
         AlastriaProxy identity = new AlastriaProxy();
         identityKeys[msg.sender] = identity;
         accessTokens[msg.sender] = 0;

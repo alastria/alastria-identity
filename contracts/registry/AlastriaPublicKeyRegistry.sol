@@ -23,11 +23,11 @@ contract AlastriaPublicKeyRegistry {
     // Mapping (subject, publickey)
     mapping(address => mapping(bytes32 => PublicKey)) private publicKeyRegistry;
     // mapping subject => publickey
-    mapping(address => bytes32[]) public publicKeyList;
+    mapping(address => string[]) public publicKeyList;
 
     //Events, just for revocation and deletion
-    event PublicKeyDeleted (bytes32 publicKeyHash);
-    event PublicKeyRevoked (bytes32 publicKeyHash);
+    event PublicKeyDeleted (string publicKey);
+    event PublicKeyRevoked (string publicKey);
 
     //Modifiers
     modifier validAddress(address addr) {//protects against some weird attacks
@@ -42,10 +42,10 @@ contract AlastriaPublicKeyRegistry {
     }
 
     // Sets new key and revokes previous
-    function addKey(string publicKey) public {
+    function addKey(string memory publicKey, address subject) public {
         require(!publicKeyRegistry[msg.sender][getStringHash(publicKey)].exists);
         uint changeDate = now;
-        revokePublicKey(getCurrentPublicKey(msg.sender));
+        revokePublicKey(getCurrentPublicKey(subject));
         publicKeyRegistry[msg.sender][getStringHash(publicKey)] = PublicKey(
             true,
             Status.Valid,
@@ -55,7 +55,7 @@ contract AlastriaPublicKeyRegistry {
         publicKeyList[msg.sender].push(publicKey);
     }
 
-    function revokePublicKey(string publicKey) public {
+    function revokePublicKey(string memory publicKey) public {
         PublicKey storage value = publicKeyRegistry[msg.sender][getStringHash(publicKey)];
         // only existent no backtransition
         if (value.exists && value.status != Status.DeletedBySubject) {
@@ -64,7 +64,7 @@ contract AlastriaPublicKeyRegistry {
         }
     }
 
-    function deletePublicKey(string publicKey) public {
+    function deletePublicKey(string memory publicKey) public {
         PublicKey storage value = publicKeyRegistry[msg.sender][getStringHash(publicKey)];
         // only existent
         if (value.exists) {
@@ -74,15 +74,15 @@ contract AlastriaPublicKeyRegistry {
         }
     }
 
-    function getCurrentPublicKey(address subject) view public validAddress(subject) returns (bytes32) {
+    function getCurrentPublicKey(address subject) view public validAddress(subject) returns (string) {
         if (publicKeyList[subject].length > 0) {
             return publicKeyList[subject][publicKeyList[subject].length - 1];
         } else {
-            return 0;
+            return "";
         }
     }
 
-    function getPublicKeyStatus(address subject, string publicKey) view public validAddress(subject)
+    function getPublicKeyStatus(address subject, string memory publicKey) view public validAddress(subject)
         returns (bool exists, Status status, uint startDate, uint endDate){
         PublicKey storage value = publicKeyRegistry[subject][getStringHash(publicKey)];
         return (value.exists, value.status, value.startDate, value.endDate);
