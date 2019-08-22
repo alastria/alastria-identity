@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23;
+pragma solidity 0.4.23;
 
 
 contract AlastriaPublicKeyRegistry {
@@ -42,11 +42,11 @@ contract AlastriaPublicKeyRegistry {
     }
 
     // Sets new key and revokes previous
-    function addKey(string memory publicKey, address subject) public {
-        require(!publicKeyRegistry[msg.sender][getStringHash(publicKey)].exists);
+    function addKey(string memory publicKey) public {
+        require(!publicKeyRegistry[msg.sender][getKeyHash(publicKey)].exists);
         uint changeDate = now;
-        revokePublicKey(getCurrentPublicKey(subject));
-        publicKeyRegistry[msg.sender][getStringHash(publicKey)] = PublicKey(
+        revokePublicKey(getCurrentPublicKey(msg.sender));
+        publicKeyRegistry[msg.sender][getKeyHash(publicKey)] = PublicKey(
             true,
             Status.Valid,
             changeDate,
@@ -56,7 +56,7 @@ contract AlastriaPublicKeyRegistry {
     }
 
     function revokePublicKey(string memory publicKey) public {
-        PublicKey storage value = publicKeyRegistry[msg.sender][getStringHash(publicKey)];
+        PublicKey storage value = publicKeyRegistry[msg.sender][getKeyHash(publicKey)];
         // only existent no backtransition
         if (value.exists && value.status != Status.DeletedBySubject) {
             value.endDate = now;
@@ -65,7 +65,7 @@ contract AlastriaPublicKeyRegistry {
     }
 
     function deletePublicKey(string memory publicKey) public {
-        PublicKey storage value = publicKeyRegistry[msg.sender][getStringHash(publicKey)];
+        PublicKey storage value = publicKeyRegistry[msg.sender][getKeyHash(publicKey)];
         // only existent
         if (value.exists) {
             value.status = Status.DeletedBySubject;
@@ -82,14 +82,14 @@ contract AlastriaPublicKeyRegistry {
         }
     }
 
-    function getPublicKeyStatus(address subject, string memory publicKey) view public validAddress(subject)
+    function getPublicKeyStatus(address subject, bytes32 publicKey) view public validAddress(subject)
         returns (bool exists, Status status, uint startDate, uint endDate){
-        PublicKey storage value = publicKeyRegistry[subject][getStringHash(publicKey)];
+        PublicKey storage value = publicKeyRegistry[subject][publicKey];
         return (value.exists, value.status, value.startDate, value.endDate);
     }
-
-    function getStringHash(string memory inputString) internal pure returns(bytes32) {
-        return keccak256(inputString);
-    }
     
+    function getKeyHash(string memory inputKey) internal pure returns(bytes32){
+        return keccak256(inputKey);
+    }
+
 }

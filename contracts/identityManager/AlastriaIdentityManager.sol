@@ -59,11 +59,16 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
         accessTokens[msg.sender] = 0;
         identity.forward(alastriaPublicKeyRegistry, 0, publicKeyData);//must be alastria registry call
     } 
-      
+    
     /// @dev This method send a transaction trough the proxy of the sender
     function delegateCall(address _destination, uint256 _value, bytes _data) public {
         require(identityKeys[msg.sender]!=address(0));
-        require(identityKeys[msg.sender].call(bytes4(keccak256("forward(address,uint256,bytes)")),_destination,_value,_data));
+        identityKeys[msg.sender].call(bytes4(keccak256("forward(address,uint256,bytes)")),_destination,_value,_data);
+    }
+    
+    function recoverAccount(address accountLost, address newAccount) public onlyIdentityServiceProvider(msg.sender) {
+        identityKeys[newAccount] = identityKeys[accountLost];
+        identityKeys[accountLost] = address(0);
     }
 
     //Internals TODO: warning recommending change visibility to pure
@@ -76,5 +81,4 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
             t := eq(a, and(mask, calldataload(4)))
         }
     }
-
 }

@@ -83,8 +83,8 @@ contract AlastriaCredentialRegistry {
         return (value.exists, value.status);
     }
 
-    function getSubjectCredentialList(address subject) public view returns (uint, bytes32[]) {
-        return (subjectCredentialList[subject].length, subjectCredentialList[subject]);
+    function getSubjectCredentialList() public view returns (uint, bytes32[]) {
+        return (subjectCredentialList[msg.sender].length, subjectCredentialList[msg.sender]);
     }
 
     function updateCredentialStatus(bytes32 issuerCredentialHash, Status status) validStatus (status) public {

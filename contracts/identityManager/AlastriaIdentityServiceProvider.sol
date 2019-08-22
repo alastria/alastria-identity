@@ -23,11 +23,11 @@ contract AlastriaIdentityServiceProvider {
         addIdentityServiceProvider(msg.sender);
     }
 
-    function addIdentityServiceProvider(address _identityServiceProvider) public notIdentityServiceProvider(_identityServiceProvider) {
+    function addIdentityServiceProvider(address _identityServiceProvider) public onlyIdentityServiceProvider(msg.sender) notIdentityServiceProvider(_identityServiceProvider) {
         providers[_identityServiceProvider] = true;
     }
 
-    function deleteIdentityServiceProvider(address _identityServiceProvider) public onlyIdentityServiceProvider(_identityServiceProvider) {
+    function deleteIdentityServiceProvider(address _identityServiceProvider) public onlyIdentityServiceProvider(_identityServiceProvider) onlyIdentityServiceProvider(msg.sender) {
         providers[_identityServiceProvider] = false;
     }
 
