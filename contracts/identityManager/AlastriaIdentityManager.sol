@@ -24,6 +24,8 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     event OperationWasNotSupported(string indexed method);
 
     event IdentityCreated(address indexed identity, address indexed creator, address owner);
+    
+    event IdentityRecovered(address indexed oldAccount, address newAccount, address indexed serviceProvider);
 
     //Modifiers
     modifier isOnTimeToLiveAndIsFromCaller(address _signAddress) {
@@ -69,6 +71,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     function recoverAccount(address accountLost, address newAccount) public onlyIdentityServiceProvider(msg.sender) {
         identityKeys[newAccount] = identityKeys[accountLost];
         identityKeys[accountLost] = address(0);
+        IdentityRecovered(accountLost,newAccount,msg.sender);
     }
 
     //Internals TODO: warning recommending change visibility to pure
