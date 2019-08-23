@@ -14,7 +14,7 @@ To deepen the model, you have all the information in [the wiki](https://github.c
 ## Contracts
 Contracts must be deployed by Alastria. The version, the addresses and the ABIs of the deployed contracts are always updated at [ContractInfo.md](https://github.com/alastria/alastria-identity/blob/develop/contracts/ContractInfo.md) and at the [contracts/abi](https://github.com/alastria/alastria-identity/tree/develop/contracts/abi) folder. If you want to deploy them in your test-environment you can use [dev-tools/deployContracts](https://github.com/alastria/alastria-identity/tree/develop/dev-tools/deployContracts).
 
-The [GIST ID to open these smart contracts on Remix](https://remix.ethereum.org/#version=soljson-v0.4.23+commit.124ca40d.js&optimize=false&gist=65747824fd972fcde14bac5101489032) is 65747824fd972fcde14bac5101489032. Any contribution must follow the [code quality rules](./CODE_QUALITY.md) for developers.
+The [GIST ID to open these smart contracts on Remix](https://remix.ethereum.org/#version=soljson-v0.4.23+commit.124ca40d.js&optimize=false&gist=65747824fd972fcde14bac5101489032) is 65747824fd972fcde14bac5101489032. Any contribution must follow the code quality rules for developers.
 
 This SSI model has been implemented with three groups of contracts:
 ### 1. Identity Manager
