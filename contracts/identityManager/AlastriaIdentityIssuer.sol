@@ -29,8 +29,10 @@ contract AlastriaIdentityIssuer {
     }
 
     constructor () public {
-        // FIXME: This must be an Alastria_ID created from AlastriaIdentityManager.
-        addIdentityIssuer(msg.sender, Eidas.EidasLevel.High);
+	IdentityIssuer storage identityIssuer;
+        identityIssuer.level = Eidas.EidasLevel.High;
+        identityIssuer.active = true;
+	issuers[msg.sender] = identityIssuer;
     }
 
     function addIdentityIssuer(address _identityIssuer, Eidas.EidasLevel _level) public alLeastLow(_level) notIdentityIssuer(_identityIssuer) {

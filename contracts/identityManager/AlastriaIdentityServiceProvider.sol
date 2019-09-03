@@ -19,8 +19,7 @@ contract AlastriaIdentityServiceProvider {
     }
 
     constructor () public {
-        // FIXME: This must be an Alastria_ID created from AlastriaIdentityManager.
-        addIdentityServiceProvider(msg.sender);
+        providers[msg.sender] = true;
     }
 
     function addIdentityServiceProvider(address _identityServiceProvider) public onlyIdentityServiceProvider(msg.sender) notIdentityServiceProvider(_identityServiceProvider) {
