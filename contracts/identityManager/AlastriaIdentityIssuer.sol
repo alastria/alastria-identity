@@ -29,6 +29,7 @@ contract AlastriaIdentityIssuer {
     }
 
     constructor () public {
+
 	IdentityIssuer storage identityIssuer;
         identityIssuer.level = Eidas.EidasLevel.High;
         identityIssuer.active = true;

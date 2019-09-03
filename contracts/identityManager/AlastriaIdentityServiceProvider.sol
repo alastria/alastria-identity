@@ -19,6 +19,7 @@ contract AlastriaIdentityServiceProvider {
     }
 
     constructor () public {
+
         providers[msg.sender] = true;
     }
 
