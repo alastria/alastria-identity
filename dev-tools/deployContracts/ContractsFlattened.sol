@@ -71,15 +71,15 @@ contract AlastriaIdentityServiceProvider {
     }
 
     constructor () public {
-        // FIXME: This must be an Alastria_ID created from AlastriaIdentityManager.
-        addIdentityServiceProvider(msg.sender);
+
+        providers[msg.sender] = true;
     }
 
-    function addIdentityServiceProvider(address _identityServiceProvider) public notIdentityServiceProvider(_identityServiceProvider) {
+    function addIdentityServiceProvider(address _identityServiceProvider) public onlyIdentityServiceProvider(msg.sender) notIdentityServiceProvider(_identityServiceProvider) {
         providers[_identityServiceProvider] = true;
     }
 
-    function deleteIdentityServiceProvider(address _identityServiceProvider) public onlyIdentityServiceProvider(_identityServiceProvider) {
+    function deleteIdentityServiceProvider(address _identityServiceProvider) public onlyIdentityServiceProvider(_identityServiceProvider) onlyIdentityServiceProvider(msg.sender) {
         providers[_identityServiceProvider] = false;
     }
 
@@ -121,8 +121,11 @@ contract AlastriaIdentityIssuer {
     }
 
     constructor () public {
-        // FIXME: This must be an Alastria_ID created from AlastriaIdentityManager.
-        addIdentityIssuer(msg.sender, Eidas.EidasLevel.High);
+
+	IdentityIssuer storage identityIssuer;
+        identityIssuer.level = Eidas.EidasLevel.High;
+        identityIssuer.active = true;
+	issuers[msg.sender] = identityIssuer;
     }
 
     function addIdentityIssuer(address _identityIssuer, Eidas.EidasLevel _level) public alLeastLow(_level) notIdentityIssuer(_identityIssuer) {
@@ -182,37 +185,26 @@ pragma solidity 0.4.23;
 
 contract AlastriaProxy is Owned {
     address public owner;
-    address public recover;
 
     event Forwarded (address indexed destination, uint value, bytes data);
-    event Received (address indexed sender, uint value);
 
     modifier onlyOwner() {
         require(isOwner(msg.sender));
         _;
     }
 
-    modifier onlyOwnerOrRecover() {
-        require(isOwner(msg.sender)||isRecover(msg.sender));
-        _;
-    }
-
+    //TODO: upgradeable owner for version in Identity Manager
     constructor () public {
         owner = msg.sender;
-        recover = msg.sender;
     }
 
     function () payable public{
-        emit Received(msg.sender, msg.value);
+        revert();
     }
 
     function forward(address destination, uint value, bytes data) public onlyOwner {
         require(destination.call.value(value)(data));
         emit Forwarded(destination, value, data);
-    }
-
-    function isRecover(address addr) public view returns(bool) {
-        return addr == recover;
     }
 }
 
@@ -486,7 +478,7 @@ contract AlastriaPresentationRegistry {
 
 // File: contracts/registry/AlastriaPublicKeyRegistry.sol
 
-pragma solidity ^0.4.23;
+pragma solidity 0.4.23;
 
 
 contract AlastriaPublicKeyRegistry {
@@ -511,11 +503,11 @@ contract AlastriaPublicKeyRegistry {
     // Mapping (subject, publickey)
     mapping(address => mapping(bytes32 => PublicKey)) private publicKeyRegistry;
     // mapping subject => publickey
-    mapping(address => bytes32[]) public publicKeyList;
+    mapping(address => string[]) public publicKeyList;
 
     //Events, just for revocation and deletion
-    event PublicKeyDeleted (bytes32 publicKey);
-    event PublicKeyRevoked (bytes32 publicKey);
+    event PublicKeyDeleted (string publicKey);
+    event PublicKeyRevoked (string publicKey);
 
     //Modifiers
     modifier validAddress(address addr) {//protects against some weird attacks
@@ -530,11 +522,11 @@ contract AlastriaPublicKeyRegistry {
     }
 
     // Sets new key and revokes previous
-    function addKey(bytes32 publicKey) public {
-        require(!publicKeyRegistry[msg.sender][publicKey].exists);
+    function addKey(string memory publicKey) public {
+        require(!publicKeyRegistry[msg.sender][getKeyHash(publicKey)].exists);
         uint changeDate = now;
         revokePublicKey(getCurrentPublicKey(msg.sender));
-        publicKeyRegistry[msg.sender][publicKey] = PublicKey(
+        publicKeyRegistry[msg.sender][getKeyHash(publicKey)] = PublicKey(
             true,
             Status.Valid,
             changeDate,
@@ -543,8 +535,8 @@ contract AlastriaPublicKeyRegistry {
         publicKeyList[msg.sender].push(publicKey);
     }
 
-    function revokePublicKey(bytes32 publicKey) public {
-        PublicKey storage value = publicKeyRegistry[msg.sender][publicKey];
+    function revokePublicKey(string memory publicKey) public {
+        PublicKey storage value = publicKeyRegistry[msg.sender][getKeyHash(publicKey)];
         // only existent no backtransition
         if (value.exists && value.status != Status.DeletedBySubject) {
             value.endDate = now;
@@ -552,8 +544,8 @@ contract AlastriaPublicKeyRegistry {
         }
     }
 
-    function deletePublicKey(bytes32 publicKey) public {
-        PublicKey storage value = publicKeyRegistry[msg.sender][publicKey];
+    function deletePublicKey(string memory publicKey) public {
+        PublicKey storage value = publicKeyRegistry[msg.sender][getKeyHash(publicKey)];
         // only existent
         if (value.exists) {
             value.status = Status.DeletedBySubject;
@@ -562,11 +554,11 @@ contract AlastriaPublicKeyRegistry {
         }
     }
 
-    function getCurrentPublicKey(address subject) view public validAddress(subject) returns (bytes32) {
+    function getCurrentPublicKey(address subject) view public validAddress(subject) returns (string) {
         if (publicKeyList[subject].length > 0) {
             return publicKeyList[subject][publicKeyList[subject].length - 1];
         } else {
-            return 0;
+            return "";
         }
     }
 
@@ -575,19 +567,16 @@ contract AlastriaPublicKeyRegistry {
         PublicKey storage value = publicKeyRegistry[subject][publicKey];
         return (value.exists, value.status, value.startDate, value.endDate);
     }
+    
+    function getKeyHash(string memory inputKey) internal pure returns(bytes32){
+        return keccak256(inputKey);
+    }
 
 }
 
 // File: contracts/identityManager/AlastriaIdentityManager.sol
 
 pragma solidity 0.4.23;
-
-
-
-
-
-
-
 
 contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIdentityIssuer, Owned {
     //Variables
@@ -605,6 +594,8 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     event OperationWasNotSupported(string indexed method);
 
     event IdentityCreated(address indexed identity, address indexed creator, address owner);
+    
+    event IdentityRecovered(address indexed oldAccount, address newAccount, address indexed serviceProvider);
 
     //Modifiers
     modifier isOnTimeToLiveAndIsFromCaller(address _signAddress) {
@@ -635,25 +626,23 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     /// @dev Creates a new AlastriaProxy contract for an owner and recovery and allows an initial forward call which would be to set the registry in our case
     /// @param publicKeyData of function to be called at the destination contract
     function createAlastriaIdentity(bytes publicKeyData) public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
-        AlastriaProxy identity = createIdentity(msg.sender, address(this));
+        AlastriaProxy identity = new AlastriaProxy();
+        identityKeys[msg.sender] = identity;
         accessTokens[msg.sender] = 0;
         identity.forward(alastriaPublicKeyRegistry, 0, publicKeyData);//must be alastria registry call
     } 
-
-    /// @dev This method would be private in production
-    function createIdentity(address owner, address recoveryKey) public returns (AlastriaProxy identity){
-        identity = new AlastriaProxy();
-        identityKeys[msg.sender] = identity;
-        emit IdentityCreated(identity, recoveryKey, owner);
-    }
-    
     
     /// @dev This method send a transaction trough the proxy of the sender
     function delegateCall(address _destination, uint256 _value, bytes _data) public {
         require(identityKeys[msg.sender]!=address(0));
-        require(identityKeys[msg.sender].call(bytes4(keccak256("forward(address,uint256,bytes)")),_destination,_value,_data));
+        identityKeys[msg.sender].call(bytes4(keccak256("forward(address,uint256,bytes)")),_destination,_value,_data);
     }
-
+    
+    function recoverAccount(address accountLost, address newAccount) public onlyIdentityServiceProvider(msg.sender) {
+        identityKeys[newAccount] = identityKeys[accountLost];
+        identityKeys[accountLost] = address(0);
+        IdentityRecovered(accountLost,newAccount,msg.sender);
+    }
 
     //Internals TODO: warning recommending change visibility to pure
     //Checks that address a is the first input in msg.data.

@@ -7,7 +7,8 @@ const truffleFlattener = require('truffle-flattener')
 // const adminPath = './mocked-identity-keys/admin-6e3976aeaa3a59e4af51783cc46ee0ffabc5dc11';
 
 let web3
-let nodeUrl = 'http://127.0.0.1:8545'
+let nodeUrl = 'http://63.33.206.111/rpc'
+// let nodeUrl = 'http://127.0.0.1:8545'
 
 web3 = new Web3(new Web3.providers.HttpProvider(nodeUrl))
 
@@ -22,11 +23,10 @@ let filePath = './ContractsFlattened.sol'
 let writeTofile = true
 
 function unlockAccount() {
-  // let addressAdmin = `0x${JSON.parse(fs.readFileSync(adminPath, 'utf8')).address}`
-  // let passwordAdmin = 'Passw0rd'
   let address = web3.eth.accounts[0]
-  let password = ''
-  web3.personal.unlockAccount(address, password, '0x0')
+  // let password = ''
+  let password = 'Passw0rd'
+  web3.personal.unlockAccount(address, password)
 }
 
 function flatten(files, filePath, writeTofile) {
@@ -89,24 +89,19 @@ function deployEidas(address, compiled) {
         contractObject = item
       }
     })
-    let hexByteCode = "0x" + contractObject.hexBytecode
+    let hexByteCode = `0x${contractObject.hexBytecode}`
     let abi = contractObject.abi
     
     let contractFactory = web3.eth.contract(abi);
     contractFactory.new({
       from: address,
       data: hexByteCode,
-      gas: 5000000
+      gas: 200000
     }, function(e, contract) {
-      if (!e) {
-        setTimeout(function() {
-          if(contract.address) {
-            resolve(contract.address)
-          }
-        }, 500)
-      } else {
-        console.log(`Contract not deployed -> ${e}`);
-        reject(e);
+      if(typeof contract.address !== 'undefined') {
+        console.log('Contrato Eidas minado! ' + contract.address);
+        console.log('Tx Hash ' + contract.transactionHash);
+        resolve(contract.address)
       }
     })
   })
@@ -125,24 +120,19 @@ function deployManager(address, compiled, contractEidas) {
       }
     })
 
-    let hexByteCode = "0x" + contractObject.hexBytecode.split(symbol).join(eidasAddress)
+    let hexByteCode = `0x${contractObject.hexBytecode.split(symbol).join(eidasAddress)}`
     let abi = contractObject.abi
-    
+
     let contractFactory = web3.eth.contract(abi);
     contractFactory.new({
       from: address,
       data: hexByteCode,
-      gas: 5000000
+      gas: 30000000
     }, function(e, contract) {
-      if (!e) {
-        setTimeout(function() {
-          if(contract.address) {
-            resolve(contract.address)
-          }
-        }, 500)
-      } else {
-        console.log(`Contract not deployed -> ${e}`);
-        reject(e);
+      if(typeof contract.address !== 'undefined') {
+        console.log('Contrato Identity Manager minado! ' + contract.address);
+        console.log('Tx Hash ' + contract.transactionHash);
+        resolve(contract.address)
       }
     })
   })
@@ -150,12 +140,36 @@ function deployManager(address, compiled, contractEidas) {
 
 function saveDataInFile(address, data) {
   console.log('Saving contract data ...')
-  let contract = `| ${data.name} | ${address} | ${JSON.stringify(data.abi)} |\n`
+  let contractAbiName, contracInfo, type
+  let urlABI = 'https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/'
+  let contractName = data.name
+  let contractABI = JSON.stringify(data.abi)
+  if (contractName == 'Eidas') {
+    type = 'libs'
+    contractAbiName = `__contracts_${type}_${contractName}_sol_${contractName}.abi`
+    contracInfo = `| ${contractName} | ${address} | ${urlABI}${contractAbiName} |\n`
+    fs.writeFile(`../../contracts/abi/${contractAbiName}`, contractABI, error => {
+      if(error) throw error;
+      console.log('Eidas ABI saved successfully!!')
+    })
+    fs.appendFile('../../contracts/ContractInfo.md', contracInfo, function(err) {
+      if(err) throw err;
+      console.log('Contract data saved!!')
+    })
+  } else {
+    type = 'identityManager'
+    contractAbiName = `__contracts_${type}_${contractName}_sol_${contractName}.abi`
+    contracInfo = `| ${contractName} | ${address} | ${urlABI}${contractAbiName} |\n`
+    fs.writeFile(`../../contracts/abi/${contractAbiName}`, contractABI, error => {
+      if(error) throw error;
+      console.log('Eidas ABI saved successfully!!')
+    })
+    fs.appendFile('../../contracts/ContractInfo.md', contracInfo, function(err) {
+      if(err) throw err;
+      console.log('Contract data saved!!')
+    })
+  }
 
-  fs.appendFile('../../contracts/ContractInfo.md', contract, function(err) {
-    if(err) throw err;
-    console.log('Contract data saved!!')
-  })
 }
 
 function findEidas() {
@@ -165,8 +179,8 @@ function findEidas() {
       let eidasName, eidasAddress
       let findEidas = file.search('Eidas')
       if (findEidas > 0) {
-        eidasName = file.substr(70, 5)
-        eidasAddress = file.substr(78, 42)
+        eidasName = file.substr(71, 5)
+        eidasAddress = file.substr(79, 42)
       }
 
       let eidasData = {
@@ -186,6 +200,7 @@ function findEidas() {
 }
 
 function init() {
+  console.log('[Funtion Init] ---> Initciando el Script de despliegue de contratos')
   flatten(files, filePath, writeTofile)
   .then(flattenedFile => {
     console.log('Starting compiling contracs')
@@ -218,10 +233,12 @@ function init() {
               console.log('Contract Manager compiled successfuly')
               deployManager(address, compiledManager, contractEidas)
               .then(contractManager => {
+                web3.personal.lockAccount(address)
                 saveDataInFile(contractManager, managerData)
                 console.log('Contract Manager deployed successfuly. Address: ', contractManager)
               })
               .catch(error => {
+                web3.personal.lockAccount(address)
                 console.log('ERROR ------> ', error)
               })
             })
@@ -246,12 +263,15 @@ function init() {
             }
           })
           console.log('Contract Manager compiled successfuly')
+          unlockAccount()
           deployManager(address, compiledManager, eidasAddress)
           .then(contractManager => {
+            web3.personal.lockAccount(address)
             saveDataInFile(contractManager, managerData)
             console.log('Contract Manager deployed successfuly. Address: ', contractManager)
           })
           .catch(error => {
+            web3.personal.lockAccount(address)
             console.log('ERROR ------> ', error)
           })
         })
