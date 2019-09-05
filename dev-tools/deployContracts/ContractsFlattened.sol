@@ -578,6 +578,13 @@ contract AlastriaPublicKeyRegistry {
 
 pragma solidity 0.4.23;
 
+
+
+
+
+
+
+
 contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIdentityIssuer, Owned {
     //Variables
     uint256 public version;

@@ -15,7 +15,8 @@ web3 = new Web3(new Web3.providers.HttpProvider(nodeUrl))
 let solidityEidas = fs.readFileSync('../../contracts/libs/Eidas.sol', 'utf8')
 let solidityManager = fs.readFileSync('./ContractsFlattened.sol', 'utf8')
 let address = web3.eth.accounts[0]
-let contractEidas, eidasData, managerData, eidasAddress
+// let password = ''
+let password = 'Passw0rd'
 let files = [
   '../../contracts/identityManager/AlastriaIdentityManager.sol'
 ]
@@ -23,10 +24,11 @@ let filePath = './ContractsFlattened.sol'
 let writeTofile = true
 
 function unlockAccount() {
-  let address = web3.eth.accounts[0]
-  // let password = ''
-  let password = 'Passw0rd'
   web3.personal.unlockAccount(address, password)
+}
+
+function lockAcount() {
+  web3.personal.lockAccount(address)
 }
 
 function flatten(files, filePath, writeTofile) {
@@ -80,18 +82,23 @@ function compileContract(solidity) {
   })
 }
 
-function deployEidas(address, compiled) {
-  console.log('Deploying Eidas Contract ...')
+function deploy(address, compiled, contractEidas) {
+  console.log('Deploying Contract ...')
   return new Promise((resolve, reject) => {
-    let contractObject
+    let symbol = "__:Eidas________________________________"
+    let eidasAddress
+    let hexByteCode, abi, contractObject
     compiled.map(item => {
-      if(item['name'] === 'Eidas') {
+      if(item['name'] === 'AlastriaIdentityManager') {
         contractObject = item
+        eidasAddress = contractEidas.substr(2)
+        hexByteCode = `0x${item.hexBytecode.split(symbol).join(eidasAddress)}`
+      } else {
+        contractObject = item
+        hexByteCode = `0x${item.hexBytecode}`
       }
     })
-    let hexByteCode = `0x${contractObject.hexBytecode}`
-    let abi = contractObject.abi
-    
+    abi = contractObject.abi
     let contractFactory = web3.eth.contract(abi);
     contractFactory.new({
       from: address,
@@ -99,39 +106,6 @@ function deployEidas(address, compiled) {
       gas: 200000
     }, function(e, contract) {
       if(typeof contract.address !== 'undefined') {
-        console.log('Contrato Eidas minado! ' + contract.address);
-        console.log('Tx Hash ' + contract.transactionHash);
-        resolve(contract.address)
-      }
-    })
-  })
-}
-
-function deployManager(address, compiled, contractEidas) {
-  console.log('Deploying Manager Contract ...')
-  return new Promise((resolve, reject) => {
-    let symbol = "__:Eidas________________________________"
-    let eidasAddress = contractEidas.substr(2)
-    let contractObject
-
-    compiled.map(item => {
-      if(item['name'] === 'AlastriaIdentityManager') {
-        contractObject = item
-      }
-    })
-
-    let hexByteCode = `0x${contractObject.hexBytecode.split(symbol).join(eidasAddress)}`
-    let abi = contractObject.abi
-
-    let contractFactory = web3.eth.contract(abi);
-    contractFactory.new({
-      from: address,
-      data: hexByteCode,
-      gas: 30000000
-    }, function(e, contract) {
-      if(typeof contract.address !== 'undefined') {
-        console.log('Contrato Identity Manager minado! ' + contract.address);
-        console.log('Tx Hash ' + contract.transactionHash);
         resolve(contract.address)
       }
     })
@@ -144,141 +118,60 @@ function saveDataInFile(address, data) {
   let urlABI = 'https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/'
   let contractName = data.name
   let contractABI = JSON.stringify(data.abi)
-  if (contractName == 'Eidas') {
+  if (contractName == 'Eidas' || contractName === 'Owned') {
     type = 'libs'
-    contractAbiName = `__contracts_${type}_${contractName}_sol_${contractName}.abi`
-    contracInfo = `| ${contractName} | ${address} | ${urlABI}${contractAbiName} |\n`
-    fs.writeFile(`../../contracts/abi/${contractAbiName}`, contractABI, error => {
-      if(error) throw error;
-      console.log('Eidas ABI saved successfully!!')
-    })
-    fs.appendFile('../../contracts/ContractInfo.md', contracInfo, function(err) {
-      if(err) throw err;
-      console.log('Contract data saved!!')
-    })
+  } else if (contractName === 'AlastriaCredentialRegistry' || contractName === 'AlastriaPresentationRegistry' || contractName === 'AlastriaPublicKeyRegistry') {
+    type = 'registry'
   } else {
     type = 'identityManager'
-    contractAbiName = `__contracts_${type}_${contractName}_sol_${contractName}.abi`
-    contracInfo = `| ${contractName} | ${address} | ${urlABI}${contractAbiName} |\n`
-    fs.writeFile(`../../contracts/abi/${contractAbiName}`, contractABI, error => {
-      if(error) throw error;
-      console.log('Eidas ABI saved successfully!!')
-    })
-    fs.appendFile('../../contracts/ContractInfo.md', contracInfo, function(err) {
-      if(err) throw err;
-      console.log('Contract data saved!!')
-    })
   }
-
-}
-
-function findEidas() {
-  return new Promise((resolve, reject) => {
-    try {
-      let file = fs.readFileSync('../../contracts/ContractInfo.md', 'utf-8')
-      let eidasName, eidasAddress
-      let findEidas = file.search('Eidas')
-      if (findEidas > 0) {
-        eidasName = file.substr(71, 5)
-        eidasAddress = file.substr(79, 42)
-      }
-
-      let eidasData = {
-        name: eidasName,
-        address: eidasAddress
-      }
-      resolve(eidasData)
-    } catch(error) {
-      eidasData = {
-        name: '',
-        address: ''
-      }
-      resolve(eidasData)
-    }
-    
+  contractAbiName = `__contracts_${type}_${contractName}_sol_${contractName}.abi`
+  contracInfo = `| ${contractName} | ${address} | ${urlABI}${contractAbiName} |\n`
+  fs.writeFile(`../../contracts/abi/${contractAbiName}`, contractABI, error => {
+    if(error) throw error;
+    console.log(`${type} ABI saved successfully!!`)
+  })
+  fs.appendFile('../../contracts/ContractInfo.md', contracInfo, function(err) {
+    if(err) throw err;
+    console.log('Contract data saved!!')
   })
 }
 
 function init() {
-  console.log('[Funtion Init] ---> Initciando el Script de despliegue de contratos')
   flatten(files, filePath, writeTofile)
   .then(flattenedFile => {
     console.log('Starting compiling contracs')
-    findEidas()
-    .then(eidas => {
-      eidasAddress = eidas.address ? eidas.address : ''
-      if(eidas.name != 'Eidas') {
-        console.log('Contract Eidas not found. Compiling and deploying Eidas contract')
-        compileContract(solidityEidas)
-        .then(compiledEidas => {
-          compiledEidas.map(item => {
-            if(item['name'] === 'Eidas') {
-              eidasData = item
-            }
-          })
-          console.log('Contract Eidas compiled successfuly')
-          unlockAccount()
-          deployEidas(address, compiledEidas)
-          .then(eidas => {
-            console.log('Contract Eidas deployed successfuly. Address: ', eidas)
-            contractEidas = eidas
-            saveDataInFile(contractEidas, eidasData)
-            compileContract(solidityManager)
-            .then(compiledManager => {
-              compiledManager.map(item => {
-                if(item['name'] === 'AlastriaIdentityManager') {
-                  managerData = item
-                }
-              })
-              console.log('Contract Manager compiled successfuly')
-              deployManager(address, compiledManager, contractEidas)
-              .then(contractManager => {
-                web3.personal.lockAccount(address)
-                saveDataInFile(contractManager, managerData)
-                console.log('Contract Manager deployed successfuly. Address: ', contractManager)
-              })
-              .catch(error => {
-                web3.personal.lockAccount(address)
-                console.log('ERROR ------> ', error)
-              })
+    compileContract(solidityEidas)
+    .then(compiledEidas => {
+      unlockAccount()
+      deploy(address, compiledEidas)
+      .then(eidasAddress => {
+        compileContract(solidityManager)
+        .then(compiledContracts => {
+          compiledContracts.map(item => {
+            console.log('Contract compiled successfuly')
+            deploy(address, compiledContracts, eidasAddress)
+            .then(contractAddress => {
+              // lockAcount
+              saveDataInFile(contractAddress, item)
+              console.log(`Contract ${item.name} deployed successfuly. Address:  ${contractAddress}`)
             })
             .catch(error => {
+              // lockAcount
               console.log('ERROR ------> ', error)
             })
           })
-          .catch(error => {
-            console.log('ERROR ------> ', error)
-          })
         })
         .catch(error => {
           console.log('ERROR ------> ', error)
         })
-      } else {
-        console.log('Contract Eidas found. Compiling and deploying Manager contract')
-        compileContract(solidityManager)
-        .then(compiledManager => {
-          compiledManager.map(item => {
-            if(item['name'] === 'AlastriaIdentityManager') {
-              managerData = item
-            }
-          })
-          console.log('Contract Manager compiled successfuly')
-          unlockAccount()
-          deployManager(address, compiledManager, eidasAddress)
-          .then(contractManager => {
-            web3.personal.lockAccount(address)
-            saveDataInFile(contractManager, managerData)
-            console.log('Contract Manager deployed successfuly. Address: ', contractManager)
-          })
-          .catch(error => {
-            web3.personal.lockAccount(address)
-            console.log('ERROR ------> ', error)
-          })
-        })
-        .catch(error => {
-          console.log('ERROR ------> ', error)
-        })
-      }
+      })
+      .catch(error => {
+        console.log('ERROR ------> ', error)
+      })
+    })
+    .catch(error => {
+      console.log('ERROR ------> ', error)
     })
   })
   
