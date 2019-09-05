@@ -152,12 +152,12 @@ function init() {
             console.log('Contract compiled successfuly')
             deploy(address, compiledContracts, eidasAddress)
             .then(contractAddress => {
-              // lockAcount
+              lockAcount()
               saveDataInFile(contractAddress, item)
               console.log(`Contract ${item.name} deployed successfuly. Address:  ${contractAddress}`)
             })
             .catch(error => {
-              // lockAcount
+              lockAcount()
               console.log('ERROR ------> ', error)
             })
           })
