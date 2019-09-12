@@ -28,7 +28,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     event IdentityRecovered(address indexed oldAccount, address newAccount, address indexed serviceProvider);
 
     //Modifiers
-    modifier isOnTimeToLiveAndIsFromCaller(address _signAddress) {
+    modifier isPendingAndOnTime(address _signAddress) {
         require(pendingIDs[_signAddress] > 0 && pendingIDs[_signAddress] > now);
         _;
     }
@@ -55,7 +55,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
 
     /// @dev Creates a new AlastriaProxy contract for an owner and recovery and allows an initial forward call which would be to set the registry in our case
     /// @param addPublicKeyCallData of the call to addKey function in AlastriaPublicKeyRegistry from the new deployed AlastriaProxy contract
-    function createAlastriaIdentity(bytes addPublicKeyCallData) public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
+    function createAlastriaIdentity(bytes addPublicKeyCallData) public validAddress(msg.sender) isPendingAndOnTime(msg.sender) {
         AlastriaProxy identity = new AlastriaProxy();
         identityKeys[msg.sender] = identity;
         pendingIDs[msg.sender] = 0;
