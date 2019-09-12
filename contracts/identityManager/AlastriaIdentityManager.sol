@@ -16,20 +16,20 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     AlastriaPresentationRegistry public alastriaPresentationRegistry;
     AlastriaPublicKeyRegistry public alastriaPublicKeyRegistry;
     mapping(address => address) public identityKeys; //change to alastriaID created check bool
-    mapping(address => uint) public accessTokens;
+    mapping(address => uint) public pendingIDs;
 
     //Events
-    event AccessTokenGenerated(address indexed signAddress);
+    event PreparedAlastriaID(address indexed signAddress);
 
     event OperationWasNotSupported(string indexed method);
 
     event IdentityCreated(address indexed identity, address indexed creator, address owner);
-    
+
     event IdentityRecovered(address indexed oldAccount, address newAccount, address indexed serviceProvider);
 
     //Modifiers
     modifier isOnTimeToLiveAndIsFromCaller(address _signAddress) {
-        require(accessTokens[_signAddress] > 0 && accessTokens[_signAddress] > now);
+        require(pendingIDs[_signAddress] > 0 && pendingIDs[_signAddress] > now);
         _;
     }
 
@@ -48,26 +48,26 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     }
 
     //Methods
-    function generateAccessToken(address _signAddress) public onlyIdentityServiceProvider(msg.sender) {
-        accessTokens[_signAddress] = now + timeToLive;
-        emit AccessTokenGenerated(_signAddress);
+    function prepareAlastriaID(address _signAddress) public onlyIdentityServiceProvider(msg.sender) {
+        pendingIDs[_signAddress] = now + timeToLive;
+        emit PreparedAlastriaID(_signAddress);
     }
 
     /// @dev Creates a new AlastriaProxy contract for an owner and recovery and allows an initial forward call which would be to set the registry in our case
-    /// @param publicKeyData of function to be called at the destination contract
-    function createAlastriaIdentity(bytes publicKeyData) public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
+    /// @param addPublicKeyCallData of the call to addKey function in AlastriaPublicKeyRegistry from the new deployed AlastriaProxy contract
+    function createAlastriaIdentity(bytes addPublicKeyCallData) public validAddress(msg.sender) isOnTimeToLiveAndIsFromCaller(msg.sender) {
         AlastriaProxy identity = new AlastriaProxy();
         identityKeys[msg.sender] = identity;
-        accessTokens[msg.sender] = 0;
-        identity.forward(alastriaPublicKeyRegistry, 0, publicKeyData);//must be alastria registry call
-    } 
-    
+        pendingIDs[msg.sender] = 0;
+        identity.forward(alastriaPublicKeyRegistry, 0, addPublicKeyCallData);//must be alastria registry call
+    }
+
     /// @dev This method send a transaction trough the proxy of the sender
     function delegateCall(address _destination, uint256 _value, bytes _data) public {
         require(identityKeys[msg.sender]!=address(0));
         identityKeys[msg.sender].call(bytes4(keccak256("forward(address,uint256,bytes)")),_destination,_value,_data);
     }
-    
+
     function recoverAccount(address accountLost, address newAccount) public onlyIdentityServiceProvider(msg.sender) {
         identityKeys[newAccount] = identityKeys[accountLost];
         identityKeys[accountLost] = address(0);
