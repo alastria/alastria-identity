@@ -14,7 +14,7 @@ web3 = new Web3(new Web3.providers.HttpProvider(nodeUrl))
 
 let solidityEidas = fs.readFileSync('../../contracts/libs/Eidas.sol', 'utf8')
 let solidityManager = fs.readFileSync('./ContractsFlattened.sol', 'utf8')
-let address = web3.eth.accounts[0]
+let address = web3.eth.accounts[2]
 // let password = ''
 let password = 'Passw0rd'
 let files = [
