@@ -4,23 +4,24 @@ const fs = require('fs')
 const solc = require('solc')
 const ora = require('ora')
 const truffleFlattener = require('truffle-flattener')
-// const adminPath = './mocked-identity-keys/admin-6e3976aeaa3a59e4af51783cc46ee0ffabc5dc11';
+
+let rawdata = fs.readFileSync('./config.json')
+let config = JSON.parse(rawdata)
+console.log(config)
 
 let web3
-let nodeUrl = 'http://63.33.206.111/rpc'
-// let nodeUrl = 'http://127.0.0.1:8545'
+// let nodeUrl = config.nodeURLAlastria
+let nodeUrl = config.nodeURLLocal
 
 web3 = new Web3(new Web3.providers.HttpProvider(nodeUrl))
 
-let solidityEidas = fs.readFileSync('../../contracts/libs/Eidas.sol', 'utf8')
-let solidityManager = fs.readFileSync('./ContractsFlattened.sol', 'utf8')
+let solidityEidas = fs.readFileSync(config.contractEidas, 'utf8')
+let solidityManager = fs.readFileSync(config.contractManager, 'utf8')
 let address = web3.eth.accounts[2]
-// let password = ''
-let password = 'Passw0rd'
-let files = [
-  '../../contracts/identityManager/AlastriaIdentityManager.sol'
-]
-let filePath = './ContractsFlattened.sol'
+let password = config.addressPwdLocal
+// let password = config.addressAlastria
+let files = config.filesManager
+let filePath = config.filePath
 let writeTofile = true
 
 function unlockAccount() {
@@ -85,7 +86,7 @@ function compileContract(solidity) {
 function deploy(address, compiled, contractEidas) {
   console.log('Deploying Contract ...')
   return new Promise((resolve, reject) => {
-    let symbol = "__:Eidas________________________________"
+    let symbol = config.symbolEidas
     let eidasAddress
     let hexByteCode, abi, contractObject
     compiled.map(item => {
@@ -114,8 +115,8 @@ function deploy(address, compiled, contractEidas) {
 
 function saveDataInFile(address, data) {
   console.log('Saving contract data ...')
-  let contractAbiName, contracInfo, type
-  let urlABI = 'https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/'
+  let contractAbiName, contracInfo, contractInfoHeaders, type
+  let urlABI = config.urlABI
   let contractName = data.name
   let contractABI = JSON.stringify(data.abi)
   if (contractName == 'Eidas' || contractName === 'Owned') {
@@ -126,12 +127,16 @@ function saveDataInFile(address, data) {
     type = 'identityManager'
   }
   contractAbiName = `__contracts_${type}_${contractName}_sol_${contractName}.abi`
+  contractInfoHeaders = `| Contract Name | Address | ABI |\n| :------------ | :-------| :--- |\n`
   contracInfo = `| ${contractName} | ${address} | ${urlABI}${contractAbiName} |\n`
-  fs.writeFile(`../../contracts/abi/${contractAbiName}`, contractABI, error => {
+  fs.writeFile(`${config.abisPath}${contractAbiName}`, contractABI, error => {
     if(error) throw error;
     console.log(`${type} ABI saved successfully!!`)
   })
-  fs.appendFile('../../contracts/ContractInfo.md', contracInfo, function(err) {
+  fs.writeFile(config.contractInfoPath, contractInfoHeaders, function(err) {
+    if(err) throw err;
+  })
+  fs.appendFile(config.contractInfoPath, contracInfo, function(err) {
     if(err) throw err;
     console.log('Contract data saved!!')
   })
@@ -152,12 +157,12 @@ function init() {
             console.log('Contract compiled successfuly')
             deploy(address, compiledContracts, eidasAddress)
             .then(contractAddress => {
-              lockAcount()
+              // lockAcount()
               saveDataInFile(contractAddress, item)
               console.log(`Contract ${item.name} deployed successfuly. Address:  ${contractAddress}`)
             })
             .catch(error => {
-              lockAcount()
+              // lockAcount()
               console.log('ERROR ------> ', error)
             })
           })
