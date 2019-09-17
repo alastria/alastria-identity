@@ -10,16 +10,16 @@ let config = JSON.parse(rawdata)
 console.log(config)
 
 let web3
-// let nodeUrl = config.nodeURLAlastria
-let nodeUrl = config.nodeURLLocal
+let nodeUrl = config.nodeURLAlastria
+// let nodeUrl = config.nodeURLLocal
 
 web3 = new Web3(new Web3.providers.HttpProvider(nodeUrl))
 
 let solidityEidas = fs.readFileSync(config.contractEidas, 'utf8')
 let solidityManager = fs.readFileSync(config.contractManager, 'utf8')
 let address = web3.eth.accounts[2]
-let password = config.addressPwdLocal
-// let password = config.addressAlastria
+// let password = config.addressPwdLocal
+let password = config.addressAlastria
 let files = config.filesManager
 let filePath = config.filePath
 let writeTofile = true
@@ -157,12 +157,12 @@ function init() {
             console.log('Contract compiled successfuly')
             deploy(address, compiledContracts, eidasAddress)
             .then(contractAddress => {
-              // lockAcount()
+              lockAcount()
               saveDataInFile(contractAddress, item)
               console.log(`Contract ${item.name} deployed successfuly. Address:  ${contractAddress}`)
             })
             .catch(error => {
-              // lockAcount()
+              lockAcount()
               console.log('ERROR ------> ', error)
             })
           })
