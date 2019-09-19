@@ -124,44 +124,62 @@ function deployManager(address, compiled, contractEidas) {
       gas: 6721975
     }, function(e, contract) {
       if(typeof contract.address !== 'undefined') {
-        resolve(contract.address)
+        let body = {
+          from: address,
+          to: contract.address
+        }
+        let addresses = {
+          credentialRegistry: contract.alastriaCredentialRegistry.call(body),
+          presentationRegistry: contract.alastriaPresentationRegistry.call(body),
+          publicKeyRegistry: contract.alastriaPublicKeyRegistry.call(body),
+          identityManager: contract.address
+        }
+        resolve(addresses)
       }
     })
   })
 }
 
-function saveDataInFile(address, data) {
-  console.log('Saving contract data ...')
-  let contractAbiName, contracInfo, contractInfoHeaders, type
-  let urlABI = config.urlABI
+function saveABIs(data) {
+  let contractAbiName, type
   let contractName = data.name
   let contractABI = JSON.stringify(data.abi)
-  contractInfoHeaders = `| Contract Name | Address | ABI |\n| :------------ | :-------| :--- |\n`
-  contracInfo = `| ${contractName} | ${address} | ${urlABI}${contractAbiName} |\n`
-  if (contractName == 'Eidas') {
+  if (contractName == 'Eidas' || contractName == 'Owned') {
     type = 'libs'
-    contractAbiName = `__contracts_${type}_${contractName}_sol_${contractName}.abi`
-    fs.writeFile(`${config.abisPath}${contractAbiName}`, contractABI, error => {
-      if(error) throw error;
-      console.log(`${type} ABI saved successfully!!`)
-    })
+  } else if (contractName === 'AlastriaCredentialRegistry' || contractName === 'AlastriaPresentationRegistry' || contractName === 'AlastriaPublicKeyRegistry') {
+    type = 'registry'
+  } else {
+    type = 'identityManager'
+  }
+  contractAbiName = `__contracts_${type}_${contractName}_sol_${contractName}.abi`
+  fs.writeFile(`${config.abisPath}${contractAbiName}`, contractABI, error => {
+    if(error) throw error;
+  })
+  contractAbiName = `__contracts_${type}_${contractName}_sol_${contractName}.abi`
+  fs.writeFile(`${config.abisPath}${contractAbiName}`, contractABI, error => {
+    if(error) throw error;
+  })
+
+}
+
+function saveAddresesInfo(address, data) {
+  let contracInfo, contractInfoHeaders
+  let urlABI = config.urlABI
+  let contractName = data.name
+  contractInfoHeaders = `| Contract Name | Address | ABI |\n| :------------ | :-------| :--- |\n`
+  contracInfo = `| ${contractName} | ${address} | ${urlABI}${contractName} |\n`
+  if (contractName == 'Eidas') {
     fs.writeFile(config.contractInfoPath, contractInfoHeaders, function(err) {
       if(err) throw err;
     })
     fs.appendFile(config.contractInfoPath, contracInfo, function(err) {
       if(err) throw err;
-      console.log('Contract data saved!!')
+      console.log(`${contractName} address info saved!`)
     })
   } else {
-    type = 'identityManager'
-    contractAbiName = `__contracts_${type}_${contractName}_sol_${contractName}.abi`
-    fs.writeFile(`${config.abisPath}${contractAbiName}`, contractABI, error => {
-      if(error) throw error;
-      console.log(`${type} ABI saved successfully!!`)
-    })
     fs.appendFile(config.contractInfoPath, contracInfo, function(err) {
       if(err) throw err;
-      console.log('Contract data saved!!')
+      console.log(`${contractName} address info saved!`)
     })
   }
 }
@@ -183,20 +201,42 @@ function init() {
       .then(eidas => {
         console.log('Contract Eidas deployed successfuly. Address: ', eidas)
         contractEidas = eidas
-        saveDataInFile(contractEidas, eidasData)
+        saveABIs(eidasData)
+        console.log(`Eidas ABI saved!`)
+        saveAddresesInfo(contractEidas, eidasData)
         compileContract(solidityManager)
         .then(compiledManager => {
           compiledManager.map(item => {
             if(item['name'] === 'AlastriaIdentityManager') {
               managerData = item
+              saveABIs(managerData)
+              console.log(`${item['name']} ABI saved!`)
+            } else if(item['name'] === 'AlastriaCredentialRegistry') {
+              credentialData = item
+              saveABIs(credentialData)
+              console.log(`${item['name']} ABI saved!`)
+            } else if(item['name'] === 'AlastriaPresentationRegistry') {
+              presentationData = item
+              saveABIs(presentationData)
+              console.log(`${item['name']} ABI saved!`)
+            } else if(item['name'] === 'AlastriaPublicKeyRegistry') {
+              publicKeyData = item
+              saveABIs(publicKeyData)
+              console.log(`${item['name']} ABI saved!`)
             }
           })
           console.log('Contract Manager compiled successfuly')
           deployManager(address, compiledManager, contractEidas)
-          .then(contractManager => {
+          .then(addresses => {
             lockAcount()
-            saveDataInFile(contractManager, managerData)
-            console.log('Contract Manager deployed successfuly. Address: ', contractManager)
+            saveAddresesInfo(addresses.identityManager, managerData)
+            saveAddresesInfo(addresses.credentialRegistry, credentialData)
+            saveAddresesInfo(addresses.presentationRegistry, presentationData)
+            saveAddresesInfo(addresses.publicKeyRegistry, publicKeyData)
+            console.log('Contract AlastriaIdentityManager deployed successfuly. Address: ', addresses.identityManager)
+            console.log('Contract AlastriaCredentialRegistry deployed successfuly. Address: ', addresses.credentialRegistry)
+            console.log('Contract AlastriaPresentationRegistry deployed successfuly. Address: ', addresses.presentationRegistry)
+            console.log('Contract AlastriaPublicKeyManager deployed successfuly. Address: ', addresses.publicKeyRegistry)
           })
           .catch(error => {
             lockAcount()
