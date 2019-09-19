@@ -12,5 +12,6 @@
     "symbolEidas": "__:Eidas________________________________",
     "urlABI": "https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/",
     "abisPath": "../../contracts/abi/",
-    "contractInfoPath": "../../contracts/ContractInfo.md"
+    "contractInfoPath": "../../contracts/ContractInfo.md",
+    "addressPosition": 2
 }
