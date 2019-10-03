@@ -7,11 +7,6 @@ contract AlastriaProxy is Owned {
 
     event Forwarded (address indexed destination, uint value, bytes data);
 
-    modifier onlyOwner() {
-        require(isOwner(msg.sender));
-        _;
-    }
-
     //TODO: upgradeable owner for version in Identity Manager
     constructor () public {
         owner = msg.sender;

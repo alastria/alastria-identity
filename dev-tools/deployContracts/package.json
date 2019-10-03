@@ -9,7 +9,9 @@
   "author": "Alastria",
   "license": "MIT",
   "dependencies": {
+    "ora": "^4.0.2",
     "solc": "0.4.23",
+    "truffle-flattener": "^1.4.2",
     "web3": "^0.x.x"
   },
   "devDependencies": {}

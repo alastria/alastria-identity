@@ -188,11 +188,6 @@ contract AlastriaProxy is Owned {
 
     event Forwarded (address indexed destination, uint value, bytes data);
 
-    modifier onlyOwner() {
-        require(isOwner(msg.sender));
-        _;
-    }
-
     //TODO: upgradeable owner for version in Identity Manager
     constructor () public {
         owner = msg.sender;
@@ -636,7 +631,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
         AlastriaProxy identity = new AlastriaProxy();
         identityKeys[msg.sender] = identity;
         pendingIDs[msg.sender] = 0;
-        identity.forward(alastriaPublicKeyRegistry, 0, addPublicKeyCallData);//must be alastria registry call
+        identity.forward(address(alastriaPublicKeyRegistry), 0, addPublicKeyCallData);//must be alastria registry call
     }
 
     /// @dev This method send a transaction trough the proxy of the sender

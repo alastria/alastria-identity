@@ -59,8 +59,8 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
         AlastriaProxy identity = new AlastriaProxy();
         identityKeys[msg.sender] = identity;
         pendingIDs[msg.sender] = 0;
-        identity.forward(alastriaPublicKeyRegistry, 0, addPublicKeyCallData);//must be alastria registry call
-    }
+        identity.forward(address(alastriaPublicKeyRegistry), 0, addPublicKeyCallData);//must be alastria registry call
+    }ddress(alastriaPublicKeyRegistry), 
 
     /// @dev This method send a transaction trough the proxy of the sender
     function delegateCall(address _destination, uint256 _value, bytes _data) public {
