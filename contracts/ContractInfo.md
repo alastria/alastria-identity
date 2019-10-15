@@ -1,9 +1,7 @@
-# Contracts Info
-
 | Contract Name | Address | ABI |
 | :------------ | :-------| :--- |
-| Eidas | 0xab5d09c0e92913ea193b78ca57360a78342f81ad | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/Eidas |
-| AlastriaIdentityManager | 0x5ea489540c5a5d8cf95b48940d6f54afa48ee6f5 | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/AlastriaIdentityManager |
-| AlastriaCredentialRegistry | 0xf52a1198aa78364a0921e374ad351e34b4550cb5 | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/AlastriaCredentialRegistry |
-| AlastriaPresentationRegistry | 0x2b5343c56b0591c6aef15665a83c334afa368405 | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/AlastriaPresentationRegistry |
-| AlastriaPublicKeyRegistry | 0x761831f1233b578ff5b7b374dcd7f2b353b18d2d | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/AlastriaPublicKeyRegistry |
+| Eidas | 0x9f5c6312cdee2c9a2fda6d93bf102ec09a4fc80b | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/Eidas |
+| AlastriaIdentityManager | 0x1178e37836794a3814c8233c2d1283dd6af9dadf | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/AlastriaIdentityManager |
+| AlastriaCredentialRegistry | 0xff42d188cc7c2008f5465042e5b8963a8aeb7342 | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/AlastriaCredentialRegistry |
+| AlastriaPresentationRegistry | 0x74c26af288abd828005614cf9fb4a6ca8caa9fa0 | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/AlastriaPresentationRegistry |
+| AlastriaPublicKeyRegistry | 0x366118d90be311e3a08371fa78bb1fe6bf7bf5b2 | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/AlastriaPublicKeyRegistry |
