@@ -29,8 +29,8 @@ contract AlastriaCredentialRegistry {
     }
 
     // Mapping subject, hash (JSON credential)
-    mapping(address => mapping(bytes32 => SubjectCredential)) private subjectCredentialRegistry;
-    mapping(address => bytes32[]) private subjectCredentialList;
+    mapping(address => mapping(bytes32 => SubjectCredential)) public subjectCredentialRegistry;
+    mapping(address => bytes32[]) public subjectCredentialList;
 
     struct IssuerCredential {
         bool exists;
@@ -83,8 +83,8 @@ contract AlastriaCredentialRegistry {
         return (value.exists, value.status);
     }
 
-    function getSubjectCredentialList() public view returns (uint, bytes32[]) {
-        return (subjectCredentialList[msg.sender].length, subjectCredentialList[msg.sender]);
+    function getSubjectCredentialList(address subject) public view returns (uint, bytes32[]) {
+        return (subjectCredentialList[subject].length, subjectCredentialList[subject]);
     }
 
     function updateCredentialStatus(bytes32 issuerCredentialHash, Status status) validStatus (status) public {

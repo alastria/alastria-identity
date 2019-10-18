@@ -207,23 +207,8 @@ function init() {
         compileContract(solidityManager)
         .then(compiledManager => {
           compiledManager.map(item => {
-            if(item['name'] === 'AlastriaIdentityManager') {
-              managerData = item
-              saveABIs(managerData)
-              console.log(`${item['name']} ABI saved!`)
-            } else if(item['name'] === 'AlastriaCredentialRegistry') {
-              credentialData = item
-              saveABIs(credentialData)
-              console.log(`${item['name']} ABI saved!`)
-            } else if(item['name'] === 'AlastriaPresentationRegistry') {
-              presentationData = item
-              saveABIs(presentationData)
-              console.log(`${item['name']} ABI saved!`)
-            } else if(item['name'] === 'AlastriaPublicKeyRegistry') {
-              publicKeyData = item
-              saveABIs(publicKeyData)
-              console.log(`${item['name']} ABI saved!`)
-            }
+            saveABIs(item)
+            console.log(`${item['name']} ABI saved!`)
           })
           console.log('Contract Manager compiled successfuly')
           deployManager(address, compiledManager, contractEidas)
