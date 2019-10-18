@@ -9,14 +9,14 @@ let rawdata = fs.readFileSync('./config.json')
 let config = JSON.parse(rawdata)
 
 let web3
-let nodeUrl = config.nodeURLAlastria  // you can change the URL node in config.
+let nodeUrl = config.nodeURLLocal  // you can change the URL node in config.
 
 web3 = new Web3(new Web3.providers.HttpProvider(nodeUrl))
 
 let solidityEidas = fs.readFileSync(config.contractEidas, 'utf8')
 let solidityManager = fs.readFileSync(config.contractManager, 'utf8')
 let address = web3.eth.accounts[config.addressPosition]  // yopu can change the address in config
-let password = config.addressPwdAlastria  // you can change the password address in config
+let password = config.addressPwdLocal  // you can change the password address in config
 let files = config.filesManager
 let filePath = config.filePath
 let writeTofile = true
@@ -207,23 +207,8 @@ function init() {
         compileContract(solidityManager)
         .then(compiledManager => {
           compiledManager.map(item => {
-            if(item['name'] === 'AlastriaIdentityManager') {
-              managerData = item
-              saveABIs(managerData)
-              console.log(`${item['name']} ABI saved!`)
-            } else if(item['name'] === 'AlastriaCredentialRegistry') {
-              credentialData = item
-              saveABIs(credentialData)
-              console.log(`${item['name']} ABI saved!`)
-            } else if(item['name'] === 'AlastriaPresentationRegistry') {
-              presentationData = item
-              saveABIs(presentationData)
-              console.log(`${item['name']} ABI saved!`)
-            } else if(item['name'] === 'AlastriaPublicKeyRegistry') {
-              publicKeyData = item
-              saveABIs(publicKeyData)
-              console.log(`${item['name']} ABI saved!`)
-            }
+            saveABIs(item)
+            console.log(`${item['name']} ABI saved!`)
           })
           console.log('Contract Manager compiled successfuly')
           deployManager(address, compiledManager, contractEidas)
