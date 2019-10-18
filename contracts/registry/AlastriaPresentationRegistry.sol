@@ -44,8 +44,8 @@ contract AlastriaPresentationRegistry {
         string URI;
     }
     // Mapping subject, subjectPresentationHash (Complete JSON Presentation)
-    mapping(address => mapping(bytes32 => SubjectPresentation)) private subjectPresentationRegistry;
-    mapping(address => bytes32[]) private subjectPresentationListRegistry;
+    mapping(address => mapping(bytes32 => SubjectPresentation)) public subjectPresentationRegistry;
+    mapping(address => bytes32[]) public subjectPresentationListRegistry;
 
     struct ReceiverPresentation {
         bool exists;
@@ -106,8 +106,8 @@ contract AlastriaPresentationRegistry {
         return (value.exists, value.status);
     }
 
-    function getSubjectPresentationList() public view returns (uint, bytes32[]) {
-        return (subjectPresentationListRegistry[msg.sender].length, subjectPresentationListRegistry[msg.sender]);
+    function getSubjectPresentationList(address subject) public view returns (uint, bytes32[]) {
+        return (subjectPresentationListRegistry[subject].length, subjectPresentationListRegistry[subject]);
     }
 
     //
