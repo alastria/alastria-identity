@@ -13,5 +13,10 @@
     "urlABI": "https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/",
     "abisPath": "../../contracts/abi/",
     "contractInfoPath": "../../contracts/ContractInfo.md",
-    "addressPosition": 2
+    "addressPosition": 2,
+    "manager": "AlastriaIdentityManager",
+    "presentation": "AlastriaPresentationRegistry",
+    "credential": "AlastriaCredentialRegistry",
+    "publicKey": "AlastriaPublicKeyRegistry",
+    "eidas": "Eidas"
 }

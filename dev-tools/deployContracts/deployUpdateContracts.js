@@ -162,10 +162,10 @@ function saveABIs(data) {
 
 }
 
-function saveAddresesInfo(address, data) {
+function saveAddresesInfo(address, contracsName) {
   let contracInfo, contractInfoHeaders
   let urlABI = config.urlABI
-  let contractName = data.name
+  let contractName = contracsName
   contractInfoHeaders = `| Contract Name | Address | ABI |\n| :------------ | :-------| :--- |\n`
   contracInfo = `| ${contractName} | ${address} | ${urlABI}${contractName} |\n`
   if (contractName == 'Eidas') {
@@ -203,7 +203,7 @@ function init() {
         contractEidas = eidas
         saveABIs(eidasData)
         console.log(`Eidas ABI saved!`)
-        saveAddresesInfo(contractEidas, eidasData)
+        saveAddresesInfo(contractEidas, config.eidas)
         compileContract(solidityManager)
         .then(compiledManager => {
           compiledManager.map(item => {
@@ -214,10 +214,10 @@ function init() {
           deployManager(address, compiledManager, contractEidas)
           .then(addresses => {
             lockAcount()
-            saveAddresesInfo(addresses.identityManager, managerData)
-            saveAddresesInfo(addresses.credentialRegistry, credentialData)
-            saveAddresesInfo(addresses.presentationRegistry, presentationData)
-            saveAddresesInfo(addresses.publicKeyRegistry, publicKeyData)
+            saveAddresesInfo(addresses.identityManager, config.manager)
+            saveAddresesInfo(addresses.credentialRegistry, config.credential)
+            saveAddresesInfo(addresses.presentationRegistry, config.presentation)
+            saveAddresesInfo(addresses.publicKeyRegistry, config.publicKey)
             console.log('Contract AlastriaIdentityManager deployed successfuly. Address: ', addresses.identityManager)
             console.log('Contract AlastriaCredentialRegistry deployed successfuly. Address: ', addresses.credentialRegistry)
             console.log('Contract AlastriaPresentationRegistry deployed successfuly. Address: ', addresses.presentationRegistry)
