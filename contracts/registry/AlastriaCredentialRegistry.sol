@@ -39,6 +39,7 @@ contract AlastriaCredentialRegistry {
 
     // Mapping issuer, hash (JSON credential + CredentialSignature)
     mapping(address => mapping(bytes32 => IssuerCredential)) private issuerCredentialRegistry;
+    mapping(address => bytes32[]) public issuerCredentialList;
 
     // Events. Just for changes, not for initial set
     event SubjectCredentialDeleted (bytes32 subjectCredentialHash);
@@ -65,6 +66,12 @@ contract AlastriaCredentialRegistry {
         require(!subjectCredentialRegistry[msg.sender][subjectCredentialHash].exists);
         subjectCredentialRegistry[msg.sender][subjectCredentialHash] = SubjectCredential(true, Status.Valid, URI);
         subjectCredentialList[msg.sender].push(subjectCredentialHash);
+    }
+
+    function addIssuerCredential(bytes32 issuerCredentialHash) public {
+        require(!issuerCredentialRegistry[msg.sender][issuerCredentialHash].exists);
+        issuerCredentialRegistry[msg.sender][issuerCredentialHash] = IssuerCredential(true, Status.Valid);
+        issuerCredentialList[msg.sender].push(issuerCredentialHash);
     }
 
     function deleteSubjectCredential(bytes32 subjectCredentialHash) public {
