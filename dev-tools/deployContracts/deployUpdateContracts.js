@@ -10,7 +10,6 @@ let config = JSON.parse(rawdata)
 
 let web3
 let nodeUrl = config.nodeURLAlastria  // you can change the URL node in config.
-//let nodeUrl = config.nodeURLLocal  
 
 web3 = new Web3(new Web3.providers.HttpProvider(nodeUrl))
 
@@ -18,7 +17,6 @@ let solidityEidas = fs.readFileSync(config.contractEidas, 'utf8')
 let solidityManager = fs.readFileSync(config.contractManager, 'utf8')
 let address = web3.eth.accounts[config.addressPosition]  // you can change the address in config
 let password = config.addressPwdAlastria  // you can change the password address in config
-//let password = config.addressPwdLocal
 let files = config.filesManager
 let filePath = config.filePath
 let writeTofile = true
@@ -177,7 +175,6 @@ function saveAddresesInfo(address, contracsName) {
     type = 'identityManager'
   }
   contractAbiName = `__contracts_${type}_${contractName}_sol_${contractName}.abi`
-  console.log(contractAbiName)
   contracInfo = `| ${contractName} | ${address} | ${urlABI}${contractAbiName} |\n`
   if (contractName == 'Eidas') {
     fs.writeFile(config.contractInfoPath, contractInfoHeaders, function(err) {
