@@ -167,7 +167,16 @@ function saveAddresesInfo(address, contracsName) {
   let urlABI = config.urlABI
   let contractName = contracsName
   contractInfoHeaders = `| Contract Name | Address | ABI |\n| :------------ | :-------| :--- |\n`
-  contracInfo = `| ${contractName} | ${address} | ${urlABI}${contractName} |\n`
+  if (contractName == 'Eidas' || contractName == 'Owned') {
+    type = 'libs'
+  } else if (contractName === 'AlastriaCredentialRegistry' || contractName === 'AlastriaPresentationRegistry' || contractName === 'AlastriaPublicKeyRegistry') {
+    type = 'registry'
+  } else {
+    type = 'identityManager'
+  }
+  contractAbiName = `__contracts_${type}_${contractName}_sol_${contractName}.abi`
+  console.log(contractAbiName)
+  contracInfo = `| ${contractName} | ${address} | ${urlABI}${contractAbiName} |\n`
   if (contractName == 'Eidas') {
     fs.writeFile(config.contractInfoPath, contractInfoHeaders, function(err) {
       if(err) throw err;
