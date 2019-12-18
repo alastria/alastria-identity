@@ -23,7 +23,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
 
     event OperationWasNotSupported(string indexed method);
 
-    event IdentityCreated(address indexed identity, address indexed creator, address owner);
+    event IdentityCreated(address indexed identity, address indexed creator);
 
     event IdentityRecovered(address indexed oldAccount, address newAccount, address indexed serviceProvider);
 
@@ -60,6 +60,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
         identityKeys[msg.sender] = identity;
         pendingIDs[msg.sender] = 0;
         identity.forward(address(alastriaPublicKeyRegistry), 0, addPublicKeyCallData);//must be alastria registry call
+        emit IdentityCreated(identity, msg.sender);
     }
 
     /// @dev This method send a transaction trough the proxy of the sender
