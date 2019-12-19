@@ -23,7 +23,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
 
     event OperationWasNotSupported(string indexed method);
 
-    event IdentityCreated(address indexed identity, address indexed creator);
+    event IdentityCreated(address indexed subjectAlastriaProxy, address indexed issuerAddress);
 
     event IdentityRecovered(address indexed oldAccount, address newAccount, address indexed serviceProvider);
 
