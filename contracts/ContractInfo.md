@@ -1,7 +1,7 @@
 | Contract Name | Address | ABI |
 | :------------ | :-------| :--- |
-| Eidas | 0x1ed7af95ca54a6a2095d7e7b4df15261bb9508d4 | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/__contracts_libs_Eidas_sol_Eidas.abi |
-| AlastriaIdentityManager | 0x812c27bb1f50bcb4a2fea015bd89c3691cd759a5 | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/__contracts_identityManager_AlastriaIdentityManager_sol_AlastriaIdentityManager.abi |
-| AlastriaCredentialRegistry | 0xd09698c682f060d1f434b30a8438245371d124e2 | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/__contracts_registry_AlastriaCredentialRegistry_sol_AlastriaCredentialRegistry.abi |
-| AlastriaPresentationRegistry | 0xbc06df48fae8a59f9b5fcc00e01d753fd4e91f69 | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/__contracts_registry_AlastriaPresentationRegistry_sol_AlastriaPresentationRegistry.abi |
-| AlastriaPublicKeyRegistry | 0x0383815e2667071fce25db63c11962f95b2e893f | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/__contracts_registry_AlastriaPublicKeyRegistry_sol_AlastriaPublicKeyRegistry.abi |
+| Eidas | 0x43d1539565c67d5b79838d8ebf1bbabe13dd05d3 | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/__contracts_libs_Eidas_sol_Eidas.abi |
+| AlastriaIdentityManager | 0xf2181a91f31689ef31a845bad08794b12d130076 | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/__contracts_identityManager_AlastriaIdentityManager_sol_AlastriaIdentityManager.abi |
+| AlastriaCredentialRegistry | 0x017d719f22ac584ac5eb18a6672fdc75bea1418a | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/__contracts_registry_AlastriaCredentialRegistry_sol_AlastriaCredentialRegistry.abi |
+| AlastriaPresentationRegistry | 0x19cac6d887a21df1ee29da0a0b3d2682ce799e05 | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/__contracts_registry_AlastriaPresentationRegistry_sol_AlastriaPresentationRegistry.abi |
+| AlastriaPublicKeyRegistry | 0x7de4a925346ba532028d245d2c3b3f0b5d5b85fb | https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/__contracts_registry_AlastriaPublicKeyRegistry_sol_AlastriaPublicKeyRegistry.abi |
