@@ -3,12 +3,13 @@ pragma solidity 0.4.23;
 import "./AlastriaIdentityServiceProvider.sol";
 import "./AlastriaIdentityIssuer.sol";
 import "./AlastriaProxy.sol";
+import "./AlastriaIdentityEntity.sol";
 import "../registry/AlastriaCredentialRegistry.sol";
 import "../registry/AlastriaPresentationRegistry.sol";
 import "../registry/AlastriaPublicKeyRegistry.sol";
 import "../libs/Owned.sol";
 
-contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIdentityIssuer, Owned {
+contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIdentityIssuer, AlastriaIdentityEntity, Owned {
     //Variables
     uint256 public version;
     uint internal timeToLive = 10000;
@@ -48,7 +49,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     }
 
     //Methods
-    function prepareAlastriaID(address _signAddress) public onlyIdentityServiceProvider(msg.sender) {
+    function prepareAlastriaID(address _signAddress) public onlyIdentityIssuer(msg.sender) {
         pendingIDs[_signAddress] = now + timeToLive;
         emit PreparedAlastriaID(_signAddress);
     }
@@ -69,7 +70,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
         identity.forward(_destination,_value,_data);
     }
 
-    function recoverAccount(address accountLost, address newAccount) public onlyIdentityServiceProvider(msg.sender) {
+    function recoverAccount(address accountLost, address newAccount) public onlyIdentityIssuer(msg.sender) {
         identityKeys[newAccount] = identityKeys[accountLost];
         identityKeys[accountLost] = address(0);
         IdentityRecovered(accountLost,newAccount,msg.sender);
