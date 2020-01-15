@@ -3,12 +3,13 @@ pragma solidity 0.4.23;
 import "./AlastriaIdentityServiceProvider.sol";
 import "./AlastriaIdentityIssuer.sol";
 import "./AlastriaProxy.sol";
+import "./AlastriaIdentityEntity.sol";
 import "../registry/AlastriaCredentialRegistry.sol";
 import "../registry/AlastriaPresentationRegistry.sol";
 import "../registry/AlastriaPublicKeyRegistry.sol";
 import "../libs/Owned.sol";
 
-contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIdentityIssuer, Owned {
+contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIdentityIssuer, AlastriaIdentityEntity, Owned {
     //Variables
     uint256 public version;
     uint internal timeToLive = 10000;
