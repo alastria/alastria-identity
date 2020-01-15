@@ -128,7 +128,7 @@ contract AlastriaIdentityIssuer {
 	    issuers[msg.sender] = identityIssuer;
     }
 
-    function addIdentityIssuer(address _identityIssuer, Eidas.EidasLevel _level) public alLeastLow(_level) notIdentityIssuer(_identityIssuer) onlyIdentityIssuer(_identityIssuer) {
+    function addIdentityIssuer(address _identityIssuer, Eidas.EidasLevel _level) public alLeastLow(_level) notIdentityIssuer(_identityIssuer) onlyIdentityIssuer(msg.sender) {
         IdentityIssuer storage identityIssuer = issuers[_identityIssuer];
         identityIssuer.level = _level;
         identityIssuer.active = true;
@@ -232,11 +232,15 @@ contract AlastriaIdentityEntity {
         _;
     }
    
-    constructor (address _addressEntity) public {
+    constructor () public {
         IdentityEntity storage identityEntity;
         identityEntity.active = true;
 	    entities[msg.sender] = identityEntity;
-	    listEntities.push(_addressEntity);
+	   
+    }
+    
+    function addEntity(address _addressEntity) public onlyIdentityEntity(msg.sender) {
+         listEntities.push(_addressEntity);
     }
     
     function setNameEntity(address _addressEntity, string _name) public{
