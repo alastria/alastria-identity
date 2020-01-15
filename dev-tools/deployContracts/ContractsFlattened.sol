@@ -627,7 +627,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     }
 
     //Methods
-    function prepareAlastriaID(address _signAddress) public onlyIdentityServiceProvider(msg.sender) {
+    function prepareAlastriaID(address _signAddress) public onlyIdentityIssuer(msg.sender) {
         pendingIDs[_signAddress] = now + timeToLive;
         emit PreparedAlastriaID(_signAddress);
     }
@@ -648,7 +648,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
         identity.forward(_destination,_value,_data);
     }
 
-    function recoverAccount(address accountLost, address newAccount) public onlyIdentityServiceProvider(msg.sender) {
+    function recoverAccount(address accountLost, address newAccount) public onlyIdentityIssuer(msg.sender) {
         identityKeys[newAccount] = identityKeys[accountLost];
         identityKeys[accountLost] = address(0);
         IdentityRecovered(accountLost,newAccount,msg.sender);
