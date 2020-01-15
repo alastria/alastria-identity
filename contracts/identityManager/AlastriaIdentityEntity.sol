@@ -23,11 +23,15 @@ contract AlastriaIdentityEntity {
         _;
     }
    
-    constructor (address _addressEntity) public {
+    constructor () public {
         IdentityEntity storage identityEntity;
         identityEntity.active = true;
 	    entities[msg.sender] = identityEntity;
-	    listEntities.push(_addressEntity);
+	   
+    }
+    
+    function addEntity(address _addressEntity) public onlyIdentityEntity(msg.sender) {
+         listEntities.push(_addressEntity);
     }
     
     function setNameEntity(address _addressEntity, string _name) public{
