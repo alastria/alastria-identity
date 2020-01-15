@@ -59,13 +59,15 @@ Also, you have a bunch of deployed identities and identity smart contracts in Te
 0x643266eb3105f4bf8b4f4fec50886e453f0da9ad
 ```
 Password: Passw0rd
+
 Added in tx hash: 
 ```
 0x30741fcd02d3faf8c362a22fa9ae1b6738a680c951e944eace33ac25942f1f63
 ```
 
-##Issuer: 0x806bc0d7a47b890383a831634bcb92dd4030b092
+## Issuer: 0x806bc0d7a47b890383a831634bcb92dd4030b092
 Password: Passw0rd
+
 Added in tx hash: 
 ```
 0xfe01429627d8150952cd15cc52c35a6076f655812ce5cff5a4feb9d82abb5af9
@@ -73,6 +75,7 @@ Added in tx hash:
 
 ## Identity 1: 0xa9728125c573924b2b1ad6a8a8cd9bf6858ced49
 Password: Passw0rd
+
 Create identity transaction:
 ```
 {
@@ -96,6 +99,7 @@ PublicKey(Used as raw signature):
 ```
 ## Identity 2: 0xad88f1a89cf02a32010b971d8c8af3a2c7b3bd94
 Password: Passw0rd
+
 Create identity transaction:
 ```
 {
@@ -119,7 +123,12 @@ PublicKey(Used as raw signature):
 ```
 ## Identity 3: 0xde7ab34219563ac50ccc7b51d23b9a61d22a383e
 Password: Passw0rd
-Generated acces token in tx hash: 0x960e6fcdd1a8a527a78d82fe644893ddad06926cc28a7d75bf7cf3ac41461d3b
+
+Generated acces token in tx hash: 
+```
+0x960e6fcdd1a8a527a78d82fe644893ddad06926cc28a7d75bf7cf3ac41461d3b
+```
+
 Create identity transaction:
 ```
 {
