@@ -2,8 +2,6 @@
 const Web3 = require('web3')
 const fs = require('fs')
 const solc = require('solc')
-const ora = require('ora')
-const truffleFlattener = require('truffle-flattener')
 
 let rawdata = fs.readFileSync('./config.json')
 let config = JSON.parse(rawdata)
@@ -17,9 +15,6 @@ let solidityEidas = fs.readFileSync(config.contractEidas, 'utf8')
 let solidityManager = fs.readFileSync(config.contractManager, 'utf8')
 let address = web3.eth.accounts[config.addressPosition]  // you can change the address in config
 let password = config.addressPwdAlastria  // you can change the password address in config
-let files = config.filesManager
-let filePath = config.filePath
-let writeTofile = true
 
 function unlockAccount() {
   web3.personal.unlockAccount(address, password)
@@ -27,27 +22,6 @@ function unlockAccount() {
 
 function lockAcount() {
   web3.personal.lockAccount(address)
-}
-
-function flatten(files, filePath, writeTofile) {
-  return new Promise((resolve, reject) => {
-    const spinner = ora(`Flattening .sol file ${filePath} ...`).start()
-    truffleFlattener(files)
-    .then(flattened => {
-      if(writeTofile) {
-        fs.writeFileSync(filePath, flattened)
-        spinner.succeed()
-        console.log(`Flattened file ${filePath} written!`)
-        resolve(flattened)
-      } else {
-        spinner.fail()
-      }
-    })
-    .catch(error => {
-      spinner.fail()
-      reject(error)
-    })
-  })
 }
 
 function compileContract(solidity) {
@@ -192,51 +166,45 @@ function saveAddresesInfo(address, contracsName) {
   }
 }
 
-function init() {
-  flatten(files, filePath, writeTofile)
-  .then(flattenedFile => {
-    console.log('Starting compiling contracs')
-    compileContract(solidityEidas)
-    .then(compiledEidas => {
-      compiledEidas.map(item => {
-        if(item['name'] === 'Eidas') {
-          eidasData = item
-        }
-      })
-      console.log('Contract Eidas compiled successfuly')
-      unlockAccount()
-      deployEidas(address, compiledEidas)
-      .then(eidas => {
-        console.log('Contract Eidas deployed successfuly. Address: ', eidas)
-        contractEidas = eidas
-        saveABIs(eidasData)
-        console.log(`Eidas ABI saved!`)
-        saveAddresesInfo(contractEidas, config.eidas)
-        compileContract(solidityManager)
-        .then(compiledManager => {
-          compiledManager.map(item => {
-            saveABIs(item)
-            console.log(`${item['name']} ABI saved!`)
-          })
-          console.log('Contract Manager compiled successfuly')
-          deployManager(address, compiledManager, contractEidas)
-          .then(addresses => {
-            lockAcount()
-            saveAddresesInfo(addresses.identityManager, config.manager)
-            saveAddresesInfo(addresses.credentialRegistry, config.credential)
-            saveAddresesInfo(addresses.presentationRegistry, config.presentation)
-            saveAddresesInfo(addresses.publicKeyRegistry, config.publicKey)
-            console.log('Contract AlastriaIdentityManager deployed successfuly. Address: ', addresses.identityManager)
-            console.log('Contract AlastriaCredentialRegistry deployed successfuly. Address: ', addresses.credentialRegistry)
-            console.log('Contract AlastriaPresentationRegistry deployed successfuly. Address: ', addresses.presentationRegistry)
-            console.log('Contract AlastriaPublicKeyManager deployed successfuly. Address: ', addresses.publicKeyRegistry)
-          })
-          .catch(error => {
-            lockAcount()
-            console.log('ERROR ------> ', error)
-          })
+async function init() {
+  console.log('Starting compiling contracs')
+  compileContract(solidityEidas)
+  .then(compiledEidas => {
+    compiledEidas.map(item => {
+      if(item['name'] === 'Eidas') {
+        eidasData = item
+      }
+    })
+    console.log('Contract Eidas compiled successfuly')
+    unlockAccount()
+    deployEidas(address, compiledEidas)
+    .then(eidas => {
+      console.log('Contract Eidas deployed successfuly. Address: ', eidas)
+      contractEidas = eidas
+      saveABIs(eidasData)
+      console.log(`Eidas ABI saved!`)
+      saveAddresesInfo(contractEidas, config.eidas)
+      compileContract(solidityManager)
+      .then(compiledManager => {
+        compiledManager.map(item => {
+          saveABIs(item)
+          console.log(`${item['name']} ABI saved!`)
+        })
+        console.log('Contract Manager compiled successfuly')
+        deployManager(address, compiledManager, contractEidas)
+        .then(addresses => {
+          lockAcount()
+          saveAddresesInfo(addresses.identityManager, config.manager)
+          saveAddresesInfo(addresses.credentialRegistry, config.credential)
+          saveAddresesInfo(addresses.presentationRegistry, config.presentation)
+          saveAddresesInfo(addresses.publicKeyRegistry, config.publicKey)
+          console.log('Contract AlastriaIdentityManager deployed successfuly. Address: ', addresses.identityManager)
+          console.log('Contract AlastriaCredentialRegistry deployed successfuly. Address: ', addresses.credentialRegistry)
+          console.log('Contract AlastriaPresentationRegistry deployed successfuly. Address: ', addresses.presentationRegistry)
+          console.log('Contract AlastriaPublicKeyManager deployed successfuly. Address: ', addresses.publicKeyRegistry)
         })
         .catch(error => {
+          lockAcount()
           console.log('ERROR ------> ', error)
         })
       })
