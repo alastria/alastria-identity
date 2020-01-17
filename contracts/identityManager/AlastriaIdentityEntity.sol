@@ -45,23 +45,23 @@ contract AlastriaIdentityEntity {
          entities[_addressEntity].active = _active;
     }
     
-    function setNameEntity(address _addressEntity, string _name) public{
+    function setNameEntity(address _addressEntity, string _name) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].name = _name;
     }
     
-    function setCifEntity(address _addressEntity, string _cif) public{
+    function setCifEntity(address _addressEntity, string _cif) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].cif = _cif;
     }
     
-    function setUrlLogo(address _addressEntity, string _url_logo) public{
+    function setUrlLogo(address _addressEntity, string _url_logo) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].url_logo = _url_logo;
     }
     
-    function setUrlCreateAID(address _addressEntity, string _url_createAID) public{
+    function setUrlCreateAID(address _addressEntity, string _url_createAID) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].url_createAID = _url_createAID;
     }
     
-    function setUrlAOA(address _addressEntity, string _url_AOA) public {
+    function setUrlAOA(address _addressEntity, string _url_AOA) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].url_AOA = _url_AOA;
     }
 
