@@ -22,6 +22,11 @@ contract AlastriaIdentityEntity {
         require (entities[_identityEntity].active == true);
         _;
     }
+    
+     modifier notIdentityEntity(address _identityEntity) {
+        require (!entities[_identityEntity].active);
+        _;
+    }
    
     constructor () public {
         IdentityEntity storage identityEntity;
@@ -29,7 +34,7 @@ contract AlastriaIdentityEntity {
 	    entities[msg.sender] = identityEntity;
     }
     
-    function addEntity(address _addressEntity, string _name, string _cif, string _url_logo, string _url_createAID, string _url_AOA, bool _active) public onlyIdentityEntity(msg.sender) {
+    function addEntity(address _addressEntity, string _name, string _cif, string _url_logo, string _url_createAID, string _url_AOA, bool _active) public notIdentityEntity(_addressEntity) onlyIdentityEntity(msg.sender) {
          IdentityEntity storage identityEntity = entities[_addressEntity];
          listEntities.push(_addressEntity);
          entities[_addressEntity].name = _name;
