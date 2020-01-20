@@ -24,6 +24,7 @@ This SSI model has been implemented with three groups of contracts:
 | AlastriaProxy.sol     |It is the Alastria ID itself. Only receives transactions from the IdentityManager and resends them to the target  | 
 | AlastriaIdentityIssuer.sol     | It keeps a registry of the issuers identities | 
 | AlastriaIdentityServiceProvider.sol     |It keeps a registry of the service providers identities | 
+| AlastriaIdentityEntity.sol     |It keeps a registry of the entities identities | 
 
 ### 2. Registry
 |Contract      | What it does          | 
