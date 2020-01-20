@@ -231,35 +231,46 @@ contract AlastriaIdentityEntity {
         require (entities[_identityEntity].active == true);
         _;
     }
+    
+     modifier notIdentityEntity(address _identityEntity) {
+        require (!entities[_identityEntity].active);
+        _;
+    }
    
     constructor () public {
         IdentityEntity storage identityEntity;
         identityEntity.active = true;
 	    entities[msg.sender] = identityEntity;
-	   
     }
     
-    function addEntity(address _addressEntity) public onlyIdentityEntity(msg.sender) {
+    function addEntity(address _addressEntity, string _name, string _cif, string _url_logo, string _url_createAID, string _url_AOA, bool _active) public notIdentityEntity(_addressEntity) onlyIdentityEntity(msg.sender) {
+         IdentityEntity storage identityEntity = entities[_addressEntity];
          listEntities.push(_addressEntity);
+         entities[_addressEntity].name = _name;
+         entities[_addressEntity].cif = _cif;
+         entities[_addressEntity].url_logo = _url_logo;
+         entities[_addressEntity].url_createAID = _url_createAID;
+         entities[_addressEntity].url_AOA = _url_AOA;
+         entities[_addressEntity].active = _active;
     }
     
-    function setNameEntity(address _addressEntity, string _name) public{
+    function setNameEntity(address _addressEntity, string _name) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].name = _name;
     }
     
-    function setCifEntity(address _addressEntity, string _cif) public{
+    function setCifEntity(address _addressEntity, string _cif) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].cif = _cif;
     }
     
-    function setUrlLogo(address _addressEntity, string _url_logo) public{
+    function setUrlLogo(address _addressEntity, string _url_logo) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].url_logo = _url_logo;
     }
     
-    function setUrlCreateAID(address _addressEntity, string _url_createAID) public{
+    function setUrlCreateAID(address _addressEntity, string _url_createAID) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].url_createAID = _url_createAID;
     }
     
-    function setUrlAOA(address _addressEntity, string _url_AOA) public {
+    function setUrlAOA(address _addressEntity, string _url_AOA) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].url_AOA = _url_AOA;
     }
 
@@ -679,7 +690,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
 
     event OperationWasNotSupported(string indexed method);
 
-    event IdentityCreated(address indexed subjectAlastriaProxy, address indexed issuerAddress);
+    event IdentityCreated(address indexed identity, address indexed creator, address owner);
 
     event IdentityRecovered(address indexed oldAccount, address newAccount, address indexed serviceProvider);
 
@@ -716,7 +727,6 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
         identityKeys[msg.sender] = identity;
         pendingIDs[msg.sender] = 0;
         identity.forward(address(alastriaPublicKeyRegistry), 0, addPublicKeyCallData);//must be alastria registry call
-        emit IdentityCreated(identity, msg.sender);
     }
 
     /// @dev This method send a transaction trough the proxy of the sender
