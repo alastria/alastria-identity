@@ -41,7 +41,7 @@ contract AlastriaIdentityEntity {
     * @param _name the name of the entity
     * @param _cif the cif of the entity
     * @param _url_logo the url that contains the logo of the entity
-    * @param _erl_createAID the url that contains the alastria ID of the entity
+    * @param _url_createAID the url that contains the alastria ID of the entity
     * @param _url_AOA the url that contains the AOA of the entity
     * @param _active a flag that shows if a entity is active or not
     */ 
