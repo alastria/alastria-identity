@@ -34,6 +34,17 @@ contract AlastriaIdentityEntity {
 	    entities[msg.sender] = identityEntity;
     }
     
+
+    /**
+    * @dev function that allows you to add a entity to the entities mapping
+    * @param _addressEntity the address that identify the entity in the blockchain
+    * @param _name the name of the entity
+    * @param _cif the cif of the entity
+    * @param _url_logo the url that contains the logo of the entity
+    * @param _url_createAID the url that contains the alastria ID of the entity
+    * @param _url_AOA the url that contains the AOA of the entity
+    * @param _active a flag that shows if a entity is active or not
+    */ 
     function addEntity(address _addressEntity, string _name, string _cif, string _url_logo, string _url_createAID, string _url_AOA, bool _active) public notIdentityEntity(_addressEntity) onlyIdentityEntity(msg.sender) {
          IdentityEntity storage identityEntity = entities[_addressEntity];
          listEntities.push(_addressEntity);
@@ -45,27 +56,56 @@ contract AlastriaIdentityEntity {
          entities[_addressEntity].active = _active;
     }
     
+    /**
+    * @dev function that allows you to change the name of the entity
+    * @param _addressEntity the address that identify the entity in the blockchain
+    * @param _name the new name of the entity
+    */
     function setNameEntity(address _addressEntity, string _name) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].name = _name;
     }
     
+    /**
+    * @dev function that allows you to change the CIF of the entity
+    * @param _addressEntity the address that identify the entity in the blockchain
+    * @param _cif the new cif of the entity
+    */
     function setCifEntity(address _addressEntity, string _cif) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].cif = _cif;
     }
     
+    /**
+    * @dev function that allows you to change the Url that contains the logo of the entity
+    * @param _addressEntity the address that identify the entity in the blockchain
+    * @param _url_logo the new url that contains the logo of the entity
+    */
     function setUrlLogo(address _addressEntity, string _url_logo) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].url_logo = _url_logo;
     }
     
+    /**
+    * @dev function that allows you to change the Url that contains the Alastria ID of the entity
+    * @param _addressEntity the address that identify the entity in the blockchain
+    * @param _url_createAID the new url that contains the Alastria ID of the entity
+    */
     function setUrlCreateAID(address _addressEntity, string _url_createAID) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].url_createAID = _url_createAID;
     }
     
+    /**
+    * @dev function that allows you to change the Url that contains the AOA of the entity
+    * @param _addressEntity the address that identify the entity in the blockchain
+    * @param _url_AOA the new url that contains the AOA of the entity
+    */
     function setUrlAOA(address _addressEntity, string _url_AOA) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].url_AOA = _url_AOA;
     }
 
-    
+    /**
+    * @dev function that returns all the information of a entity
+    * @param _addressEntity the address that identify the entity in the blockchain
+    * @return _name, _cif, _url_logo, _url_createAID, _url_AOA, _active of the entity you pass to the functions as a parameter
+    */
     function getEntity(address _addressEntity) public view returns(string _name, string _cif, string _url_logo, string _url_createAID, string _url_AOA, bool _active){
         _name = entities[_addressEntity].name;
         _cif = entities[_addressEntity].cif;
@@ -75,6 +115,10 @@ contract AlastriaIdentityEntity {
         _active = entities[_addressEntity].active;
     }
     
+    /**
+    * @dev function that return the list of entities that are registered in the blockchain
+    * @return array of address of entities
+    */
     function entitiesList() public view returns(address[]){
         return listEntities;
     } 
