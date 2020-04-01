@@ -57,6 +57,9 @@ On the dev-tools directory you can find some interesting functionalities for dev
 | deployContracts      | Deploys the contracts on the chosen network and, if it is Alastria T-Network, it updates their address, ABI and version on this repository|  
 | serviceprovider | Service Provider site, capable of doing login and sending credentials |   
 
+## How to test AlastriaID compliant
+As the AlastriaID is a ID Model, plus an Reference Implementation of the SC and APIs and, additionally, a demo wallet and a demo entity provider, it is highly recommended that all the identity projects that will aim to use the AlastriaID Model or even the SC or the API, will pass a test to verify compatibility with the AlastriaID reference implementation.
+This test will be detailed soon to be used by all the projects.
 
 ## Need Help?
 Our identity core team will be happy to listen to you at [slack #identidaddigital](https://github.com/alastria/alastria-node/wiki/HELP)
