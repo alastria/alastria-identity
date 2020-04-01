@@ -12,7 +12,7 @@ To interact with the identity contracts, there is a library to use from the wall
 To deepen the model, you have all the information in [the wiki](https://github.com/alastria/alastria-identity/wiki). 
 
 ## Contracts
-Contracts must be deployed by Alastria. The version, the addresses and the ABIs of the deployed contracts are always updated at [ContractInfo.md](https://github.com/alastria/alastria-identity/blob/develop/contracts/ContractInfo.md) and at the [contracts/abi](https://github.com/alastria/alastria-identity/tree/develop/contracts/abi) folder. If you want to deploy them in your test-environment you can use [dev-tools/deployContracts](https://github.com/alastria/alastria-identity/tree/develop/dev-tools/deployContracts).
+Contracts must be deployed by Alastria Core Identity Team. The version, the addresses and the ABIs of the deployed contracts are always updated at [ContractInfo.md](https://github.com/alastria/alastria-identity/blob/develop/contracts/ContractInfo.md) and at the [contracts/abi](https://github.com/alastria/alastria-identity/tree/develop/contracts/abi) folder. If you want to deploy them in your test-environment you can use [dev-tools/deployContracts](https://github.com/alastria/alastria-identity/tree/develop/dev-tools/deployContracts).
 
 The [GIST ID to open these smart contracts on Remix](https://remix.ethereum.org/#version=soljson-v0.4.23+commit.124ca40d.js&optimize=false&gist=65747824fd972fcde14bac5101489032) is 65747824fd972fcde14bac5101489032. Any contribution must follow the code quality rules for developers.
 
@@ -58,6 +58,9 @@ On the dev-tools directory you can find some interesting functionalities for dev
 | deployContracts      | Deploys the contracts on the chosen network and, if it is Alastria T-Network, it updates their address, ABI and version on this repository|  
 | serviceprovider | Service Provider site, capable of doing login and sending credentials |   
 
+## How to test AlastriaID compliant
+As the AlastriaID is a ID Model, plus an Reference Implementation of the SC and APIs and, additionally, a demo wallet and a demo entity provider, it is highly recommended that all the identity projects that will aim to use the AlastriaID Model or even the SC or the API, will pass a test to verify compatibility with the AlastriaID reference implementation.
+This test will be detailed soon to be used by all the projects.
 
 ## Need Help?
 Our identity core team will be happy to listen to you at [slack #identidaddigital](https://github.com/alastria/alastria-node/wiki/HELP)
