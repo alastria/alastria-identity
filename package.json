@@ -118,6 +118,6 @@
     "truffle-hdwallet-provider": "0.0.3",
     "web3": "0.20.6",
     "webpack": "^2.2.1",
-    "webpack-dev-server": "^2.3.0"
+    "webpack-dev-server": "^3.1.11"
   }
 }
