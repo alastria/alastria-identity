@@ -101,4 +101,18 @@ contract AlastriaPublicKeyRegistry is Ownable, Upgradeable, InterfacePublicKeyRe
         _storagePublicKey.setPublicKeyRegistry(msg.sender, _keyId, _key);
         emit PublicKeyRevoked(publicKey);
     }
+    
+    function initMigration() public onlyOwner {
+        _initMigration();
+    }
+    
+    function cancelMigration() public onlyOwner {
+        _cancelMigration();
+    }
+    
+    function endMigration(address nextVersion) public onlyOwner {
+        Ownable _sto = Ownable(address(_storagePublicKey));
+        _endMigration(nextVersion);
+        _sto.transferOwnership(nextVersion);
+    }
 }
