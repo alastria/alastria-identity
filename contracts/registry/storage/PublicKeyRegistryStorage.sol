@@ -30,5 +30,4 @@ contract PresentationRegistryStorage is Ownable, InterfacePresentationRegistrySt
   function lentghPublicKeyList(address subject) public view onlyOwner override returns(uint256) {
     return publicKeyList[subject].length;
   }
-
 }

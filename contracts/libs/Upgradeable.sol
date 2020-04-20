@@ -10,7 +10,7 @@ contract Upgradeable {
      * Dev: The constructor must be called as a modifier in the main contract
      * @param _lastVersion the address of the contract being upgraded
      */ 
-    constructor (address _lastVersion) public {
+    constructor (address _lastVersion) internal {
         lastVersion = _lastVersion;
         if(_lastVersion == address(0)){
             migrated = false;
