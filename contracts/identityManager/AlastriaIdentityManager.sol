@@ -1,4 +1,4 @@
-pragma solidity 0.4.23;
+pragma solidity 0.6.6;
 
 import "./AlastriaIdentityServiceProvider.sol";
 import "./AlastriaIdentityIssuer.sol";
@@ -56,15 +56,15 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
 
     /// @dev Creates a new AlastriaProxy contract for an owner and recovery and allows an initial forward call which would be to set the registry in our case
     /// @param addPublicKeyCallData of the call to addKey function in AlastriaPublicKeyRegistry from the new deployed AlastriaProxy contract
-    function createAlastriaIdentity(bytes addPublicKeyCallData) public validAddress(msg.sender) isPendingAndOnTime(msg.sender) {
+    function createAlastriaIdentity(bytes memory addPublicKeyCallData) public validAddress(msg.sender) isPendingAndOnTime(msg.sender) {
         AlastriaProxy identity = new AlastriaProxy();
-        identityKeys[msg.sender] = identity;
+        identityKeys[msg.sender] = address(identity);
         pendingIDs[msg.sender] = 0;
         identity.forward(address(alastriaPublicKeyRegistry), 0, addPublicKeyCallData);//must be alastria registry call
     }
 
     /// @dev This method send a transaction trough the proxy of the sender
-    function delegateCall(address _destination, uint256 _value, bytes _data) public {
+    function delegateCall(address _destination, uint256 _value, bytes memory _data) public {
         require(identityKeys[msg.sender]!=address(0));
         AlastriaProxy identity = AlastriaProxy(address(identityKeys[msg.sender]));
         identity.forward(_destination,_value,_data);

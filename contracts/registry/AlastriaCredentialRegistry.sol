@@ -1,4 +1,4 @@
-pragma solidity 0.4.23;
+pragma solidity 0.6.6;
 
 
 contract AlastriaCredentialRegistry {
@@ -62,7 +62,7 @@ contract AlastriaCredentialRegistry {
         previousPublishedVersion = _previousPublishedVersion;
     }
 
-    function addSubjectCredential(bytes32 subjectCredentialHash, string URI) public {
+    function addSubjectCredential(bytes32 subjectCredentialHash, string memory URI) public {
         require(!subjectCredentialRegistry[msg.sender][subjectCredentialHash].exists);
         subjectCredentialRegistry[msg.sender][subjectCredentialHash] = SubjectCredential(true, Status.Valid, URI);
         subjectCredentialList[msg.sender].push(subjectCredentialHash);
@@ -90,7 +90,7 @@ contract AlastriaCredentialRegistry {
         return (value.exists, value.status);
     }
 
-    function getSubjectCredentialList(address subject) public view returns (uint, bytes32[]) {
+    function getSubjectCredentialList(address subject) public view returns (uint, bytes32[] memory) {
         return (subjectCredentialList[subject].length, subjectCredentialList[subject]);
     }
 
