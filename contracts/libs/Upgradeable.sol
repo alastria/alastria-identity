@@ -8,9 +8,9 @@ contract Upgradeable {
     
     /** 
      * Dev: The constructor must be called as a modifier in the main contract
-     * @_lastVersion the address of the contract being upgraded
+     * @param _lastVersion the address of the contract being upgraded
      */ 
-    constructor (address _lastVersion) public {
+    constructor (address _lastVersion) internal {
         lastVersion = _lastVersion;
         if(_lastVersion == address(0)){
             migrated = false;
@@ -32,7 +32,7 @@ contract Upgradeable {
      * Dev: this modifier should be added in all the functions of the main contract
      */
     modifier isLastVersion(){
-        require(!migrated && !isMigrating);
+        require(!migrated && !isMigrating, "UPGRADEABLE: the contract called is not the last version");
         _;
     }
     
@@ -53,10 +53,12 @@ contract Upgradeable {
 
     /**
      * Dev: this method must be public to be called by the last version to finish the migration
+     * @param _versionIndex set the numeric index for version
      */
-    function setNewVersion(uint256 _version) public {
-        require(msg.sender == lastVersion);
-        version = _version; 
+    function setNewVersion(uint256 _versionIndex) public {
+        require(msg.sender == lastVersion, "UPGRADEABLE: only last version can set the new version index");
+        require(_versionIndex > version, "UPGRADEABLE: new version must be higher than previus version");
+        version = _versionIndex; 
         isMigrating = false;
 
     }
