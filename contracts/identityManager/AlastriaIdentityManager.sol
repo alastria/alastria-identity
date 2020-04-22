@@ -1,4 +1,4 @@
-pragma solidity 0.6.6;
+pragma solidity 0.5.17;
 
 import "./AlastriaIdentityServiceProvider.sol";
 import "./AlastriaIdentityIssuer.sol";
@@ -73,7 +73,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     function recoverAccount(address accountLost, address newAccount) public onlyIdentityIssuer(msg.sender) {
         identityKeys[newAccount] = identityKeys[accountLost];
         identityKeys[accountLost] = address(0);
-        IdentityRecovered(accountLost,newAccount,msg.sender);
+        emit IdentityRecovered(accountLost,newAccount,msg.sender);
     }
 
     //Internals TODO: warning recommending change visibility to pure

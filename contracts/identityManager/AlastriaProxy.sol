@@ -1,4 +1,4 @@
-pragma solidity 0.6.6;
+pragma solidity 0.5.17;
 
 import "../libs/Owned.sol";
 
@@ -12,7 +12,7 @@ contract AlastriaProxy is Owned {
     //    owner = msg.sender;
     //}
 
-    fallback() external {
+    function () external {
         revert();
     }
 
