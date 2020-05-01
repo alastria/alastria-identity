@@ -40,12 +40,15 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     }
 
     //Constructor
-    constructor (uint256 _version) public{
+    constructor (uint256 _version, address _alastriaCredentialRegistry, 
+                 address _alastriaPresentationRegistry, 
+                 address _alastriaPublicKeyRegistry) 
+    public{
         //TODO require(_version > getPreviousVersion(_previousVersion));
         version = _version;
-        alastriaCredentialRegistry = new AlastriaCredentialRegistry(address(0));
-        alastriaPresentationRegistry = new AlastriaPresentationRegistry(address(0));
-        alastriaPublicKeyRegistry = new AlastriaPublicKeyRegistry(address(0));
+        alastriaCredentialRegistry = AlastriaCredentialRegistry(_alastriaCredentialRegistry);
+        alastriaPresentationRegistry = AlastriaPresentationRegistry(_alastriaPresentationRegistry);
+        alastriaPublicKeyRegistry = AlastriaPublicKeyRegistry(_alastriaPublicKeyRegistry);
     }
 
     //Methods
