@@ -1,9 +1,9 @@
-pragma solidity 0.4.23;
+pragma solidity 0.6.4;
 
 import "../libs/Owned.sol";
 
 contract AlastriaProxy is Owned {
-    address public owner;
+//    address public owner;
 
     event Forwarded (address indexed destination, uint value, bytes data);
 
@@ -12,12 +12,22 @@ contract AlastriaProxy is Owned {
         owner = msg.sender;
     }
 
-    function () payable public{
-        revert();
+//    function () payable external {
+//        revert();
+//    }
+
+// payable deleted 
+    fallback () payable external {  
+        revert(); 
     }
 
-    function forward(address destination, uint value, bytes data) public onlyOwner {
-        require(destination.call.value(value)(data));
-        emit Forwarded(destination, value, data);
+    function forward(address destination, uint value, bytes memory data) public onlyOwner {
+        (bool success, bytes memory returnData) = destination.call.value(value)(data);
+	//destination.call.value(value);
+	require(success);
+        emit Forwarded(destination, value, returnData);
+
+        //require(destination.call.value(value)(data));
     }
 }
+
