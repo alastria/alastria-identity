@@ -1,4 +1,4 @@
-pragma solidity 0.4.23;
+pragma solidity 0.6.4;
 
 
 contract AlastriaPublicKeyRegistry {
@@ -74,7 +74,7 @@ contract AlastriaPublicKeyRegistry {
         }
     }
 
-    function getCurrentPublicKey(address subject) view public validAddress(subject) returns (string) {
+    function getCurrentPublicKey(address subject) view public validAddress(subject) returns (string memory) {
         if (publicKeyList[subject].length > 0) {
             return publicKeyList[subject][publicKeyList[subject].length - 1];
         } else {
