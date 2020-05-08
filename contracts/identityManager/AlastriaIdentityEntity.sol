@@ -1,4 +1,4 @@
-pragma solidity 0.4.23;
+pragma solidity 0.6.4;
 
 import "../libs/Eidas.sol";
 
@@ -29,8 +29,8 @@ contract AlastriaIdentityEntity {
     }
    
     constructor () public {
-        IdentityEntity storage identityEntity;
-        identityEntity.active = true;
+        IdentityEntity memory identityEntity = IdentityEntity({name: '', cif: '', url_logo: '', url_createAID: '', url_AOA: '',active: true});
+//        identityEntity.active = true;
 	    entities[msg.sender] = identityEntity;
     }
     
@@ -45,7 +45,7 @@ contract AlastriaIdentityEntity {
     * @param _url_AOA the url that contains the AOA of the entity
     * @param _active a flag that shows if a entity is active or not
     */ 
-    function addEntity(address _addressEntity, string _name, string _cif, string _url_logo, string _url_createAID, string _url_AOA, bool _active) public notIdentityEntity(_addressEntity) onlyIdentityEntity(msg.sender) {
+    function addEntity(address _addressEntity, string memory _name, string memory _cif, string memory _url_logo, string memory _url_createAID, string memory _url_AOA, bool _active) public notIdentityEntity(_addressEntity) onlyIdentityEntity(msg.sender) {
          IdentityEntity storage identityEntity = entities[_addressEntity];
          listEntities.push(_addressEntity);
          entities[_addressEntity].name = _name;
@@ -61,7 +61,7 @@ contract AlastriaIdentityEntity {
     * @param _addressEntity the address that identify the entity in the blockchain
     * @param _name the new name of the entity
     */
-    function setNameEntity(address _addressEntity, string _name) public onlyIdentityEntity(_addressEntity) {
+    function setNameEntity(address _addressEntity, string memory _name) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].name = _name;
     }
     
@@ -70,7 +70,7 @@ contract AlastriaIdentityEntity {
     * @param _addressEntity the address that identify the entity in the blockchain
     * @param _cif the new cif of the entity
     */
-    function setCifEntity(address _addressEntity, string _cif) public onlyIdentityEntity(_addressEntity) {
+    function setCifEntity(address _addressEntity, string memory _cif) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].cif = _cif;
     }
     
@@ -79,7 +79,7 @@ contract AlastriaIdentityEntity {
     * @param _addressEntity the address that identify the entity in the blockchain
     * @param _url_logo the new url that contains the logo of the entity
     */
-    function setUrlLogo(address _addressEntity, string _url_logo) public onlyIdentityEntity(_addressEntity) {
+    function setUrlLogo(address _addressEntity, string memory _url_logo) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].url_logo = _url_logo;
     }
     
@@ -88,7 +88,7 @@ contract AlastriaIdentityEntity {
     * @param _addressEntity the address that identify the entity in the blockchain
     * @param _url_createAID the new url that contains the Alastria ID of the entity
     */
-    function setUrlCreateAID(address _addressEntity, string _url_createAID) public onlyIdentityEntity(_addressEntity) {
+    function setUrlCreateAID(address _addressEntity, string memory _url_createAID) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].url_createAID = _url_createAID;
     }
     
@@ -97,16 +97,16 @@ contract AlastriaIdentityEntity {
     * @param _addressEntity the address that identify the entity in the blockchain
     * @param _url_AOA the new url that contains the AOA of the entity
     */
-    function setUrlAOA(address _addressEntity, string _url_AOA) public onlyIdentityEntity(_addressEntity) {
+    function setUrlAOA(address _addressEntity, string memory _url_AOA) public onlyIdentityEntity(_addressEntity) {
         entities[_addressEntity].url_AOA = _url_AOA;
     }
 
     /**
     * @dev function that returns all the information of a entity
     * @param _addressEntity the address that identify the entity in the blockchain
-    * @return _name, _cif, _url_logo, _url_createAID, _url_AOA, _active of the entity you pass to the functions as a parameter
+    * return _name, _cif, _url_logo, _url_createAID, _url_AOA, _active of the entity you pass to the functions as a parameter
     */
-    function getEntity(address _addressEntity) public view returns(string _name, string _cif, string _url_logo, string _url_createAID, string _url_AOA, bool _active){
+    function getEntity(address _addressEntity) public view returns(string memory _name, string memory _cif, string memory _url_logo, string memory _url_createAID, string memory _url_AOA, bool _active){
         _name = entities[_addressEntity].name;
         _cif = entities[_addressEntity].cif;
         _url_logo = entities[_addressEntity].url_logo;
@@ -119,7 +119,7 @@ contract AlastriaIdentityEntity {
     * @dev function that return the list of entities that are registered in the blockchain
     * @return array of address of entities
     */
-    function entitiesList() public view returns(address[]){
+    function entitiesList() public view returns(address[] memory){
         return listEntities;
     } 
 
