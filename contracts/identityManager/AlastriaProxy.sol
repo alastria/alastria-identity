@@ -1,25 +1,20 @@
 pragma solidity 0.5.17;
 
-import "../libs/Owned.sol";
+import "../libs/Ownable.sol";
 
-contract AlastriaProxy is Owned {
-    //address public owner;
+contract AlastriaProxy is Ownable {
 
     event Forwarded (address indexed destination, uint value, bytes data);
-
-    //TODO: upgradeable owner for version in Identity Manager
-    //constructor () public {
-    //    owner = msg.sender;
-    //}
+    string public reason;
 
     function () external {
         revert();
     }
 
-    function forward(address destination, uint value, bytes memory data) public onlyOwner {
-        bool ret; 
-        (ret, ) = destination.call.value(value)(data);
-        require(ret);
-        emit Forwarded(destination, value, data);
+    function forward(address destination, bytes memory data) public payable onlyOwner returns(bytes memory){
+        (bool success, bytes memory returnData) = destination.call.value(msg.value)(data);
+        require(success);
+        emit Forwarded(destination, msg.value, data);
+        return returnData;
     }
 }
