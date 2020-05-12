@@ -22,6 +22,8 @@
   "author": "Alastria",
   "license": "MIT",
   "dependencies": {
+    "@openzeppelin/cli": "^2.8.2",
+    "@openzeppelin/contracts-ethereum-package": "^2.5.0",
     "async": "^2.1.4",
     "easyweb3": "^1.1.4",
     "ethjs-abi": "^0.1.8",
