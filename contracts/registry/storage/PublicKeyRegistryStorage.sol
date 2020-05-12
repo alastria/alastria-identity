@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 import "../../libs/Ownable.sol";
 import "../interfaces/InterfacePublicKeyRegistryStorage.sol";
 
-contract PresentationRegistryStorage is Ownable, InterfacePresentationRegistryStorage_v0 {
+contract PublicKeyRegistryStorage is Ownable, InterfacePublicKeyRegistryStorage_v0 {
 
   mapping(address => mapping(bytes32 => PublicKey)) private publicKeyRegistry;
   mapping(address => bytes32[]) private publicKeyList;
