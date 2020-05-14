@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import "../openzeppelin/initializable.sol";
+import "../openzeppelin/Initializable.sol";
 
 contract AlastriaCredentialRegistry is Initializable {
 
