@@ -8,8 +8,10 @@ import "../registry/AlastriaCredentialRegistry.sol";
 import "../registry/AlastriaPresentationRegistry.sol";
 import "../registry/AlastriaPublicKeyRegistry.sol";
 import "../libs/Owned.sol";
+import "../openzeppelin/Initializable.sol";
 
-contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIdentityIssuer, AlastriaIdentityEntity, Owned {
+contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIdentityIssuer, Owned, Initializable {
+
     //Variables
     uint256 public version;
     uint internal timeToLive = 10000;
@@ -40,15 +42,11 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     }
 
     //Constructor
-    constructor (uint256 _version, address _alastriaCredentialRegistry, 
-                 address _alastriaPresentationRegistry, 
-                 address _alastriaPublicKeyRegistry) 
-    public{
+    function initialize (address _credentialRegistry, address _publicKeyRegistry, address _presentationRegistry) public initializer {
         //TODO require(_version > getPreviousVersion(_previousVersion));
-        version = _version;
-        alastriaCredentialRegistry = AlastriaCredentialRegistry(_alastriaCredentialRegistry);
-        alastriaPresentationRegistry = AlastriaPresentationRegistry(_alastriaPresentationRegistry);
-        alastriaPublicKeyRegistry = AlastriaPublicKeyRegistry(_alastriaPublicKeyRegistry);
+        alastriaCredentialRegistry = AlastriaCredentialRegistry(_credentialRegistry);
+        alastriaPresentationRegistry = AlastriaPresentationRegistry(_presentationRegistry);
+        alastriaPublicKeyRegistry = AlastriaPublicKeyRegistry(_publicKeyRegistry);
     }
 
     //Methods

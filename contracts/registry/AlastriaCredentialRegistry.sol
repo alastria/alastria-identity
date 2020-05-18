@@ -1,7 +1,8 @@
 pragma solidity 0.5.17;
 
+import "../openzeppelin/Initializable.sol";
 
-contract AlastriaCredentialRegistry {
+contract AlastriaCredentialRegistry is Initializable {
 
     // SubjectCredential are registered under Hash(Credential) in a (subject, hash) mapping
     // IssuerCredentials are registered under Hash (Credentials + SubjectCredentialSignature) in a (issuer, hash) mapping
@@ -57,7 +58,8 @@ contract AlastriaCredentialRegistry {
     }
 
     // Functions
-    constructor (address _previousPublishedVersion) public {
+    // Constructor
+    function initialize(address _previousPublishedVersion) public initializer {
         version = 3;
         previousPublishedVersion = _previousPublishedVersion;
     }
