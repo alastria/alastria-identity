@@ -1,7 +1,9 @@
 pragma solidity 0.5.17;
 
+import "../openzeppelin/Initializable.sol";
 
-contract AlastriaPublicKeyRegistry {
+
+contract AlastriaPublicKeyRegistry is Initializable{
 
     // This contracts registers and makes publicly avalaible the AlastriaID Public Keys hash and status, current and past.
 
@@ -35,9 +37,8 @@ contract AlastriaPublicKeyRegistry {
         _;
     }
 
-    //Functions
-    constructor (address _previousPublishedVersion) public {
-        version = 3;
+    function initialize(address _previousPublishedVersion) initializer public{
+        version = 4;
         previousPublishedVersion = _previousPublishedVersion;
     }
 
