@@ -1,4 +1,4 @@
-pragma solidity 0.4.23;
+pragma solidity 0.5.17;
 
 import "../libs/Eidas.sol";
 
@@ -31,7 +31,7 @@ contract AlastriaIdentityServiceProvider {
         providers[_identityServiceProvider] = false;
     }
 
-    function isIdentityServiceProvider(address _identityServiceProvider) public constant returns (bool) {
+    function isIdentityServiceProvider(address _identityServiceProvider) public view returns (bool) {
         return providers[_identityServiceProvider];
     }
 

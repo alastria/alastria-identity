@@ -1,7 +1,8 @@
-pragma solidity 0.4.23;
+pragma solidity 0.5.17;
 
+import "../openzeppelin/Initializable.sol";
 
-contract AlastriaCredentialRegistry {
+contract AlastriaCredentialRegistry is Initializable {
 
     // SubjectCredential are registered under Hash(Credential) in a (subject, hash) mapping
     // IssuerCredentials are registered under Hash (Credentials + SubjectCredentialSignature) in a (issuer, hash) mapping
@@ -39,6 +40,7 @@ contract AlastriaCredentialRegistry {
 
     // Mapping issuer, hash (JSON credential + CredentialSignature)
     mapping(address => mapping(bytes32 => IssuerCredential)) private issuerCredentialRegistry;
+    mapping(address => bytes32[]) public issuerCredentialList;
 
     // Events. Just for changes, not for initial set
     event SubjectCredentialDeleted (bytes32 subjectCredentialHash);
@@ -56,15 +58,22 @@ contract AlastriaCredentialRegistry {
     }
 
     // Functions
-    constructor (address _previousPublishedVersion) public {
+    // Constructor
+    function initialize(address _previousPublishedVersion) public initializer {
         version = 3;
         previousPublishedVersion = _previousPublishedVersion;
     }
 
-    function addSubjectCredential(bytes32 subjectCredentialHash, string URI) public {
+    function addSubjectCredential(bytes32 subjectCredentialHash, string memory URI) public {
         require(!subjectCredentialRegistry[msg.sender][subjectCredentialHash].exists);
         subjectCredentialRegistry[msg.sender][subjectCredentialHash] = SubjectCredential(true, Status.Valid, URI);
         subjectCredentialList[msg.sender].push(subjectCredentialHash);
+    }
+
+    function addIssuerCredential(bytes32 issuerCredentialHash) public {
+        require(!issuerCredentialRegistry[msg.sender][issuerCredentialHash].exists);
+        issuerCredentialRegistry[msg.sender][issuerCredentialHash] = IssuerCredential(true, Status.Valid);
+        issuerCredentialList[msg.sender].push(issuerCredentialHash);
     }
 
     function deleteSubjectCredential(bytes32 subjectCredentialHash) public {
@@ -83,7 +92,7 @@ contract AlastriaCredentialRegistry {
         return (value.exists, value.status);
     }
 
-    function getSubjectCredentialList(address subject) public view returns (uint, bytes32[]) {
+    function getSubjectCredentialList(address subject) public view returns (uint, bytes32[] memory) {
         return (subjectCredentialList[subject].length, subjectCredentialList[subject]);
     }
 

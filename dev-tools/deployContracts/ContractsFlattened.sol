@@ -125,14 +125,13 @@ contract AlastriaIdentityIssuer {
 	IdentityIssuer storage identityIssuer;
         identityIssuer.level = Eidas.EidasLevel.High;
         identityIssuer.active = true;
-	issuers[msg.sender] = identityIssuer;
+	    issuers[msg.sender] = identityIssuer;
     }
 
-    function addIdentityIssuer(address _identityIssuer, Eidas.EidasLevel _level) public alLeastLow(_level) notIdentityIssuer(_identityIssuer) {
+    function addIdentityIssuer(address _identityIssuer, Eidas.EidasLevel _level) public alLeastLow(_level) notIdentityIssuer(_identityIssuer) onlyIdentityIssuer(msg.sender) {
         IdentityIssuer storage identityIssuer = issuers[_identityIssuer];
         identityIssuer.level = _level;
         identityIssuer.active = true;
-
     }
 
     function updateIdentityIssuerEidasLevel(address _identityIssuer, Eidas.EidasLevel _level) public alLeastLow(_level) onlyIdentityIssuer(_identityIssuer) {
@@ -148,6 +147,10 @@ contract AlastriaIdentityIssuer {
 
     function getEidasLevel(address _identityIssuer) public constant onlyIdentityIssuer(_identityIssuer) returns (Eidas.EidasLevel) {
         return issuers[_identityIssuer].level;
+    }
+    
+     function isIdentityIssuer(address _identityIssuer) public constant returns (bool) {
+        return issuers[_identityIssuer].active;
     }
 
 }
@@ -203,6 +206,90 @@ contract AlastriaProxy is Owned {
     }
 }
 
+// File: contracts/identityManager/AlastriaIdentityEntity.sol
+
+pragma solidity 0.4.23;
+
+
+contract AlastriaIdentityEntity {
+
+    using Eidas for Eidas.EidasLevel;
+
+    struct IdentityEntity {  
+        string name;
+        string cif;
+        string url_logo;
+        string url_createAID;
+        string url_AOA;
+        bool active;
+    }
+
+    mapping(address => IdentityEntity) internal entities;
+    address[] listEntities;
+
+    modifier onlyIdentityEntity(address _identityEntity) {
+        require (entities[_identityEntity].active == true);
+        _;
+    }
+    
+     modifier notIdentityEntity(address _identityEntity) {
+        require (!entities[_identityEntity].active);
+        _;
+    }
+   
+    constructor () public {
+        IdentityEntity storage identityEntity;
+        identityEntity.active = true;
+	    entities[msg.sender] = identityEntity;
+    }
+    
+    function addEntity(address _addressEntity, string _name, string _cif, string _url_logo, string _url_createAID, string _url_AOA, bool _active) public notIdentityEntity(_addressEntity) onlyIdentityEntity(msg.sender) {
+         IdentityEntity storage identityEntity = entities[_addressEntity];
+         listEntities.push(_addressEntity);
+         entities[_addressEntity].name = _name;
+         entities[_addressEntity].cif = _cif;
+         entities[_addressEntity].url_logo = _url_logo;
+         entities[_addressEntity].url_createAID = _url_createAID;
+         entities[_addressEntity].url_AOA = _url_AOA;
+         entities[_addressEntity].active = _active;
+    }
+    
+    function setNameEntity(address _addressEntity, string _name) public onlyIdentityEntity(_addressEntity) {
+        entities[_addressEntity].name = _name;
+    }
+    
+    function setCifEntity(address _addressEntity, string _cif) public onlyIdentityEntity(_addressEntity) {
+        entities[_addressEntity].cif = _cif;
+    }
+    
+    function setUrlLogo(address _addressEntity, string _url_logo) public onlyIdentityEntity(_addressEntity) {
+        entities[_addressEntity].url_logo = _url_logo;
+    }
+    
+    function setUrlCreateAID(address _addressEntity, string _url_createAID) public onlyIdentityEntity(_addressEntity) {
+        entities[_addressEntity].url_createAID = _url_createAID;
+    }
+    
+    function setUrlAOA(address _addressEntity, string _url_AOA) public onlyIdentityEntity(_addressEntity) {
+        entities[_addressEntity].url_AOA = _url_AOA;
+    }
+
+    
+    function getEntity(address _addressEntity) public view returns(string _name, string _cif, string _url_logo, string _url_createAID, string _url_AOA, bool _active){
+        _name = entities[_addressEntity].name;
+        _cif = entities[_addressEntity].cif;
+        _url_logo = entities[_addressEntity].url_logo;
+        _url_createAID = entities[_addressEntity].url_createAID;
+        _url_AOA = entities[_addressEntity].url_AOA;
+        _active = entities[_addressEntity].active;
+    }
+    
+    function entitiesList() public view returns(address[]){
+        return listEntities;
+    } 
+
+}
+
 // File: contracts/registry/AlastriaCredentialRegistry.sol
 
 pragma solidity 0.4.23;
@@ -246,6 +333,7 @@ contract AlastriaCredentialRegistry {
 
     // Mapping issuer, hash (JSON credential + CredentialSignature)
     mapping(address => mapping(bytes32 => IssuerCredential)) private issuerCredentialRegistry;
+    mapping(address => bytes32[]) public issuerCredentialList;
 
     // Events. Just for changes, not for initial set
     event SubjectCredentialDeleted (bytes32 subjectCredentialHash);
@@ -272,6 +360,12 @@ contract AlastriaCredentialRegistry {
         require(!subjectCredentialRegistry[msg.sender][subjectCredentialHash].exists);
         subjectCredentialRegistry[msg.sender][subjectCredentialHash] = SubjectCredential(true, Status.Valid, URI);
         subjectCredentialList[msg.sender].push(subjectCredentialHash);
+    }
+
+    function addIssuerCredential(bytes32 issuerCredentialHash) public {
+        require(!issuerCredentialRegistry[msg.sender][issuerCredentialHash].exists);
+        issuerCredentialRegistry[msg.sender][issuerCredentialHash] = IssuerCredential(true, Status.Valid);
+        issuerCredentialList[msg.sender].push(issuerCredentialHash);
     }
 
     function deleteSubjectCredential(bytes32 subjectCredentialHash) public {
@@ -580,7 +674,8 @@ pragma solidity 0.4.23;
 
 
 
-contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIdentityIssuer, Owned {
+
+contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIdentityIssuer, AlastriaIdentityEntity, Owned {
     //Variables
     uint256 public version;
     uint internal timeToLive = 10000;
@@ -620,7 +715,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     }
 
     //Methods
-    function prepareAlastriaID(address _signAddress) public onlyIdentityServiceProvider(msg.sender) {
+    function prepareAlastriaID(address _signAddress) public onlyIdentityIssuer(msg.sender) {
         pendingIDs[_signAddress] = now + timeToLive;
         emit PreparedAlastriaID(_signAddress);
     }
@@ -641,7 +736,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
         identity.forward(_destination,_value,_data);
     }
 
-    function recoverAccount(address accountLost, address newAccount) public onlyIdentityServiceProvider(msg.sender) {
+    function recoverAccount(address accountLost, address newAccount) public onlyIdentityIssuer(msg.sender) {
         identityKeys[newAccount] = identityKeys[accountLost];
         identityKeys[accountLost] = address(0);
         IdentityRecovered(accountLost,newAccount,msg.sender);

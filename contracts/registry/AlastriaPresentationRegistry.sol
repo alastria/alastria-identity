@@ -1,4 +1,4 @@
-pragma solidity 0.4.23;
+pragma solidity 0.5.17;
 
 
 contract AlastriaPresentationRegistry {
@@ -78,7 +78,7 @@ contract AlastriaPresentationRegistry {
 
     //
     //Subject functions
-    function addSubjectPresentation(bytes32 subjectPresentationHash, string URI) public {
+    function addSubjectPresentation(bytes32 subjectPresentationHash, string memory URI) public {
         require(!subjectPresentationRegistry[msg.sender][subjectPresentationHash].exists);
         subjectPresentationRegistry[msg.sender][subjectPresentationHash] = SubjectPresentation(true, Status.Valid, URI);
         subjectPresentationListRegistry[msg.sender].push(subjectPresentationHash);
@@ -106,7 +106,7 @@ contract AlastriaPresentationRegistry {
         return (value.exists, value.status);
     }
 
-    function getSubjectPresentationList(address subject) public view returns (uint, bytes32[]) {
+    function getSubjectPresentationList(address subject) public view returns (uint, bytes32[] memory) {
         return (subjectPresentationListRegistry[subject].length, subjectPresentationListRegistry[subject]);
     }
 

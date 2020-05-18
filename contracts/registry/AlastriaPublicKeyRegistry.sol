@@ -1,4 +1,4 @@
-pragma solidity 0.4.23;
+pragma solidity 0.5.17;
 
 
 contract AlastriaPublicKeyRegistry {
@@ -74,7 +74,7 @@ contract AlastriaPublicKeyRegistry {
         }
     }
 
-    function getCurrentPublicKey(address subject) view public validAddress(subject) returns (string) {
+    function getCurrentPublicKey(address subject) view public validAddress(subject) returns (string memory) {
         if (publicKeyList[subject].length > 0) {
             return publicKeyList[subject][publicKeyList[subject].length - 1];
         } else {
@@ -89,7 +89,7 @@ contract AlastriaPublicKeyRegistry {
     }
     
     function getKeyHash(string memory inputKey) internal pure returns(bytes32){
-        return keccak256(inputKey);
+        return keccak256(abi.encodePacked(inputKey));
     }
 
 }
