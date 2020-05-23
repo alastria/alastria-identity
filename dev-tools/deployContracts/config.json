@@ -1,0 +1,22 @@
+{
+    "nodeURLAlastria": "http://63.33.206.111/rpc",
+    "nodeURLLocal": "http://127.0.0.1:8545",
+    "addressPwdLocal": "",
+    "addressPwdAlastria": "Passw0rd",
+    "contractEidas": "../../contracts/libs/Eidas.sol",
+    "contractManager": "./ContractsFlattened.sol",
+    "filesManager": [
+        "../../contracts/identityManager/AlastriaIdentityManager.sol"
+    ],
+    "filePath": "./ContractsFlattened.sol",
+    "symbolEidas": "__:Eidas________________________________",
+    "urlABI": "https://github.com/alastria/alastria-identity/blob/develop/contracts/abi/",
+    "abisPath": "../../contracts/abi/",
+    "contractInfoPath": "../../contracts/ContractInfo.md",
+    "addressPosition": 2,
+    "manager": "AlastriaIdentityManager",
+    "presentation": "AlastriaPresentationRegistry",
+    "credential": "AlastriaCredentialRegistry",
+    "publicKey": "AlastriaPublicKeyRegistry",
+    "eidas": "Eidas"
+}
