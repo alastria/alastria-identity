@@ -5,14 +5,22 @@ module.exports = {
       port: 8545,
       network_id: "*"
     },
-    'alastria': {
-      host: "35.176.19.89",
-      port: 22000,
+    'red-t': {
+      host: "http://63.33.206.111/rpc", //identity node
+      port: 80,
       network_id: "*",
       gas: 0xffffff,
       gasPrice: 0x0,
       from: "0xd65616c46a2e55957aff33e238b31bc568358e20"
     },
+    'red-b': {
+      host: "", //identiy node
+      port: 22000,
+      network_id: "*",
+      gas: 0xffffff,
+      gasPrice: 0x0,
+      from: "0xd65616c46a2e55957aff33e238b31bc568358e20"
+    }
 
   },
   compilers: {

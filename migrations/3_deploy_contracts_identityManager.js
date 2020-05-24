@@ -85,11 +85,6 @@ module.exports = async function(deployer, network, accounts) {
   await saveABIs(AlastriaIdentityIssuer)
   await saveAddresesInfo(identityIssuer.address, config.identityIssuer)
 
-  let alastriaProxy = await AlastriaProxy.new()
-  console.log("alastriaProxy deployed: ", alastriaProxy.address)
-  await saveABIs(AlastriaProxy)
-  await saveAddresesInfo(alastriaProxy.address , config.alastriaProxy)
-
   let identityEntity = await AlastriaIdentityEntity.new()
   console.log("identityEntity deployed: ", identityEntity.address)
   await saveABIs(AlastriaIdentityEntity)
@@ -101,27 +96,36 @@ module.exports = async function(deployer, network, accounts) {
 
   deployer.deploy(AlastriaIdentityManager, USER_TIME_LOCK, ADMIN_TIME_LOCK, ADMIN_RATE);*/
   let credentialRegistry = await AlastriaCredentialRegistry.new('0x0000000000000000000000000000000000000000')
-  console.log("credentialRegistry deployed: ", credentialRegistry.address)
+  let proxyCredentialRegistry = await Proxy.new(credentialRegistry.address, accounts[0], [])
+  credentialRegistry = await AlastriaCredentialRegistry.at(proxyCredentialRegistry.address)
+  await credentialRegistry.initialize('0x0000000000000000000000000000000000000000', {from: accounts[1]})
+  console.log("credentialRegistry deployed: ", proxyCredentialRegistry.address)
   await saveABIs(AlastriaCredentialRegistry)
-  await saveAddresesInfo(credentialRegistry.address, config.credential)
+  await saveAddresesInfo(proxyCredentialRegistry.address, config.credential)
 
   let presentationRegistry = await AlastriaPresentationRegistry.new('0x0000000000000000000000000000000000000000')
-  console.log("presentationRegistry deployed: ", presentationRegistry.address)
+  let proxyPresentationRegistry = await Proxy.new(presentationRegistry.address, accounts[0], [])
+  presentationRegistry = await AlastriaPublicKeyRegistry.at(proxyPresentationRegistry.address)
+  await presentationRegistry.initialize('0x0000000000000000000000000000000000000000', {from: accounts[1]})
+  console.log("presentationRegistry deployed: ", proxyPresentationRegistry.address)
   await saveABIs(AlastriaPresentationRegistry)
-  await saveAddresesInfo(presentationRegistry.address, config.presentation)
+  await saveAddresesInfo(proxyPresentationRegistry.address, config.presentation)
 
   let publicKeyRegistry = await AlastriaPublicKeyRegistry.new()
-  let proxy = await Proxy.new(publicKeyRegistry.address, accounts[0], [])
-  publicKeyRegistry = await AlastriaPublicKeyRegistry.at(proxy.address)
+  let proxyPublicKeyRegistry = await Proxy.new(publicKeyRegistry.address, accounts[0], [])
+  publicKeyRegistry = await AlastriaPublicKeyRegistry.at(proxyPublicKeyRegistry.address)
   await publicKeyRegistry.initialize('0x0000000000000000000000000000000000000000', {from: accounts[1]})
-  console.log("publicKeyRegistry deployed: ", publicKeyRegistry.address)
+  console.log("publicKeyRegistry deployed: ", proxyPublicKeyRegistry.address)
   await saveABIs(AlastriaPublicKeyRegistry)
-  await saveAddresesInfo(publicKeyRegistry.address, config.publicKey)
+  await saveAddresesInfo(proxyPublicKeyRegistry.address, config.publicKey)
 
-  identityManager = await AlastriaIdentityManager.new(0, credentialRegistry.address, presentationRegistry.address, publicKeyRegistry.address);
-  console.log("identityManager deployed: ", identityManager.address)
+  let identityManager = await AlastriaIdentityManager.new();
+  let proxyIdentityManager = await Proxy.new(identityManager.address, accounts[0], [])
+  identityManager = await AlastriaIdentityManager.at(proxyIdentityManager.address)
+  await identityManager.initialize(proxyCredentialRegistry.address, proxyPresentationRegistry.address, proxyPublicKeyRegistry.address, {from: accounts[1]})
+  console.log("identityManager deployed: ", proxyIdentityManager.address)
   await saveABIs(AlastriaIdentityManager)
-  await saveAddresesInfo(identityManager.address, config.manager)
+  await saveAddresesInfo(proxyCredentialRegistry.address, config.manager)
 };
 
 

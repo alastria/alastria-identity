@@ -1,7 +1,9 @@
 pragma solidity 0.5.17;
 
+import "../openzeppelin/Initializable.sol";
 
-contract AlastriaPresentationRegistry {
+
+contract AlastriaPresentationRegistry is Initializable {
 
     // Subject Presentation actions are registered under subjectPresentationHash = hash(Presentation)
     // in a (subject, subjectPresentationHash) mapping
@@ -71,8 +73,8 @@ contract AlastriaPresentationRegistry {
     }
 
     // Functions
-    constructor (address _previousPublishedVersion) public {
-        version = 3;
+    function initialize(address _previousPublishedVersion) public initializer {
+        version = 4;
         previousPublishedVersion = _previousPublishedVersion;
     }
 
