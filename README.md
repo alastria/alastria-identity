@@ -2,11 +2,14 @@
 # ALASTRIA IDENTITY 0.1
 Self-sovereign identity (SSI) implementation on Alastria network.
 
-At this moment, this solution is being developed and tested for Quorum (Geth) on the Alastria T-Network. More information about its nodes and the network can be found in the [alastria-node repository](https://github.com/alastria/alastria-node). In the future, the objetive is that this works with other Alastria networks such as Parity or Hyperledger Fabric.
+At this moment, this solution has been developed and tested for Quorum (Geth) on the Alastria Red-T network. More information about its nodes and the network can be found in the [alastria-node repository](https://github.com/alastria/alastria-node). In the future, the objetive is that this works with other Alastria networks such as Besu Red-B or Hyperledger Fabric Red-H.
 
-A mobile Alastria Wallet on IONIC has been developed as a reference implementation to exploit and explore the self-sovereign identity concept. It has the logic for managing credentials to be stored and sended when required. Also, the app asks for user aceptance. Code is available on the [alastria-wallet repository](https://github.com/alastria/alastria-wallet).
+A mobile Alastria Wallet on IONIC has been developed as a reference implementation to exploit and explore the self-sovereign identity concept. It has the logic for managing credentials to be stored and sended when required. Also, the app asks for user aceptance. Code is available on the [alastria-wallet repository](https://github.com/alastria/alastria-wallet) where you can download an APK to install in your Android mobile phone for demo purposes.
 
-To interact with the identity contracts, there is a library to use from the wallet in the [alastria-identity-lib repository](https://github.com/alastria/alastria-identity-lib).
+To interact with the identity contracts, there is also a library to use from the wallet in the [alastria-identity-lib repository](https://github.com/alastria/alastria-identity-lib).
+
+And finally, if you are looking for a way to use it inside your Web page you can find information and examples in the [alastria-identity-examples repository](https://github.com/alastria/alastria-identity-example).
+
 
 ## Alastria Self-Sovereign Identity Model
 To deepen the model, you have all the information in [the wiki](https://github.com/alastria/alastria-identity/wiki). 
