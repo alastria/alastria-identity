@@ -11,6 +11,7 @@ var AlastriaCredentialRegistry = artifacts.require("contracts/registry/AlastriaC
 var AlastriaPresentationRegistry  = artifacts.require("contracts/registry/AlastriaPresentationRegistry.sol");
 var AlastriaPublicKeyRegistry = artifacts.require("contracts/registry/AlastriaPublicKeyRegistry.sol");
 var config = require('./config')
+import { ethers } from 'ethers';
 //const { encodeCall } = require('@openzeppelin/upgrades');
 
 
@@ -36,6 +37,8 @@ module.exports = async function(deployer, network, accounts) {
   }
 
   async function saveAddresesInfo(address, contracsName) {
+    // Should work, depends on the web3js version
+    let provider = new ethers.providers.Web3Provider(web3.currentProvider());
     if (network == 'development'){
       return
     }
@@ -66,6 +69,13 @@ module.exports = async function(deployer, network, accounts) {
 
   if (AlastriaIdentityManager.network_id === '19535753591') {
     web3.personal.unlockAccount(web3.eth.accounts[0], "Passw0rd");
+  } else if (AlastriaIdentityManager.network_id === 'IDfromBESU') {
+    const encWallet = JSON.parse(fs.readFileSync(path));
+    wallet = await ethers.Wallet.fromEncryptedJson(
+      JSON.stringify(encWallet),
+      'password'
+    );
+    wallet = wallet.connect(provider);
   }
 
   await saveABIs(Eidas)

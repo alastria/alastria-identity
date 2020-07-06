@@ -1,7 +1,7 @@
 module.exports = {
   networks: {
     'development': {
-      host: "localhost",
+      host: "127.0.0.1",
       port: 8545,
       network_id: "*"
     },
@@ -9,6 +9,7 @@ module.exports = {
       host: "http://63.33.206.111/rpc", //identity node
       port: 80,
       network_id: "*",
+      type: "quorum",
       gas: 0xffffff,
       gasPrice: 0x0,
       from: "0xd65616c46a2e55957aff33e238b31bc568358e20"
@@ -26,6 +27,13 @@ module.exports = {
   compilers: {
     solc: {
       version: "0.5.17", // A version or constraint - Ex. "^0.5.0"
+      settings: {
+        optimizer: {
+          enabled: true,
+          runs: 100   // Optimize for how many times you intend to run the code
+        },
+        evmVersion: "byzantium" // for T network
+      }
     }
   }
 
