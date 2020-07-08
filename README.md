@@ -1,5 +1,5 @@
 
-# ALASTRIA IDENTITY 0.1
+# ALASTRIA IDENTITY 1.0
 Self-sovereign identity (SSI) implementation on Alastria network.
 
 At this moment, this solution has been developed and tested for Quorum (Geth) on the Alastria Red-T network. More information about its nodes and the network can be found in the [alastria-node repository](https://github.com/alastria/alastria-node). In the future, the objetive is that this works with other Alastria networks such as Besu Red-B or Hyperledger Fabric Red-H.
@@ -63,7 +63,8 @@ On the dev-tools directory you can find some interesting functionalities for dev
 
 ## How to test AlastriaID compliant
 As the AlastriaID is a ID Model, plus an Reference Implementation of the SC and APIs and, additionally, a demo wallet and a demo entity provider, it is highly recommended that all the identity projects that will aim to use the AlastriaID Model or even the SC or the API, will pass a test to verify compatibility with the AlastriaID reference implementation.
-This test will be detailed soon to be used by all the projects.
+Please visit the documents to do an autocheck validation under the autocheck directory.
+A set of automated test will be detailed soon to be used also by all the projects.
 
 ## Need Help?
 Our identity core team will be happy to listen to you at [slack #identidaddigital](https://github.com/alastria/alastria-node/wiki/HELP)
