@@ -42,7 +42,7 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     }
 
     //Constructor
-    function initialize (address _credentialRegistry, address _publicKeyRegistry, address _presentationRegistry, address _issuer0, bytes addPublicKeyCallData) public initializer {
+    function initialize (address _credentialRegistry, address _publicKeyRegistry, address _presentationRegistry, address _issuer0, bytes memory addPublicKeyCallData) public initializer {
         //TODO require(_version > getPreviousVersion(_previousVersion));
         alastriaCredentialRegistry = AlastriaCredentialRegistry(_credentialRegistry);
         alastriaPresentationRegistry = AlastriaPresentationRegistry(_presentationRegistry);
