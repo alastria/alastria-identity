@@ -42,11 +42,14 @@ contract AlastriaIdentityManager is AlastriaIdentityServiceProvider, AlastriaIde
     }
 
     //Constructor
-    function initialize (address _credentialRegistry, address _publicKeyRegistry, address _presentationRegistry) public initializer {
+    function initialize (address _credentialRegistry, address _publicKeyRegistry, address _presentationRegistry, address _issuer0, bytes addPublicKeyCallData) public initializer {
         //TODO require(_version > getPreviousVersion(_previousVersion));
         alastriaCredentialRegistry = AlastriaCredentialRegistry(_credentialRegistry);
         alastriaPresentationRegistry = AlastriaPresentationRegistry(_presentationRegistry);
         alastriaPublicKeyRegistry = AlastriaPublicKeyRegistry(_publicKeyRegistry);
+        AlastriaProxy identity = new AlastriaProxy();
+        identityKeys[_issuer0] = address(identity);
+        identity.forward(address(alastriaPublicKeyRegistry), 0, addPublicKeyCallData);
     }
 
     //Methods
