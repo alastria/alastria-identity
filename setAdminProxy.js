@@ -26,6 +26,12 @@ module.exports = async function () {
     // addIdentityIssuer with the admin proxy address and eidas level
     const tx3 = await imInstance.addIdentityIssuer("0x7F4fbC3f46d6ece0eC8D05B41EaC195862c946d0", 3);
     console.log("tx3", tx3);
+    //addIdentityServiceProvider with the admin proxy address
+    const tx4 = await imInstance.addIdentityServiceProvider("0x7F4fbC3f46d6ece0eC8D05B41EaC195862c946d0");
+    console.log("tx4", tx4);
+    //addEntity
+    const tx5 = await imInstance.addEntity("0x7F4fbC3f46d6ece0eC8D05B41EaC195862c946d0", "Entidad1", "A-28964782", "www.entidad1.com/logo", "www.entidad1.com/AID", "www.entidad1.com/AOA", true);
+    console.log("tx5",tx5);  
   } catch (error) {
     console.log(error);
   }
