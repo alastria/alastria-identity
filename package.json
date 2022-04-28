@@ -22,7 +22,7 @@
   "author": "Alastria",
   "license": "MIT",
   "dependencies": {
-    "async": "^2.1.4",
+    "async": "^2.6.4",
     "easyweb3": "^1.1.4",
     "ethjs-abi": "^0.1.8",
     "ethjs-util": "^0.1.3",
