@@ -2,7 +2,7 @@
 
 Alastria provides a node in the T (GoQuorum, IBFT 1.0) and B (BESU, IBTF 2.0) networks for those developers who want to contribute to the AlastriaID project.
 
-Access to this node is not open: access must be requested through this form.
+Access to this node is not open: access must be requested through this [form](https://docs.google.com/forms/d/e/1FAIpQLSdtixEkTFZKSMrmfn68qJP2UXrqCwyQGyb3Nx92Jqajy8yzMA/viewform).
 
 This guide describes how to access this resource:
 
