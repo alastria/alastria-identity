@@ -34,10 +34,10 @@ There are some settings to consider for a successful connection:
 ![AlastriaT Network](./img/alastria-t-remix-version.jpg "AlastriaT Network")
 
 * Use HTTP as Web3 provider:
-![AlastriaB Network](./img/alastria-t-remix-http-provider.jpg "AlastriaB Network")
+![AlastriaB Network](./img/alastria-t-remix-http-provider.jpg "HTTP provider")
 
 * Or use Metamask as provider:
-![AlastriaB Network](./img/alastria-t-remix-deploy-metamask.jpg "AlastriaB Network")
+![Metamask provider](./img/alastria-t-remix-deploy-metamask.jpg "Metamask provider")
 
 ## Truffle
 
@@ -46,30 +46,27 @@ The connection to the node through Truffle is similar to those described above.
 These examples are based on the repository https://github.com/alastria/smart-contract-deployment:
 
 ```
- export SIGNER_PRIVATE_KEY=ae...
- export T_NODE_IP=https://red-t.alastria.io/v0/94...
- export B_NODE_IP=https://red-b.alastria.io/v0/94...
+$ export SIGNER_PRIVATE_KEY=ae...
+$ export T_NODE_IP=https://red-t.alastria.io/v0/94...
+$ export B_NODE_IP=https://red-b.alastria.io/v0/94...
 ```
 
 ```
-npm install --save-dev truffle ganache-cli @truffle/hdwallet-provider dotenv
+$ npm install --save-dev truffle ganache-cli @truffle/hdwallet-provider dotenv
 ```
 
 ```
-truffle migrate --network alastriat                                                                                   INT ✘  at 00:09:05  
+$ truffle migrate --network alastriat
 
 Compiling your contracts...
 ===========================
 > Everything is up to date, there is nothing to compile.
-
-
 
 Starting migrations...
 ======================
 > Network name:    'alastriat'
 > Network id:      83584648538
 > Block gas limit: 30000000 (0x1c9c380)
-
 
 2_deploy.js
 ===========
@@ -101,6 +98,3 @@ Summary
 > Total deployments:   1
 > Final cost:          0 ETH
 ```
-
-
-
